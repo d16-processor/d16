@@ -32,7 +32,22 @@ int main(int argc, const char * argv[]) {
 }
 void print_elem(void* element, void* data){
     Instruction* i = (Instruction* ) element;
-    printf("%s\n",i->opcode);
+    switch (i->type) {
+        case I_TYPE_NONE:
+            printf("%s\n",i->opcode);
+            break;
+        case I_TYPE_R:
+            printf("%s r%d\n", i->opcode, i->rD);
+            break;
+        case I_TYPE_RR:
+            printf("%s r%d, r%d\n",i->opcode,i->rD, i->rS);
+            break;
+        case I_TYPE_RIMM:
+            printf("%s r%d, #%d\n",i->opcode,i->rD,i->immediate);
+            break;
+
+    }
+    
     free(i->opcode);
     free(element);
 }

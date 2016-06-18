@@ -11,5 +11,31 @@
 Instruction* new_instruction(char* string){
     Instruction* i = malloc(sizeof(Instruction));
     i->opcode = string;
+    i->type = I_TYPE_NONE;
     return i;
+}
+Instruction* new_instruction_r(char* string, int rD){
+    Instruction* i = malloc(sizeof(Instruction));
+    i->opcode = string;
+    i->rD = rD;
+    i->type= I_TYPE_R;
+    return i;
+
+}
+Instruction* new_instruction_rr(char* string, int rD, int rS){
+    Instruction* i = malloc(sizeof(Instruction));
+    i->opcode = string;
+    i->rD = rD;
+    i->rS = rS;
+    i->type= I_TYPE_RR;
+    return i;
+}
+Instruction* new_instruction_ri(char* string, int rD, int imm){
+    Instruction* i = malloc(sizeof(Instruction));
+    i->opcode = string;
+    i->rD = rD;
+    i->immediate = imm;
+    i->type= I_TYPE_RIMM;
+    return i;
+
 }

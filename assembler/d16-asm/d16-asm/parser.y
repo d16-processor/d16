@@ -12,15 +12,26 @@
 %union{
     char* sval;
     struct _GList* list;
+    int ival;
+    struct _Instruction* instr;
 }
+%token COMMA
 %token <sval> IDENTIFIER
+%token <ival> REGISTER IMMEDIATE
+%type <instr> instruction
 %type <list> program
 %start start
 %%
 start: program {print_list($1);};
 program:
-    program IDENTIFIER {$$=g_list_append($$, new_instruction(strdup($2)));}
+    program instruction {$$=g_list_append($$, $2);}
     | {$$=NULL;}
+;
+instruction:
+        IDENTIFIER {$$=new_instruction(strdup($1));}
+    |   IDENTIFIER REGISTER {$$=new_instruction_r(strdup($1),$2);}
+    |   IDENTIFIER REGISTER COMMA REGISTER{$$=new_instruction_rr(strdup($1),$2,$4);}
+    |   IDENTIFIER REGISTER COMMA IMMEDIATE{$$=new_instruction_ri(strdup($1),$2,$4);}
 ;
 
 

@@ -11,12 +11,23 @@
 
 #include <stdio.h>
 #include <glib.h>
-typedef struct{
+typedef enum{
+    I_TYPE_NONE,
+    I_TYPE_R,
+    I_TYPE_RR,
+    I_TYPE_RIMM
+}Instruction_Type;
+struct _Instruction{
     char* opcode;
     int rD;
     int rS;
     int immediate;
-}Instruction;
+    Instruction_Type type;
+};
+typedef struct _Instruction Instruction;
 
 Instruction* new_instruction(char*);
+Instruction* new_instruction_r(char*,int);
+Instruction* new_instruction_rr(char*,int,int);
+Instruction* new_instruction_ri(char*,int,int);
 #endif /* instruction_h */
