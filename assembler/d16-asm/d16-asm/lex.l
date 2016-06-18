@@ -15,6 +15,7 @@
 \x5d {printf("] Bracket\n");return RBRACKET;};
 [cC][rR][0-9][1-9]? {yylval.ival = atoi(yytext+2); return CP_REGISTER;}
 [rR][0-7] {yylval.ival = yytext[1] - '0'; return REGISTER;}
+
 nop {yylval.op = op(strdup(yytext),NOP); return OPCODE;};
 add {yylval.op = op(strdup(yytext),ADD); return OPCODE;};
 sub {yylval.op = op(strdup(yytext),SUB); return OPCODE;};
@@ -39,7 +40,8 @@ rcl {yylval.op = op(strdup(yytext),RCL); return OPCODE;};
 ldcp {yylval.op = op(strdup(yytext),LDCP); return OPCODE;};
 stcp {yylval.op = op(strdup(yytext),STCP); return OPCODE;};
 
-#-?[0-9]* {yylval.ival = atoi(yytext+1); return IMMEDIATE;}
+#-?[0-9]* {yylval.ival = atoi(yytext+1); return IMMEDIATE;};
+#0x[0-9a-fA-F]* {yylval.ival = strtol(yytext+1,NULL,16); return IMMEDIATE;};
 '[a-zA-z][a-zA-Z0-9]*' {printf("Identifier %s\n",yytext);yylval.sval = strdup(yytext); return IDENTIFIER;};
 . {return yytext[0];}
 
