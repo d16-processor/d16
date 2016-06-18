@@ -8,6 +8,6 @@
 
 #ifndef main_h
 #define main_h
-
-
+#include <glib.h>
+void print_list(struct _GList*);
 #endif /* main_h */
