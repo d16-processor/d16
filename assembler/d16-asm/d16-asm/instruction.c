@@ -42,10 +42,7 @@ struct _OP* op(char* str,enum _Op_Type op_type){
     return op;
 }
 
-Op_Type op_from_instruction(char* string, bool imm){
 
-    return  NOP;
-}
 Instruction* gen_instruction_internal(OP *op){
     Instruction* i = malloc(sizeof(Instruction));
     i->opcode = op->str;
@@ -76,6 +73,7 @@ Instruction* new_instruction_ri(OP* op, int rD, int imm){
     Instruction *i = gen_instruction_internal(op);
     i->rD = rD;
     i->immediate = imm;
+    i->op_type--;
     i->type= I_TYPE_RIMM;
     return i;
 

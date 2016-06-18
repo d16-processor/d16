@@ -31,12 +31,12 @@ program:
     | {$$=NULL;}
 ;
 instruction:
-        OPCODE {$$=new_instruction(strdup($1->str));}
-    |   OPCODE REGISTER {$$=new_instruction_r(strdup($1->str),$2);}
-    |   OPCODE REGISTER COMMA REGISTER{$$=new_instruction_rr(strdup($1->str),$2,$4);}
-    |   OPCODE REGISTER COMMA IMMEDIATE{$$=new_instruction_ri(strdup($1->str),$2,$4);}
-    |   OPCODE REGISTER COMMA CP_REGISTER {$$=new_instruction_rc(strdup($1->str),$2,$4);}
-    |   OPCODE CP_REGISTER COMMA REGISTER {$$=new_instruction_cr(strdup($1->str),$2,$4);}
+        OPCODE {$$=new_instruction($1);}
+    |   OPCODE REGISTER {$$=new_instruction_r($1,$2);}
+    |   OPCODE REGISTER COMMA REGISTER{$$=new_instruction_rr($1,$2,$4);}
+    |   OPCODE REGISTER COMMA IMMEDIATE{$$=new_instruction_ri($1,$2,$4);}
+    |   OPCODE REGISTER COMMA CP_REGISTER {$$=new_instruction_rc($1,$2,$4);}
+    |   OPCODE CP_REGISTER COMMA REGISTER {$$=new_instruction_cr($1,$2,$4);}
 ;
 
 
