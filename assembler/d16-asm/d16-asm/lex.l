@@ -2,10 +2,12 @@
     #include <stdio.h>
     #include "y.tab.h"
     #include "instruction.h"
+    #define YY_NO_INPUT
     extern int yylex();
 %}
 %option header-file="lex.yy.h"
 %option noyywrap
+%option nounput
 
 %%
 \n {return NEWLINE;};
@@ -41,7 +43,8 @@ ldcp {yylval.op = op(strdup(yytext),LDCP); return OPCODE;};
 stcp {yylval.op = op(strdup(yytext),STCP); return OPCODE;};
 
 #-?[0-9]* {yylval.ival = atoi(yytext+1); return IMMEDIATE;};
-#0x[0-9a-fA-F]* {yylval.ival = strtol(yytext+1,NULL,16); return IMMEDIATE;};
+#0x[0-9a-fA-F]* {yylval.ival = (int)strtol(yytext+1,NULL,16); return IMMEDIATE;};
+
 '[a-zA-z][a-zA-Z0-9]*' {printf("Identifier %s\n",yytext);yylval.sval = strdup(yytext); return IDENTIFIER;};
 . {return yytext[0];}
 

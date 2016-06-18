@@ -28,7 +28,7 @@
 %start start
 
 %%
-start: program {print_list($1);};
+start: program {process_list($1);};
 program:
     program instruction NEWLINE{$$=g_list_append($$, $2);}
     | {$$=NULL;}

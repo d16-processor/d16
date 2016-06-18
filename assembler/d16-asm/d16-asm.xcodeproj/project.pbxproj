@@ -10,7 +10,6 @@
 		0A4CA7461D14C01400BC8619 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7451D14C01400BC8619 /* main.c */; };
 		0A4CA74D1D14C03200BC8619 /* lex.l in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA74C1D14C03200BC8619 /* lex.l */; };
 		0A4CA74F1D14C03900BC8619 /* parser.y in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA74E1D14C03900BC8619 /* parser.y */; };
-		0A4CA7521D14C0EA00BC8619 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7511D14C0EA00BC8619 /* Makefile */; };
 		0A4CA7551D14C5A200BC8619 /* test.s in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0A4CA7531D14C43A00BC8619 /* test.s */; };
 		0A4CA7571D14C66700BC8619 /* libglib-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */; };
 		0A4CA75A1D14C70B00BC8619 /* instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7581D14C70B00BC8619 /* instruction.c */; };
@@ -145,7 +144,6 @@
 				0A4CA75A1D14C70B00BC8619 /* instruction.c in Sources */,
 				0A4CA74F1D14C03900BC8619 /* parser.y in Sources */,
 				0A4CA74D1D14C03200BC8619 /* lex.l in Sources */,
-				0A4CA7521D14C0EA00BC8619 /* Makefile in Sources */,
 				0A4CA7461D14C01400BC8619 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

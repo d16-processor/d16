@@ -93,7 +93,7 @@ void assemble_instruction(Instruction* i, uint16_t** data){
 
 
 }
-void print_list(struct _GList* list){
+void process_list(struct _GList* list){
     size_t output_size = 0;
     g_list_foreach(list, &print_elem, NULL);
     g_list_foreach(list, &sum_program_length , &output_size);
@@ -103,8 +103,10 @@ void print_list(struct _GList* list){
     uint16_t* buf_save = buffer;
     g_list_foreach(list, (void(*)(void*,void*))&assemble_instruction, &buffer);
     fwrite(buf_save, sizeof(uint16_t), output_size/2, output_file);
+    #ifdef DEBUG
     for(int i=0;i<output_size/2;i++){
         printf("0x%04x\n",buf_save[i]);
     }
+    #endif
     g_list_free_full(list, &free_elem);
 }
