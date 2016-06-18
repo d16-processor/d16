@@ -29,7 +29,7 @@ enum _Op_Type{
     PUSH,
     POP,
     MOVB,
-    MOVI=0x16,
+    MOVI=0x10,
     MOV,
     ANDI,
     AND,
@@ -80,5 +80,6 @@ Instruction* new_instruction_rr(OP*,int,int);
 Instruction* new_instruction_ri(OP*,int,int);
 Instruction* new_instruction_cr(OP*,int,int);
 Instruction* new_instruction_rc(OP*,int,int);
-
+int instruction_length(Instruction*);
+uint8_t build_reg_selector(Instruction *);
 #endif /* instruction_h */

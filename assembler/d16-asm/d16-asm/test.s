@@ -1,5 +1,2 @@
-nop
-add r0,#32
-push r1
-pop r2
-and r0,#128
+mov r4, #15
+mov r6, #1032

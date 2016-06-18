@@ -92,3 +92,26 @@ Instruction* new_instruction_rc(OP* op, int rD, int rS){
     i->type= I_TYPE_RC;
     return i;
 }
+uint8_t build_reg_selector(Instruction* i){
+    if(i->type == I_TYPE_RR){
+        return (i->rS & 0x7)<<3 | (i->rD &0x7);
+    }
+    else if(i->type == I_TYPE_R || i->type == I_TYPE_RIMM){
+        return i->rD & 0x7;
+    }
+    return 0;
+}
+int instruction_length(Instruction* i){
+    if(i->type == I_TYPE_RIMM){
+        if(i->op_type == MOVI && ((unsigned int)i->immediate) < 255 ){
+            i->op_type = MOVB;
+            return 1;
+        }
+        if(i->op_type == MOVB){
+            return 1;
+        }
+        return 2;
+    }
+
+    return 1;
+}

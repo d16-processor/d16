@@ -66,6 +66,10 @@
             argument = "test.s"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "output.o"
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
