@@ -17,7 +17,7 @@
 }
 %token COMMA
 %token <sval> IDENTIFIER
-%token <ival> REGISTER IMMEDIATE
+%token <ival> REGISTER IMMEDIATE CP_REGISTER
 %type <instr> instruction
 %type <list> program
 %start start
@@ -32,6 +32,8 @@ instruction:
     |   IDENTIFIER REGISTER {$$=new_instruction_r(strdup($1),$2);}
     |   IDENTIFIER REGISTER COMMA REGISTER{$$=new_instruction_rr(strdup($1),$2,$4);}
     |   IDENTIFIER REGISTER COMMA IMMEDIATE{$$=new_instruction_ri(strdup($1),$2,$4);}
+    |   IDENTIFIER REGISTER COMMA CP_REGISTER {$$=new_instruction_rc(strdup($1),$2,$4);}
+    |   IDENTIFIER CP_REGISTER COMMA REGISTER {$$=new_instruction_cr(strdup($1),$2,$4);}
 ;
 
 

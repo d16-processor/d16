@@ -39,3 +39,19 @@ Instruction* new_instruction_ri(char* string, int rD, int imm){
     return i;
 
 }
+Instruction* new_instruction_cr(char* string, int rD, int rS){
+    Instruction* i = malloc(sizeof(Instruction));
+    i->opcode = string;
+    i->rD = rD;
+    i->rS = rS;
+    i->type= I_TYPE_CR;
+    return i;
+}
+Instruction* new_instruction_rc(char* string, int rD, int rS){
+    Instruction* i = malloc(sizeof(Instruction));
+    i->opcode = string;
+    i->rD = rD;
+    i->rS = rS;
+    i->type= I_TYPE_RC;
+    return i;
+}

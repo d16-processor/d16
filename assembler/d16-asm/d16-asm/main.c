@@ -45,6 +45,12 @@ void print_elem(void* element, void* data){
         case I_TYPE_RIMM:
             printf("%s r%d, #%d\n",i->opcode,i->rD,i->immediate);
             break;
+        case I_TYPE_CR:
+            printf("%s cr%d, r%d\n",i->opcode,i->rD, i->rS);
+            break;
+        case I_TYPE_RC:
+            printf("%s r%d, cr%d\n", i->opcode, i->rD, i->rS);
+            break;
 
     }
     

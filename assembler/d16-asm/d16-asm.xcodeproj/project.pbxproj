@@ -11,18 +11,21 @@
 		0A4CA74D1D14C03200BC8619 /* lex.l in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA74C1D14C03200BC8619 /* lex.l */; };
 		0A4CA74F1D14C03900BC8619 /* parser.y in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA74E1D14C03900BC8619 /* parser.y */; };
 		0A4CA7521D14C0EA00BC8619 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7511D14C0EA00BC8619 /* Makefile */; };
-		0A4CA7541D14C43A00BC8619 /* test.s in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7531D14C43A00BC8619 /* test.s */; };
+		0A4CA7551D14C5A200BC8619 /* test.s in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0A4CA7531D14C43A00BC8619 /* test.s */; };
+		0A4CA7571D14C66700BC8619 /* libglib-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */; };
+		0A4CA75A1D14C70B00BC8619 /* instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7581D14C70B00BC8619 /* instruction.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		0A4CA7401D14C01400BC8619 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
+				0A4CA7551D14C5A200BC8619 /* test.s in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -34,6 +37,9 @@
 		0A4CA7501D14C0D600BC8619 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		0A4CA7511D14C0EA00BC8619 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		0A4CA7531D14C43A00BC8619 /* test.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = test.s; sourceTree = "<group>"; };
+		0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libglib-2.0.0.dylib"; path = "../../../../../../usr/local/Cellar/glib/2.46.2/lib/libglib-2.0.0.dylib"; sourceTree = "<group>"; };
+		0A4CA7581D14C70B00BC8619 /* instruction.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = instruction.c; sourceTree = "<group>"; };
+		0A4CA7591D14C70B00BC8619 /* instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instruction.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A4CA7571D14C66700BC8619 /* libglib-2.0.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +57,7 @@
 		0A4CA7391D14C01400BC8619 = {
 			isa = PBXGroup;
 			children = (
+				0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */,
 				0A4CA7441D14C01400BC8619 /* d16-asm */,
 				0A4CA7431D14C01400BC8619 /* Products */,
 			);
@@ -72,6 +80,8 @@
 				0A4CA74E1D14C03900BC8619 /* parser.y */,
 				0A4CA7511D14C0EA00BC8619 /* Makefile */,
 				0A4CA7531D14C43A00BC8619 /* test.s */,
+				0A4CA7581D14C70B00BC8619 /* instruction.c */,
+				0A4CA7591D14C70B00BC8619 /* instruction.h */,
 			);
 			path = "d16-asm";
 			sourceTree = "<group>";
@@ -132,7 +142,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A4CA7541D14C43A00BC8619 /* test.s in Sources */,
+				0A4CA75A1D14C70B00BC8619 /* instruction.c in Sources */,
 				0A4CA74F1D14C03900BC8619 /* parser.y in Sources */,
 				0A4CA74D1D14C03200BC8619 /* lex.l in Sources */,
 				0A4CA7521D14C0EA00BC8619 /* Makefile in Sources */,
@@ -227,6 +237,14 @@
 		0A4CA74A1D14C01400BC8619 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
+					"/usr/local/Cellar/glib/2.46.2/lib/glib-2.0/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/glib/2.46.2/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -234,6 +252,14 @@
 		0A4CA74B1D14C01400BC8619 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
+					"/usr/local/Cellar/glib/2.46.2/lib/glib-2.0/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/glib/2.46.2/lib,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

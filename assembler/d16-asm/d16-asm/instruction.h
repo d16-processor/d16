@@ -15,7 +15,9 @@ typedef enum{
     I_TYPE_NONE,
     I_TYPE_R,
     I_TYPE_RR,
-    I_TYPE_RIMM
+    I_TYPE_RIMM,
+    I_TYPE_RC,
+    I_TYPE_CR
 }Instruction_Type;
 struct _Instruction{
     char* opcode;
@@ -30,4 +32,6 @@ Instruction* new_instruction(char*);
 Instruction* new_instruction_r(char*,int);
 Instruction* new_instruction_rr(char*,int,int);
 Instruction* new_instruction_ri(char*,int,int);
+Instruction* new_instruction_cr(char*,int,int);
+Instruction* new_instruction_rc(char*,int,int);
 #endif /* instruction_h */
