@@ -54,11 +54,13 @@ void print_elem(void* element, void* data){
 
     }
     
-    free(i->opcode);
-    free(element);
 }
-
+void free_elem(void* element){
+    Instruction *i = (Instruction*)element;
+    free(i->opcode);
+    free(i);
+}
 void print_list(struct _GList* list){
     g_list_foreach(list, &print_elem, NULL);
-    g_list_free(list);
+    g_list_free_full(list, &free_elem);
 }

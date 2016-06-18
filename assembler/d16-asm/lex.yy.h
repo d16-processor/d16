@@ -314,7 +314,7 @@ extern int yylex (void);
 #undef YY_DECL
 #endif
 
-#line 13 "/Users/mnolan/programming/d16/assembler/d16-asm/d16-asm/lex.l"
+#line 23 "/Users/mnolan/programming/d16/assembler/d16-asm/d16-asm/lex.l"
 
 
 #line 321 "lex.yy.h"

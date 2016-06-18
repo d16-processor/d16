@@ -19,19 +19,66 @@ typedef enum{
     I_TYPE_RC,
     I_TYPE_CR
 }Instruction_Type;
+enum _Op_Type{
+    NOP=0,
+    ADDI,
+    ADD,
+    SUBI,
+    SUB,
+    PUSHI,
+    PUSH,
+    POP,
+    MOVB,
+    MOVI=0x16,
+    MOV,
+    ANDI,
+    AND,
+    ORI,
+    OR,
+    XORI,
+    XOR,
+    NOT,
+    NEG,
+    LDI,
+    LD,
+    STI,
+    ST,
+    CMPI,
+    CMP,
+    JMPI,
+    JMP,
+    CALLI,
+    CALL,
+    SPEC,
+    SHL,
+    SHR,
+    ROL,
+    RCL,
+    LDCP,
+    STCP
+} ;
+struct _OP{
+    char* str;
+    enum _Op_Type type;
+} ;
+typedef struct _OP OP;
+typedef enum _Op_Type Op_Type;
 struct _Instruction{
     char* opcode;
     int rD;
     int rS;
     int immediate;
+    Op_Type op_type;
     Instruction_Type type;
 };
 typedef struct _Instruction Instruction;
+struct _OP* op(char*,enum _Op_Type);
 
-Instruction* new_instruction(char*);
-Instruction* new_instruction_r(char*,int);
-Instruction* new_instruction_rr(char*,int,int);
-Instruction* new_instruction_ri(char*,int,int);
-Instruction* new_instruction_cr(char*,int,int);
-Instruction* new_instruction_rc(char*,int,int);
+Instruction* new_instruction(OP*);
+Instruction* new_instruction_r(OP*,int);
+Instruction* new_instruction_rr(OP*,int,int);
+Instruction* new_instruction_ri(OP*,int,int);
+Instruction* new_instruction_cr(OP*,int,int);
+Instruction* new_instruction_rc(OP*,int,int);
+
 #endif /* instruction_h */
