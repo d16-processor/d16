@@ -34,11 +34,12 @@
 		0A4CA74C1D14C03200BC8619 /* lex.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = lex.l; sourceTree = "<group>"; };
 		0A4CA74E1D14C03900BC8619 /* parser.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = parser.y; sourceTree = "<group>"; };
 		0A4CA7501D14C0D600BC8619 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
-		0A4CA7511D14C0EA00BC8619 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		0A4CA7531D14C43A00BC8619 /* test.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = test.s; sourceTree = "<group>"; };
 		0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libglib-2.0.0.dylib"; path = "../../../../../../usr/local/Cellar/glib/2.46.2/lib/libglib-2.0.0.dylib"; sourceTree = "<group>"; };
 		0A4CA7581D14C70B00BC8619 /* instruction.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = instruction.c; sourceTree = "<group>"; };
 		0A4CA7591D14C70B00BC8619 /* instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instruction.h; sourceTree = "<group>"; };
+		0A4CA75D1D1620F400BC8619 /* configure.ac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
+		0A4CA75F1D16230C00BC8619 /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,10 +78,11 @@
 				0A4CA7501D14C0D600BC8619 /* main.h */,
 				0A4CA74C1D14C03200BC8619 /* lex.l */,
 				0A4CA74E1D14C03900BC8619 /* parser.y */,
-				0A4CA7511D14C0EA00BC8619 /* Makefile */,
 				0A4CA7531D14C43A00BC8619 /* test.s */,
 				0A4CA7581D14C70B00BC8619 /* instruction.c */,
 				0A4CA7591D14C70B00BC8619 /* instruction.h */,
+				0A4CA75D1D1620F400BC8619 /* configure.ac */,
+				0A4CA75F1D16230C00BC8619 /* Makefile.am */,
 			);
 			path = "d16-asm";
 			sourceTree = "<group>";

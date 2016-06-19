@@ -18,9 +18,9 @@
     struct _Instruction* instr;
     struct _OP* op;
 }
-#ifdef DEBUG
+
 %error-verbose
-#endif
+
 %token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD
 %token <op> OPCODE
 %token <sval> IDENTIFIER
