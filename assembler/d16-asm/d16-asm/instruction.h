@@ -8,7 +8,7 @@
 
 #ifndef instruction_h
 #define instruction_h
-
+#include <inttypes.h>
 #include <stdio.h>
 #include <glib.h>
 typedef enum{
