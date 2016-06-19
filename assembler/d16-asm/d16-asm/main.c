@@ -60,6 +60,9 @@ void print_elem(void* element, void* data){
         case I_TYPE_RC:
             printf("%s r%d, cr%d", i->opcode, i->rD, i->rS);
             break;
+        case I_TYPE_DIRECTIVE:
+            printf("%s %d",i->opcode, *(int*)i->dir_data);
+            break;
 
     }
     printf(" length: %d\n",instruction_length(i));
@@ -86,7 +89,13 @@ void assemble_instruction(Instruction* i, uint16_t** data){
             **data = i->immediate & 0xffff;
             *data += 1;
         }
-    }else{
+    }else if (i->type == I_TYPE_DIRECTIVE){
+        if(i->dir_type == D_WORD){
+            **data = *(int*)i->dir_data;
+            *data+=1;
+        }
+    }
+    else{
         **data = i->op_type<<8 | build_reg_selector(i);
         *data += 1;
     }

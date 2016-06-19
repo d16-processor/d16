@@ -19,10 +19,10 @@
     struct _OP* op;
 }
 %error-verbose
-%token COMMA NEWLINE LBRACKET RBRACKET
+%token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD
 %token <op> OPCODE
 %token <sval> IDENTIFIER
-%token <ival> REGISTER IMMEDIATE CP_REGISTER
+%token <ival> REGISTER IMMEDIATE CP_REGISTER NUMBER
 %type <instr> instruction
 %type <list> program
 %start start
@@ -42,6 +42,8 @@ instruction:
     |   OPCODE CP_REGISTER COMMA REGISTER {$$=new_instruction_cr($1,$2,$4);}
     |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET {$$=new_instruction_rr($1,$2,$5);}
     |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER {$$=new_instruction_rr($1,$3,$6);}
+    |   DIRECTIVE_WORD NUMBER {int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
+
 ;
 
 

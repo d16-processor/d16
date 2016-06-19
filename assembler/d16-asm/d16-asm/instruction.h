@@ -17,8 +17,14 @@ typedef enum{
     I_TYPE_RR,
     I_TYPE_RIMM,
     I_TYPE_RC,
-    I_TYPE_CR
+    I_TYPE_CR,
+    I_TYPE_DIRECTIVE 
 }Instruction_Type;
+enum _Dir_Type{
+    D_WORD,
+    D_ASCIZ,
+};
+typedef enum _Dir_Type Dir_Type;
 enum _Op_Type{
     NOP=0,
     ADDI,
@@ -70,6 +76,8 @@ struct _Instruction{
     int immediate;
     Op_Type op_type;
     Instruction_Type type;
+    Dir_Type dir_type;
+    void* dir_data;
 };
 typedef struct _Instruction Instruction;
 struct _OP* op(char*,enum _Op_Type);
@@ -80,6 +88,7 @@ Instruction* new_instruction_rr(OP*,int,int);
 Instruction* new_instruction_ri(OP*,int,int);
 Instruction* new_instruction_cr(OP*,int,int);
 Instruction* new_instruction_rc(OP*,int,int);
+Instruction* new_instruction_directive(Dir_Type, void* data);
 int instruction_length(Instruction*);
 uint8_t build_reg_selector(Instruction *);
 #endif /* instruction_h */

@@ -36,7 +36,7 @@ char* opcodes_str[] = {
     "stcp"
 };
 struct _OP* op(char* str,enum _Op_Type op_type){
-    OP *op = malloc(sizeof(op));
+    OP *op = calloc(1,sizeof(op));
     op->str = str;
     op->type = op_type;
     return op;
@@ -92,6 +92,21 @@ Instruction* new_instruction_rc(OP* op, int rD, int rS){
     i->type= I_TYPE_RC;
     return i;
 }
+Instruction* new_instruction_directive(Dir_Type type, void* data){
+    Instruction *i = calloc(1, sizeof(Instruction));
+    i->dir_type = type;
+    switch (type) {
+        case D_WORD:
+            i->opcode = strdup(".db");
+            break;
+        case D_ASCIZ:
+            i->opcode = strdup(".asciz");
+            break;
+    }
+    i->type = I_TYPE_DIRECTIVE;
+    i->dir_data = data;
+    return i;
+}
 uint8_t build_reg_selector(Instruction* i){
     if(i->type == I_TYPE_RR){
         return (i->rS & 0x7)<<3 | (i->rD &0x7);
@@ -101,6 +116,7 @@ uint8_t build_reg_selector(Instruction* i){
     }
     return 0;
 }
+
 int instruction_length(Instruction* i){
     if(i->type == I_TYPE_RIMM){
         if(i->op_type == MOVI && ((unsigned int)i->immediate) < 255 ){
