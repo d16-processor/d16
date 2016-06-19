@@ -1,4 +1,3 @@
-mov r4, #15
-.dw 0x51
-mov r6, #1032
-mov r5, #0xffe
+shl r0,#2
+shr r3, #7
+rol r7, #15

@@ -76,7 +76,6 @@ Instruction* new_instruction_ri(OP* op, int rD, int imm){
     i->op_type--;
     i->type= I_TYPE_RIMM;
     return i;
-
 }
 Instruction* new_instruction_cr(OP* op, int rD, int rS){
     Instruction *i = gen_instruction_internal(op);
@@ -116,11 +115,17 @@ uint8_t build_reg_selector(Instruction* i){
     }
     return 0;
 }
+uint8_t build_shift_selector(Instruction* i){
+    return i->rD || (i->immediate & 0xF)<<3;
+}
 
 int instruction_length(Instruction* i){
     if(i->type == I_TYPE_RIMM){
         if(i->op_type == MOVI && ((unsigned int)i->immediate) < 255 ){
             i->op_type = MOVB;
+            return 1;
+        }
+        else if(i->op_type == SHLI || i->op_type == SHRI || i->op_type == ROLI || i->op_type == RCLI){
             return 1;
         }
         if(i->op_type == MOVB){

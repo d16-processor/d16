@@ -56,9 +56,13 @@ enum _Op_Type{
     CALLI,
     CALL,
     SPEC,
+    SHLI,
     SHL,
+    SHRI,
     SHR,
+    ROLI,
     ROL,
+    RCLI,
     RCL,
     LDCP,
     STCP
@@ -91,4 +95,5 @@ Instruction* new_instruction_rc(OP*,int,int);
 Instruction* new_instruction_directive(Dir_Type, void* data);
 int instruction_length(Instruction*);
 uint8_t build_reg_selector(Instruction *);
+uint8_t build_shift_selector(Instruction* i);
 #endif /* instruction_h */
