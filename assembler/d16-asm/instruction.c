@@ -73,7 +73,7 @@ Instruction* new_instruction_ri(OP* op, int rD, int imm){
     Instruction *i = gen_instruction_internal(op);
     i->rD = rD;
     i->immediate = imm;
-    i->op_type--;
+    i->op_type|= 0x80;
     i->type= I_TYPE_RIMM;
     return i;
 }
