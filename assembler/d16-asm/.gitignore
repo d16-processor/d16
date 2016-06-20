@@ -6,7 +6,7 @@ autom4te.cache/*
 configure
 .deps/*
 Makefile.in
-config.h.*
 stamp-h1
 Makefile
 config.*
+configure
