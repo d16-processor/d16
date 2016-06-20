@@ -22,6 +22,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>Makefile</name>
+			<type>1</type>
+			<location>/Users/mnolan/programming/d16/vhdl/build/Makefile</location>
+		</link>
+		<link>
 			<name>tests</name>
 			<type>2</type>
 			<location>/Users/mnolan/programming/d16/vhdl/tests</location>

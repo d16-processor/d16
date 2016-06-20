@@ -1,4 +1,9 @@
-all: reg_tb
+tests: reg_tb decoder_tb
+tests-list:
+	@echo "tests:"
+	@echo "	reg_tb"
+	@echo "	decoder_tb"
+
 
 
 reg_tb: register_unit.o register_unit_tb.o

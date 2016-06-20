@@ -1,3 +1,5 @@
 *.vcd
 *.o
 *.cf
+reg_tb
+decoder_tb
