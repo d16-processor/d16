@@ -9,16 +9,24 @@ The included assembler is written in C, and uses bison and flex for parsing. It'
 
 
 It can be built on OS X by:
+
 ```
 cd assembler
 xcodebuild
 ```
+
 and on linux by:
+
 ```
 cd assembler/d16-asm
 ./configure
 make
 ```
+
+If you get an error like `configure: error: cannot find install-sh, install.sh,
+or shtool in "." "./.." "./../.."`, run `automake --force-missing
+--add-missing`.
+
 ## CPU Layout
 A general layout of the CPU is provided here, this is subject to change during the project
 ![alt text](https://raw.githubusercontent.com/C-Elegans/d16/master/D16%20Cpu%20Diagram.png "D16 CPU Diagram")
