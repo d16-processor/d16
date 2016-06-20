@@ -19,13 +19,10 @@ and on linux by:
 
 ```
 cd assembler/d16-asm
+./autogen.sh
 ./configure
 make
 ```
-
-If you get an error like `configure: error: cannot find install-sh, install.sh,
-or shtool in "." "./.." "./../.."`, run `automake --force-missing
---add-missing`.
 
 ## CPU Layout
 A general layout of the CPU is provided here, this is subject to change during the project
