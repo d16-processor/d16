@@ -32,19 +32,20 @@
 %%
 start: program {process_list($1);};
 program:
-    program instruction NEWLINE{$$=g_list_append($$, $2);}
+    program instruction{$$=g_list_append($$, $2);}
+	|program NEWLINE {$$=$1};
     | {$$=NULL;}
 ;
 instruction:
-        OPCODE {$$=new_instruction($1);}
-    |   OPCODE REGISTER {$$=new_instruction_r($1,$2);}
-    |   OPCODE REGISTER COMMA REGISTER{$$=new_instruction_rr($1,$2,$4);}
-    |   OPCODE REGISTER COMMA IMMEDIATE{$$=new_instruction_ri($1,$2,$4);}
-    |   OPCODE REGISTER COMMA CP_REGISTER {$$=new_instruction_rc($1,$2,$4);}
-    |   OPCODE CP_REGISTER COMMA REGISTER {$$=new_instruction_cr($1,$2,$4);}
-    |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET {$$=new_instruction_rr($1,$2,$5);}
-    |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER {$$=new_instruction_rr($1,$3,$6);}
-    |   DIRECTIVE_WORD NUMBER {int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
+        OPCODE NEWLINE{$$=new_instruction($1);}
+    |   OPCODE REGISTER NEWLINE {$$=new_instruction_r($1,$2);}
+    |   OPCODE REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$2,$4);}
+    |   OPCODE REGISTER COMMA IMMEDIATE NEWLINE{$$=new_instruction_ri($1,$2,$4);}
+    |   OPCODE REGISTER COMMA CP_REGISTER NEWLINE{$$=new_instruction_rc($1,$2,$4);}
+    |   OPCODE CP_REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_cr($1,$2,$4);}
+    |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_rr($1,$2,$5);}
+    |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$3,$6);}
+    |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
 
 ;
 

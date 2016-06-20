@@ -1,7 +1,7 @@
 add r0,r1
-add r0,#10
-or r3,r5
-or r3,#15
-mov r0,#23
-mov r1,#0x5050
-mov r2,r3
+sub r3,#2
+xor r3,r3
+mov r4,#0x52
+mov r5,#0x13a
+mov r6,r1
+ld r0,[r3]
