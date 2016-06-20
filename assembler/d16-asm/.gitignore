@@ -2,3 +2,4 @@
 *.tab.*
 *.yy.*
 d16-as
+autom4te.cache/*
