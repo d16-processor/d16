@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use IEEE.numeric_std.ALL;
+
 use work.cpu_constants.ALL;
 entity decoder is
 	port(
@@ -37,8 +38,28 @@ begin
 				s_en_imm <= '1';
 				s_alu_control  <= OPC_MOV(6 downto 0);
 				s_next_word    <= '0';
-				s_rD_sel       <= "000";
+				
 				s_immediate    <= X"00" & instruction(7 downto 0);
+				case instruction(15 downto 8) is
+				when OPC_MOVB_R0  => 
+					s_rD_sel  <= "000";
+				when OPC_MOVB_R1  => 
+					s_rD_sel  <= "001";
+				when OPC_MOVB_R2  => 
+					s_rD_sel  <= "010";
+				when OPC_MOVB_R3  => 
+					s_rD_sel  <= "011";
+				when OPC_MOVB_R4  => 
+					s_rD_sel  <= "100";
+				when OPC_MOVB_R5  => 
+					s_rD_sel  <= "101";
+				when OPC_MOVB_R6  => 
+					s_rD_sel  <= "110";
+				when OPC_MOVB_R7  => 
+					s_rD_sel  <= "111";
+				when others   => 
+				 
+				end case;
 			else
 				s_alu_control  <= instruction(14 downto 8);
 				s_en_imm <= instruction(15);

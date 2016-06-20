@@ -53,14 +53,19 @@ begin
 		begin
 		wait for 2*clk_period;
 		en <= '1';
-		instruction  <= X"0108";
+		instruction  <= X"0108"; --add r0,r1
 		wait for clk_period;
-		instruction  <= X"8100";
+		instruction  <= X"8203"; --sub r3, #2
 		wait for clk_period;
-		instruction  <= X"0f2b";
+		instruction  <= X"101b"; --xor r3,r3
 		wait for clk_period;
-		instruction  <= X"0517";
+		instruction  <= X"0952"; --mov r4,#82
+		wait for clk_period;
+		instruction  <= X"8d05"; --mov r5,#314
+		wait for clk_period;
+		instruction  <= X"0d0e"; --mov r6,r1
+		wait for clk_period;
+		instruction  <= X"1318"; --ld r0,r3
 		wait;
 	end process;
 end behavior;
-
