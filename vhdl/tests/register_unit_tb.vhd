@@ -6,6 +6,8 @@ entity reg_tb is
 end reg_tb;
 
 
+library ieee;
+use ieee.numeric_std.all;
 architecture behavior of reg_tb is
 	component register_unit
 		port(
@@ -65,6 +67,10 @@ architecture behavior of reg_tb is
 		rD_sel  <= "000";
 		rS_sel  <= "001";
 		wr_en  <= '0';
+		wait for clk_period;
+		assert rD_data =  X"beef" report "incorrect data written to register r0: " & integer'image(to_integer(unsigned(rD_data))) severity failure;
+		assert rS_data = X"feed" report "incorrect data written to register r1: " & integer'image(to_integer(unsigned(rS_data))) severity failure;
+		
 		wait;
 	end process;
 		
