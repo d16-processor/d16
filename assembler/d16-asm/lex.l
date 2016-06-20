@@ -1,6 +1,6 @@
 %{
     #include <stdio.h>
-    #include "y.tab.h"
+    #include "parser.h"
     #include "instruction.h"
     #define YY_NO_INPUT
     extern int yylex();

@@ -15,6 +15,20 @@
 		0A4CA75A1D14C70B00BC8619 /* instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7581D14C70B00BC8619 /* instruction.c */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXBuildRule section */
+		0A4CA7601D18375700BC8619 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = sourcecode.yacc;
+			isEditable = 1;
+			outputFiles = (
+				"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c",
+				"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.h",
+			);
+			script = "# $(YACC)\n/usr/bin/bison -d -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c ${INPUT_FILE_PATH}";
+		};
+/* End PBXBuildRule section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		0A4CA7401D14C01400BC8619 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -99,6 +113,7 @@
 				0A4CA7401D14C01400BC8619 /* CopyFiles */,
 			);
 			buildRules = (
+				0A4CA7601D18375700BC8619 /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -283,6 +298,7 @@
 				0A4CA74B1D14C01400BC8619 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

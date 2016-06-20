@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "y.tab.h"
+#include "parser.h"
 #include <glib.h>
 #include "instruction.h"
 extern int yyparse (void);
