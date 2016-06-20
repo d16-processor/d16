@@ -1,6 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
-
+use ieee.numeric_std.all;
 use std.textio.all;
 entity decoder_tb is
 end decoder_tb;
@@ -54,18 +54,59 @@ begin
 		wait for 2*clk_period;
 		en <= '1';
 		instruction  <= X"0108"; --add r0,r1
-		wait for clk_period;
+		wait for clk_period*2;
+		assert alu_control = "000"&X"1" report "ALU control set to incorrect value: "& integer'image(to_integer(unsigned(alu_control))) severity failure;
+		assert rD_sel = "000" report "RD selector set to: "&integer'image(to_integer(unsigned(rD_sel))) severity failure;
+		assert rS_sel = "001" report "RS selector set to: "&integer'image(to_integer(unsigned(rS_sel))) severity failure;
+		
 		instruction  <= X"8203"; --sub r3, #2
 		wait for clk_period;
+		
+		
+		assert next_word = '1' report "Next word not set" severity failure;
+		assert en_imm = '1' report "Immediate not set" severity failure;
+		
+		assert alu_control = "000"&X"2" report "ALU control set to incorrect value: "& integer'image(to_integer(unsigned(alu_control))) severity failure;
+		assert rD_sel = "011" report "RD selector set to: "&integer'image(to_integer(unsigned(rD_sel))) severity failure;
 		instruction  <= X"101b"; --xor r3,r3
 		wait for clk_period;
+		
+		
+		assert alu_control = "001"&X"0" report "ALU control set to incorrect value: "& integer'image(to_integer(unsigned(alu_control))) severity failure;
+		assert rD_sel = "011" report "RD selector set to: "&integer'image(to_integer(unsigned(rD_sel))) severity failure;
+		assert rS_sel = "011" report "RS selector set to: "&integer'image(to_integer(unsigned(rS_sel))) severity failure;
 		instruction  <= X"0952"; --mov r4,#82
 		wait for clk_period;
+		
+		
+		assert immediate = X"0052" report "Incorrect immediate value" severity failure;
+		assert en_imm = '1' report "Immediate not set" severity failure;
+		assert next_word = '0' report "Next word not reset" severity failure;
+		assert alu_control = "000"&X"D" report "ALU control set to incorrect value: "& integer'image(to_integer(unsigned(alu_control))) severity failure;
+		assert rD_sel = "100" report "RD selector set to: "&integer'image(to_integer(unsigned(rD_sel))) severity failure;
 		instruction  <= X"8d05"; --mov r5,#314
 		wait for clk_period;
+		
+		
+		assert en_imm = '1' report "Immediate not set" severity failure;
+		assert next_word = '1' report "Next word not set" severity failure;
+		assert alu_control = "000"&X"D" report "ALU control set to incorrect value: "& integer'image(to_integer(unsigned(alu_control))) severity failure;
+		assert rD_sel = "101" report "RD selector set to: "&integer'image(to_integer(unsigned(rD_sel))) severity failure;
+		
 		instruction  <= X"0d0e"; --mov r6,r1
 		wait for clk_period;
+		
+		
+		assert alu_control = "000"&X"D" report "ALU control set to incorrect value: "& integer'image(to_integer(unsigned(alu_control))) severity failure;
+		assert rD_sel = "110" report "RD selector set to: "&integer'image(to_integer(unsigned(rD_sel))) severity failure;
+		assert rS_sel = "001" report "RS selector set to: "&integer'image(to_integer(unsigned(rS_sel))) severity failure;
 		instruction  <= X"1318"; --ld r0,r3
+		wait for clk_period;
+		
+		
+		assert alu_control = "001"&X"3" report "ALU control set to incorrect value: "& integer'image(to_integer(unsigned(alu_control))) severity failure;
+		assert rD_sel = "000" report "RD selector set to: "&integer'image(to_integer(unsigned(rD_sel))) severity failure;
+		assert rS_sel = "011" report "RS selector set to: "&integer'image(to_integer(unsigned(rS_sel))) severity failure;
 		wait;
 	end process;
 end behavior;
