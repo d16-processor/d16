@@ -16,13 +16,15 @@ entity alu is
 	);
 end alu;
 architecture behavior of alu is
-	signal s_output        : std_logic_vector(15 downto 0) := (others => '0');
+	signal s_output        : std_logic_vector(16 downto 0) := (others => '0');
 	signal s_should_branch : std_logic                     := '0';
-
+	signal s_flags         : std_logic_vector(3 downto 0);
 begin
-	output        <= s_output;
+	output        <= s_output(15 downto 0);
 	should_branch <= s_should_branch;
-
+	s_flags(FLAG_BIT_ZERO)  <= '1' when s_output(15 downto 0) = X"0000" else '0';
+	s_flags(FLAG_BIT_CARRY) <= s_output(16);
+	s_flags(FLAG_BIT_SIGN)  <= s_output(15);
 	proc : process(clk) is
 	begin
 		if rising_edge(clk) then
@@ -30,62 +32,69 @@ begin
 				case alu_control is
 					when OPC_ADD =>
 						if en_imm = '1' then
-							s_output <= std_logic_vector(unsigned(rD_data) + unsigned(immediate));
+							s_output <= std_logic_vector(unsigned(rD_data(15) & rD_data) + unsigned(immediate(15) & immediate));
 						else
-							s_output <= std_logic_vector(unsigned(rD_data) + unsigned(rS_data));
+							s_output <= std_logic_vector(unsigned(rD_data(15) & rD_data) + unsigned(rS_data(15) & rS_data));
 						end if;
 					when OPC_SUB =>
 						if en_imm = '1' then
-							s_output <= std_logic_vector(unsigned(rD_data) - unsigned(immediate));
+							s_output <= std_logic_vector(unsigned(rD_data(15) & rD_data) - unsigned(immediate(15) & immediate));
 						else
-							s_output <= std_logic_vector(unsigned(rD_data) - unsigned(rS_data));
+							s_output <= std_logic_vector(unsigned(rD_data(15) & rD_data) - unsigned(rS_data(15) & rS_data));
 						end if;
 					when OPC_MOV =>
 						if en_imm = '1' then
-							s_output <= immediate;
+							s_output(15 downto 0) <= immediate;
 						else
-							s_output <= rS_data;
+							s_output(15 downto 0) <= rS_data;
 						end if;
+						s_output(16) <= '0';
 					when OPC_AND =>
 						if en_imm = '1' then
-							s_output <= rD_data and immediate;
+							s_output(15 downto 0) <= rD_data and immediate;
 						else
-							s_output <= rD_data and rS_data;
+							s_output(15 downto 0) <= rD_data and rS_data;
 						end if;
+						s_output(16) <= '0';
 					when OPC_OR =>
 						if en_imm = '1' then
-							s_output <= rD_data or immediate;
+							s_output(15 downto 0) <= rD_data or immediate;
 						else
-							s_output <= rD_data or rS_data;
+							s_output(15 downto 0) <= rD_data or rS_data;
 						end if;
+						s_output(16) <= '0';
 					when OPC_XOR =>
 						if en_imm = '1' then
-							s_output <= rD_data xor immediate;
+							s_output(15 downto 0) <= rD_data xor immediate;
 						else
-							s_output <= rD_data xor rS_data;
+							s_output(15 downto 0) <= rD_data xor rS_data;
 						end if;
-					when OPC_NOT => s_output <= not rD_data;
-					when OPC_NEG => s_output <= std_logic_vector(-signed(rD_data));
-
+					when OPC_NOT => 
+						s_output(15 downto 0) <= not rD_data;
+						s_output(16)         <= '0';
+					when OPC_NEG => 
+						s_output(15 downto 0) <= std_logic_vector(-signed(rD_data));
+						s_output(16)  <= '0';
 					when OPC_SHL =>
 						if en_imm = '1' then
-							s_output <= std_logic_vector(shift_left(unsigned(rD_data), to_integer(unsigned(immediate))));
+							s_output <= std_logic_vector(shift_left(unsigned('0' & rD_data), to_integer(unsigned(immediate))));
 						else
-							s_output <= std_logic_vector(shift_left(unsigned(rD_data), to_integer(unsigned(rS_data))));
+							s_output <= std_logic_vector(shift_left(unsigned('0' & rD_data), to_integer(unsigned(rS_data))));
 						end if;
 					when OPC_SHR =>
 						if en_imm = '1' then
-							s_output <= std_logic_vector(shift_right(unsigned(rD_data), to_integer(unsigned(immediate))));
+							s_output <= std_logic_vector(shift_right(unsigned('0' & rD_data), to_integer(unsigned(immediate))));
 						else
-							s_output <= std_logic_vector(shift_right(unsigned(rD_data), to_integer(unsigned(rS_data))));
+							s_output <= std_logic_vector(shift_right(unsigned('0' & rD_data), to_integer(unsigned(rS_data))));
 						end if;
 					when OPC_ROL =>
 						if en_imm = '1' then
-							s_output <= std_logic_vector(rotate_left(unsigned(rD_data), to_integer(unsigned(immediate))));
+							s_output(15 downto 0) <= std_logic_vector(rotate_left(unsigned(rD_data), to_integer(unsigned(immediate))));
 						else
-							s_output <= std_logic_vector(rotate_left(unsigned(rD_data), to_integer(unsigned(rS_data))));
+							s_output(15 downto 0) <= std_logic_vector(rotate_left(unsigned(rD_data), to_integer(unsigned(rS_data))));
 						end if;
-					when others => s_output <= X"0000";
+						s_output(16)        <= '0';
+					when others => s_output <= '0' & X"0000";
 				end case;
 
 			end if;

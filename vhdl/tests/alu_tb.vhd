@@ -25,7 +25,7 @@ architecture behavior of alu_tb is
 	signal s_rD_data     : std_logic_vector(15 downto 0);
 	signal s_rS_data     : std_logic_vector(15 downto 0);
 	signal s_immediate   : std_logic_vector(15 downto 0);
-
+	
 	signal s_should_branch : std_logic;
 	signal s_output        : std_logic_vector(15 downto 0);
 	constant clk_period    : time := 10 ns;
