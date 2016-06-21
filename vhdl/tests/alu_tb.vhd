@@ -73,10 +73,10 @@ begin
 		assert s_output = X"001D" report "Incorrect value after MOV" severity failure;
 
 		s_alu_control <= OPC_ADD;
-		s_rD_data     <= X"0014";
-		s_immediate   <= X"0005";
+		s_rD_data     <= X"7fff";
+		s_immediate   <= X"0001";
 		wait for clk_period;
-		assert s_output = X"0019" report "Incorrect value after ADDI" severity failure;
+		assert s_output = X"8000" report "Incorrect value after ADDI" severity failure;
 
 		s_alu_control <= OPC_AND;
 		s_rD_data     <= X"0fa5";

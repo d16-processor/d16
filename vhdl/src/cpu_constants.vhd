@@ -33,7 +33,8 @@ package cpu_constants is
 	constant OPC_LDCP    : std_logic_vector(7 downto 0) := X"1D";
 	constant OPC_STCP    : std_logic_vector(7 downto 0) := X"1E";
 
-	constant FLAG_BIT_ZERO  : integer := 0;
-	constant FLAG_BIT_CARRY : integer := 1;
-	constant FLAG_BIT_SIGN  : integer := 2;
+	constant FLAG_BIT_ZERO     : integer := 0;
+	constant FLAG_BIT_CARRY    : integer := 1;
+	constant FLAG_BIT_SIGN     : integer := 2;
+	constant FLAG_BIT_OVERFLOW : integer := 3;
 end cpu_constants;
