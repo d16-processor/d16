@@ -1,8 +1,9 @@
-tests: reg_tb decoder_tb
+tests: reg_tb decoder_tb alu_tb
 tests-list:
 	@echo "tests:"
 	@echo "	reg_tb"
 	@echo "	decoder_tb"
+	@echo " alu_tb"
 
 
 
@@ -14,7 +15,13 @@ decoder_tb: cpu_constants.o decoder.o decoder_tb.o
 	ghdl -e decoder_tb
 	./decoder_tb --stop-time=200ns --vcd=dump.vcd
 	gtkwave dump.vcd
+alu_tb: cpu_constants.o alu.o alu_tb.o
+	ghdl -e alu_tb
+	./alu_tb --stop-time=200ns --vcd=dump.vcd
+	gtkwave dump.vcd
 	
+alu_tb.o: ../tests/alu_tb.vhd ../src/alu.vhd
+	ghdl -a $<
 %.o: ../tests/%.vhd
 	ghdl -a $< 
 	

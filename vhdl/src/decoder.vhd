@@ -8,7 +8,7 @@ entity decoder is
 		clk          : in  std_logic;
 		en           : in  std_logic;
 		instruction  : in  std_logic_vector(15 downto 0);
-		alu_control  : out std_logic_vector(6 downto 0);
+		alu_control  : out std_logic_vector(7 downto 0);
 		rD_sel       : out std_logic_vector(2 downto 0);
 		rS_sel       : out std_logic_vector(2 downto 0);
 		immediate    : out std_logic_vector(15 downto 0);
@@ -18,7 +18,7 @@ entity decoder is
 
 end decoder;
 architecture behavior of decoder is
-	signal s_alu_control 	: std_logic_vector(6 downto 0);
+	signal s_alu_control 	: std_logic_vector(7 downto 0);
 	signal s_rD_sel 		: std_logic_vector(2 downto 0);
 	signal s_rS_sel			: std_logic_vector(2 downto 0);
 	signal s_immediate		: std_logic_vector(15 downto 0);
@@ -36,7 +36,7 @@ begin
 		if rising_edge(clk) and en = '1' then
 			if unsigned(instruction(15 downto 8)) <= unsigned(OPC_MOVB_R7) and unsigned(instruction(15 downto 8)) >= unsigned(OPC_MOVB_R0) then
 				s_en_imm <= '1';
-				s_alu_control  <= OPC_MOV(6 downto 0);
+				s_alu_control  <= OPC_MOV;
 				s_next_word    <= '0';
 				
 				s_immediate    <= X"00" & instruction(7 downto 0);
@@ -61,7 +61,7 @@ begin
 				 
 				end case;
 			else
-				s_alu_control  <= instruction(14 downto 8);
+				s_alu_control  <= instruction(15 downto 8);
 				s_en_imm <= instruction(15);
 				s_next_word    <= instruction(15);
 				s_rD_sel       <= instruction(2 downto 0);
