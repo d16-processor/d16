@@ -23,17 +23,17 @@ architecture behavior of alu_tb is
 	signal s_alu_control : std_logic_vector(7 downto 0);
 	signal s_en_imm      : std_logic := '0';
 	signal s_rD_data     : std_logic_vector(15 downto 0);
-	signal s_rS_data	: std_logic_vector(15 downto 0);
-	signal s_immediate : std_logic_vector(15 downto 0);
-	
+	signal s_rS_data     : std_logic_vector(15 downto 0);
+	signal s_immediate   : std_logic_vector(15 downto 0);
+
 	signal s_should_branch : std_logic;
-	signal s_output : std_logic_vector(15 downto 0);
-	constant clk_period : time  := 10 ns;
+	signal s_output        : std_logic_vector(15 downto 0);
+	constant clk_period    : time := 10 ns;
 
 begin
-	uut: entity work.alu
+	uut : entity work.alu
 		port map(
-			immediate => s_immediate,
+			immediate     => s_immediate,
 			clk           => s_clk,
 			en            => s_en,
 			alu_control   => s_alu_control,
@@ -45,42 +45,64 @@ begin
 		);
 	clk_proc : process is
 	begin
-		s_clk  <= '0';
-		wait for clk_period/2;
-		s_clk  <= '1';
-		wait for clk_period/2;
+		s_clk <= '0';
+		wait for clk_period / 2;
+		s_clk <= '1';
+		wait for clk_period / 2;
 	end process clk_proc;
 	stim_proc : process is
 	begin
-		s_en  <= '0';
-		wait for 2*clk_period;
-		s_en  <= '1';
-		s_rD_data  <= X"0005";
-		s_rS_data <= X"0002";
-		s_alu_control  <= OPC_ADD;
-		s_en_imm  <= '0';
+		s_en <= '0';
+		wait for 2 * clk_period;
+		s_en          <= '1';
+		s_rD_data     <= X"0005";
+		s_rS_data     <= X"0002";
+		s_alu_control <= OPC_ADD;
+		s_en_imm      <= '0';
 		wait for clk_period;
-		assert s_output =  X"0007" report "Incorrect value after ADD" severity error;
-		
-		
-		s_alu_control  <= OPC_SUB;
+		assert s_output = X"0007" report "Incorrect value after ADD" severity failure;
+
+		s_alu_control <= OPC_SUB;
 		wait for clk_period;
-		assert s_output =  X"0003" report "Incorrect value after SUB" severity error;
-		
-		s_alu_control  <= OPC_MOV;
-		s_en_imm  <= '1';
-		s_immediate  <= X"001D";
+		assert s_output = X"0003" report "Incorrect value after SUB" severity failure;
+
+		s_alu_control <= OPC_MOV;
+		s_en_imm      <= '1';
+		s_immediate   <= X"001D";
 		wait for clk_period;
-		assert s_output = X"001D" report "Incorrect value after MOV" severity error;
-		
-		s_alu_control  <= OPC_ADD;
-		s_rD_data  <= X"0014";
-		s_immediate  <= X"0005";
+		assert s_output = X"001D" report "Incorrect value after MOV" severity failure;
+
+		s_alu_control <= OPC_ADD;
+		s_rD_data     <= X"0014";
+		s_immediate   <= X"0005";
 		wait for clk_period;
-		assert s_output = X"0019" report "Incorrect value after ADDI" severity error;
+		assert s_output = X"0019" report "Incorrect value after ADDI" severity failure;
+
+		s_alu_control <= OPC_AND;
+		s_rD_data     <= X"0fa5";
+		s_rS_data     <= X"1d3C";
+		s_en_imm      <= '0';
+		wait for clk_period;
+		assert s_output = X"0d24" report "Incorrect value after AND" severity failure;
+
+		s_alu_control <= OPC_OR;
+		wait for clk_period;
+		assert s_output = X"1fbd" report "Incorrect value after OR" severity failure;
+
+		s_alu_control <= OPC_XOR;
+		wait for clk_period;
+		assert s_output = X"1299" report "Incorrect value after XOR" severity failure;
+		
+		s_alu_control  <= OPC_NOT;
+		wait for clk_period;
+		assert s_output = X"f05a" report "Incorrect value after NOT" severity failure;
+		
+		s_alu_control  <= OPC_NEG;
+		wait for clk_period;
+		assert s_output = X"f05b" report "Incorrect value after NEG" severity failure;
+		
 		
 		wait;
 	end process stim_proc;
-	
-	
+
 end architecture behavior;

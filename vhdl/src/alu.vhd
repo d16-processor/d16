@@ -46,6 +46,26 @@ begin
 						else
 							s_output <= rS_data;
 						end if;
+					when OPC_AND => 
+						if en_imm = '1' then
+							s_output  <= rD_data and immediate;	
+						else
+							s_output  <= rD_data and rS_data;
+						end if;
+					when OPC_OR => 
+						if en_imm = '1' then
+							s_output  <= rD_data or immediate;	
+						else
+							s_output  <= rD_data or rS_data;
+						end if;
+					when OPC_XOR => 
+						if en_imm = '1' then
+							s_output  <= rD_data xor immediate;	
+						else
+							s_output  <= rD_data xor rS_data;
+						end if;
+					when OPC_NOT  => s_output  <= not rD_data;
+					when OPC_NEG  => s_output <= std_logic_vector(-signed(rD_data));
 					when others => s_output <= X"0000";
 				end case;
 
