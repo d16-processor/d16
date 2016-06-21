@@ -100,7 +100,19 @@ begin
 		s_alu_control  <= OPC_NEG;
 		wait for clk_period;
 		assert s_output = X"f05b" report "Incorrect value after NEG" severity failure;
+		s_alu_control  <= OPC_SHL;
+		s_immediate  <= X"0003";
+		s_en_imm  <= '1';
+		wait for clk_period;
+		assert s_output = X"7D28" report "Incorrect value after SHL" severity failure;
+		s_alu_control  <= OPC_SHR;
 		
+		wait for clk_period;
+		assert s_output = X"01f4" report "Incorrect value after SHR" severity failure;
+		s_alu_control  <= OPC_ROL;
+		s_immediate  <= X"0006";
+		wait for clk_period;
+		assert s_output = X"E943" report "Incorrect value after ROL" severity failure;
 		
 		wait;
 	end process stim_proc;
