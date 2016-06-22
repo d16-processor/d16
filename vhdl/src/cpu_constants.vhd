@@ -32,6 +32,8 @@ package cpu_constants is
 	constant OPC_RCL     : std_logic_vector(7 downto 0) := X"1C";
 	constant OPC_LDCP    : std_logic_vector(7 downto 0) := X"1D";
 	constant OPC_STCP    : std_logic_vector(7 downto 0) := X"1E";
+	constant OPC_ADC	 : std_logic_vector(7 downto 0) := X"1F";
+	constant OPC_SBB	 : std_logic_vector(7 downto 0) := X"20"; 
 
 	constant FLAG_BIT_ZERO     : integer := 0;
 	constant FLAG_BIT_CARRY    : integer := 1;

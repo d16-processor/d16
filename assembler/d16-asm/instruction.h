@@ -50,6 +50,8 @@ enum _Op_Type{
 	RCL,
 	LDCP,
 	STCP,
+	ADC,
+	SBB,
 
 	ADDI=0x81,
 	SUBI=0x82,
@@ -66,7 +68,9 @@ enum _Op_Type{
 	SHLI=0x99,
 	SHRI=0x9a,
 	ROLI=0x9b,
-	RCLI=0x9c
+	RCLI=0x9c,
+	ADCI=0x9f,
+	SBBI=0xA0
 } ;
 struct _OP{
     char* str;

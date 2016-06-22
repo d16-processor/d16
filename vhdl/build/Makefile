@@ -17,7 +17,7 @@ decoder_tb: cpu_constants.o decoder.o decoder_tb.o
 	gtkwave dump.vcd
 alu_tb: cpu_constants.o alu.o alu_tb.o
 	ghdl -e alu_tb
-	./alu_tb --stop-time=150ns --vcd=dump.vcd
+	./alu_tb --stop-time=200ns --vcd=dump.vcd
 	gtkwave dump.vcd
 control_tb: cpu_constants.o control.o control_tb.o
 	ghdl -e control_tb

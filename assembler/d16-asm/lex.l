@@ -43,6 +43,8 @@ rol {yylval.op = op(strdup(yytext),ROL); return OPCODE;};
 rcl {yylval.op = op(strdup(yytext),RCL); return OPCODE;};
 ldcp {yylval.op = op(strdup(yytext),LDCP); return OPCODE;};
 stcp {yylval.op = op(strdup(yytext),STCP); return OPCODE;};
+adc {yylval.op = op(strdup(yytext), ADC); return OPCODE;};
+sbb {yylval.op = op(strdup(yytext), SBB); return OPCODE;};
 
 #-?[0-9]* {yylval.ival = atoi(yytext+1); return IMMEDIATE;};
 #0x[0-9a-fA-F]* {yylval.ival = (int)strtol(yytext+1,NULL,16); return IMMEDIATE;};

@@ -5,3 +5,4 @@ mov r4,#0x52
 mov r5,#0x13a
 mov r6,r1
 ld r0,[r3]
+adc r0,  #3

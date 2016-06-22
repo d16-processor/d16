@@ -126,7 +126,11 @@ begin
 		s_immediate   <= X"0006";
 		wait for clk_period;
 		assert s_output = X"E943" report "Incorrect value after ROL" severity failure;
-
+		s_alu_control  <= OPC_ADC;
+		s_flags_in  <= (FLAG_BIT_CARRY  => '1', others  => '0');
+		s_rD_data  <= X"0001";
+		wait for clk_period;
+		assert s_output = X"0008" report "Incorrect value after ADC" severity failure;
 		wait;
 	end process stim_proc;
 
