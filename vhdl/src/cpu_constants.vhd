@@ -62,5 +62,8 @@ package cpu_constants is
 	constant STATE_REG_READ : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "000100"; 
 	constant STATE_ALU      : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "001000"; 
 	constant STATE_MEM      : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "010000"; 
-	constant STATE_REG_WR   : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "100000"; 
+	constant STATE_REG_WR   : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "100000";
+	
+	type e_pc_op is (NOP, INC,SET,RESET);
+	 
 end cpu_constants;                                                           
