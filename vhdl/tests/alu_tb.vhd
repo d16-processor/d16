@@ -14,8 +14,13 @@ architecture behavior of alu_tb is
 			en_imm        : in  std_logic;
 			rD_data       : in  std_logic_vector(15 downto 0);
 			rS_data       : in  std_logic_vector(15 downto 0);
+			immediate     : in  std_logic_vector(15 downto 0);
+			condition     : in  std_logic_vector(3 downto 0);
+			flags_in      : in  std_logic_vector(3 downto 0);
 			should_branch : out std_logic;
-			output        : out std_logic_vector(15 downto 0)
+			output        : out std_logic_vector(15 downto 0);
+			write         : out std_logic;
+			flags_out     : out std_logic_vector(3 downto 0)
 		);
 	end component alu;
 	signal s_clk         : std_logic := '0';
@@ -25,23 +30,31 @@ architecture behavior of alu_tb is
 	signal s_rD_data     : std_logic_vector(15 downto 0);
 	signal s_rS_data     : std_logic_vector(15 downto 0);
 	signal s_immediate   : std_logic_vector(15 downto 0);
-	
+
 	signal s_should_branch : std_logic;
 	signal s_output        : std_logic_vector(15 downto 0);
+	signal s_flags_in      : std_logic_vector(3 downto 0);
+	signal s_flags_out     : std_logic_vector(3 downto 0);
+	signal s_write_en      : std_logic;
+	signal s_condition     : std_logic_vector(3 downto 0);
 	constant clk_period    : time := 10 ns;
 
 begin
 	uut : entity work.alu
 		port map(
-			immediate     => s_immediate,
+			condition => s_condition,
 			clk           => s_clk,
 			en            => s_en,
 			alu_control   => s_alu_control,
 			en_imm        => s_en_imm,
 			rD_data       => s_rD_data,
 			rS_data       => s_rS_data,
+			immediate     => s_immediate,
+			flags_in      => s_flags_in,
 			should_branch => s_should_branch,
-			output        => s_output
+			output        => s_output,
+			write         => s_write_en,
+			flags_out     => s_flags_out
 		);
 	clk_proc : process is
 	begin
@@ -92,28 +105,28 @@ begin
 		s_alu_control <= OPC_XOR;
 		wait for clk_period;
 		assert s_output = X"1299" report "Incorrect value after XOR" severity failure;
-		
-		s_alu_control  <= OPC_NOT;
+
+		s_alu_control <= OPC_NOT;
 		wait for clk_period;
 		assert s_output = X"f05a" report "Incorrect value after NOT" severity failure;
-		
-		s_alu_control  <= OPC_NEG;
+
+		s_alu_control <= OPC_NEG;
 		wait for clk_period;
 		assert s_output = X"f05b" report "Incorrect value after NEG" severity failure;
-		s_alu_control  <= OPC_SHL;
-		s_immediate  <= X"0003";
-		s_en_imm  <= '1';
+		s_alu_control <= OPC_SHL;
+		s_immediate   <= X"0003";
+		s_en_imm      <= '1';
 		wait for clk_period;
 		assert s_output = X"7D28" report "Incorrect value after SHL" severity failure;
-		s_alu_control  <= OPC_SHR;
-		
+		s_alu_control <= OPC_SHR;
+
 		wait for clk_period;
 		assert s_output = X"01f4" report "Incorrect value after SHR" severity failure;
-		s_alu_control  <= OPC_ROL;
-		s_immediate  <= X"0006";
+		s_alu_control <= OPC_ROL;
+		s_immediate   <= X"0006";
 		wait for clk_period;
 		assert s_output = X"E943" report "Incorrect value after ROL" severity failure;
-		
+
 		wait;
 	end process stim_proc;
 

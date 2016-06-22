@@ -37,4 +37,21 @@ package cpu_constants is
 	constant FLAG_BIT_CARRY    : integer := 1;
 	constant FLAG_BIT_SIGN     : integer := 2;
 	constant FLAG_BIT_OVERFLOW : integer := 3;
+
+	constant CONDITION_EQ     : std_logic_vector(3 downto 0) := "0001";
+	constant CONDITION_NE     : std_logic_vector(3 downto 0) := "0010";
+	constant CONDITION_OS     : std_logic_vector(3 downto 0) := "0011";
+	constant CONDITION_OC     : std_logic_vector(3 downto 0) := "0100";
+	constant CONDITION_HI     : std_logic_vector(3 downto 0) := "0101";
+	constant CONDITION_LS     : std_logic_vector(3 downto 0) := "0110";
+	constant CONDITION_P      : std_logic_vector(3 downto 0) := "0111";
+	constant CONDITION_N      : std_logic_vector(3 downto 0) := "1000";
+	constant CONDITION_CS     : std_logic_vector(3 downto 0) := "1001";
+	constant CONDITION_CC     : std_logic_vector(3 downto 0) := "1010";
+	constant CONDITION_GE     : std_logic_vector(3 downto 0) := "1011";
+	constant CONDITION_G      : std_logic_vector(3 downto 0) := "1100";
+	constant CONDITION_LE     : std_logic_vector(3 downto 0) := "1101";
+	constant CONDITION_L      : std_logic_vector(3 downto 0) := "1110";
+	constant CONDITION_ALWAYS : std_logic_vector(3 downto 0) := "1111";
+
 end cpu_constants;
