@@ -93,6 +93,8 @@ begin
 					when OPC_ROL =>
 						s_output(15 downto 0) <= std_logic_vector(rotate_left(unsigned(data1), to_integer(unsigned(data2))));
 						s_output(16)          <= '0';
+					when OPC_RCL => 
+						s_output  <= std_logic_vector(rotate_left(unsigned(s_flags(FLAG_BIT_CARRY) & data1), to_integer(unsigned(data2))));
 					when OPC_CMP =>
 						s_output     <= std_logic_vector(unsigned(data1(15) & data1) - unsigned(data2(15) & data2));
 						s_data1_sign <= data1(15);
