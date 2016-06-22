@@ -87,9 +87,7 @@ begin
 					data2 := rS_data;
 				end if;
 				case alu_control is     --overflow signals
-					when OPC_ADD =>
-						ov_op <= '1';
-					when OPC_SUB =>
+					when OPC_ADD|OPC_SUB|OPC_ADC|OPC_SBB =>
 						ov_op <= '1';
 					when others =>
 						ov_op <= '0';
