@@ -33,7 +33,7 @@
 start: program {process_list($1);};
 program:
     program instruction{$$=g_list_append($$, $2);}
-	|program NEWLINE {$$=$1};
+	|program NEWLINE {$$=$1;}
     | {$$=NULL;}
 ;
 instruction:

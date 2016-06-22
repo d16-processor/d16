@@ -5,3 +5,5 @@ reg_tb
 decoder_tb
 alu_tb
 *_tb
+*.s
+*.bin

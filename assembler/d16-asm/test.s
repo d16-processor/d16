@@ -1,8 +1,9 @@
+mov r0,#0
+mov r1,#1
 add r0,r1
-sub r3,#2
-xor r3,r3
-mov r4,#0x52
-mov r5,#0x13a
-mov r6,r1
-ld r0,[r3]
-adc r0,  #3
+add r0,r1
+shl r0,r1
+cmp r0,r1
+mov r2,#15
+add r2,r0
+adc r1,r3
