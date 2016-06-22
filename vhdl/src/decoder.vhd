@@ -32,9 +32,13 @@ begin
 	en_immediate  <= s_en_imm;
 	next_word <= s_next_word;
 	process(clk, en)
+		variable opcode : std_logic_vector(7 downto 0);
+		
 	begin
+		
 		if rising_edge(clk) and en = '1' then
-			if unsigned(instruction(15 downto 8)) <= unsigned(OPC_MOVB_R7) and unsigned(instruction(15 downto 8)) >= unsigned(OPC_MOVB_R0) then
+			opcode  := instruction(15 downto 8);
+			if unsigned(opcode) <= unsigned(OPC_MOVB_R7) and unsigned(opcode) >= unsigned(OPC_MOVB_R0) then
 				s_en_imm <= '1';
 				s_alu_control  <= OPC_MOV;
 				s_next_word    <= '0';
@@ -61,7 +65,7 @@ begin
 				 
 				end case;
 			else
-				s_alu_control  <= instruction(15 downto 8);
+				s_alu_control  <= '0' & opcode(6 downto 0);
 				s_en_imm <= instruction(15);
 				s_next_word    <= instruction(15);
 				s_rD_sel       <= instruction(2 downto 0);
