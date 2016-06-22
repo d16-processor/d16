@@ -54,4 +54,13 @@ package cpu_constants is
 	constant CONDITION_L      : std_logic_vector(3 downto 0) := "1110";
 	constant CONDITION_ALWAYS : std_logic_vector(3 downto 0) := "1111";
 
-end cpu_constants;
+	
+	constant CONTROL_BIT_MAX      : integer := 5;
+	                                                                         
+	constant STATE_FETCH    : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "000001"; 
+	constant STATE_DECODE   : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "000010"; 
+	constant STATE_REG_READ : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "000100"; 
+	constant STATE_ALU      : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "001000"; 
+	constant STATE_MEM      : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "010000"; 
+	constant STATE_REG_WR   : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "100000"; 
+end cpu_constants;                                                           

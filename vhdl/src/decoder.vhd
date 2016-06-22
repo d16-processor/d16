@@ -26,15 +26,7 @@ architecture behavior of decoder is
 	signal s_immediate   : std_logic_vector(15 downto 0);
 	signal s_en_imm      : std_logic;
 	signal s_next_word   : std_logic;
-	pure function get_should_branch (flags : std_logic_vector(3 downto 0); code : std_logic_vector(3 downto 0)) return std_logic is
-begin
-	case code is
-	when CONDITION_ALWAYS  => 
-		return '1';
 	
-	end case;
-	return '1';
-	end function get_should_branch;
 	
 begin
 	alu_control  <= s_alu_control;

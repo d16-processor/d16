@@ -19,7 +19,10 @@ alu_tb: cpu_constants.o alu.o alu_tb.o
 	ghdl -e alu_tb
 	./alu_tb --stop-time=150ns --vcd=dump.vcd
 	gtkwave dump.vcd
-	
+control_tb: cpu_constants.o control.o control_tb.o
+	ghdl -e control_tb
+	./control_tb --stop-time=150ns --vcd=dump.vcd
+	gtkwave dump.vcd	
 alu_tb.o: ../tests/alu_tb.vhd ../src/alu.vhd
 	ghdl -a $<
 %.o: ../tests/%.vhd
