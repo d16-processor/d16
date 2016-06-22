@@ -31,10 +31,18 @@ begin
 	s_flags(FLAG_BIT_CARRY)    <= s_output(16);
 	s_flags(FLAG_BIT_SIGN)     <= s_output(15);
 	s_flags(FLAG_BIT_OVERFLOW) <= '1' when ov_op = '1' and s_data1_sign = s_data2_sign and s_data1_sign /= s_output(15) else '0';
-	proc : process(clk) is
+	alu_proc : process(clk) is
+		variable data1 : std_logic_vector(15 downto 0);
+		variable data2 : std_logic_vector(15 downto 0);
 	begin
 		if rising_edge(clk) then
 			if en = '1' then
+				data1 := rD_data;
+				if en_imm = '1' then
+					data2 := immediate;
+				else
+					data2 := rS_data;
+				end if;
 				case alu_control is     --overflow signals
 					when OPC_ADD =>
 						ov_op <= '1';
@@ -51,95 +59,51 @@ begin
 				end case;
 				case alu_control is
 					when OPC_ADD =>
-						if en_imm = '1' then
-							s_output     <= std_logic_vector(unsigned(rD_data(15) & rD_data) + unsigned(immediate(15) & immediate));
-							s_data1_sign <= rD_data(15);
-							s_data2_sign <= immediate(15);
+						s_output     <= std_logic_vector(unsigned(data1(15) & data1) + unsigned(data2(15) & data2));
+						s_data1_sign <= data1(15);
+						s_data2_sign <= data2(15);
 
-						else
-							s_output     <= std_logic_vector(unsigned(rD_data(15) & rD_data) + unsigned(rS_data(15) & rS_data));
-							s_data1_sign <= rD_data(15);
-							s_data2_sign <= rS_data(15);
-
-						end if;
 					when OPC_SUB =>
-						if en_imm = '1' then
-							s_output     <= std_logic_vector(unsigned(rD_data(15) & rD_data) - unsigned(immediate(15) & immediate));
-							s_data1_sign <= rD_data(15);
-							s_data2_sign <= not immediate(15);
-						else
-							s_output     <= std_logic_vector(unsigned(rD_data(15) & rD_data) - unsigned(rS_data(15) & rS_data));
-							s_data1_sign <= rD_data(15);
-							s_data2_sign <= not rS_data(15);
-						end if;
+						s_output     <= std_logic_vector(unsigned(data1(15) & data1) - unsigned(data2(15) & data2));
+						s_data1_sign <= data1(15);
+						s_data2_sign <= not data2(15);
+
 					when OPC_MOV =>
-						if en_imm = '1' then
-							s_output(15 downto 0) <= immediate;
-						else
-							s_output(15 downto 0) <= rS_data;
-						end if;
-						s_output(16) <= '0';
+						s_output(15 downto 0) <= data2;
+						s_output(16)          <= '0';
 					when OPC_AND =>
-						if en_imm = '1' then
-							s_output(15 downto 0) <= rD_data and immediate;
-						else
-							s_output(15 downto 0) <= rD_data and rS_data;
-						end if;
-						s_output(16) <= '0';
+						s_output(15 downto 0) <= data1 and data2;
+						s_output(16)          <= '0';
 					when OPC_OR =>
-						if en_imm = '1' then
-							s_output(15 downto 0) <= rD_data or immediate;
-						else
-							s_output(15 downto 0) <= rD_data or rS_data;
-						end if;
-						s_output(16) <= '0';
+						s_output(15 downto 0) <= data1 or data2;
+						s_output(16)          <= '0';
 					when OPC_XOR =>
-						if en_imm = '1' then
-							s_output(15 downto 0) <= rD_data xor immediate;
-						else
-							s_output(15 downto 0) <= rD_data xor rS_data;
-						end if;
+						s_output(15 downto 0) <= data1 xor data2;
+						s_output(16)          <= '0';
 					when OPC_NOT =>
-						s_output(15 downto 0) <= not rD_data;
+						s_output(15 downto 0) <= not data1;
 						s_output(16)          <= '0';
 					when OPC_NEG =>
-						s_output(15 downto 0) <= std_logic_vector(-signed(rD_data));
+						s_output(15 downto 0) <= std_logic_vector(-signed(data1));
 						s_output(16)          <= '0';
 					when OPC_SHL =>
-						if en_imm = '1' then
-							s_output <= std_logic_vector(shift_left(unsigned('0' & rD_data), to_integer(unsigned(immediate))));
-						else
-							s_output <= std_logic_vector(shift_left(unsigned('0' & rD_data), to_integer(unsigned(rS_data))));
-						end if;
+						s_output <= std_logic_vector(shift_left(unsigned('0' & data1), to_integer(unsigned(data2))));
 					when OPC_SHR =>
-						if en_imm = '1' then
-							s_output <= std_logic_vector(shift_right(unsigned('0' & rD_data), to_integer(unsigned(immediate))));
-						else
-							s_output <= std_logic_vector(shift_right(unsigned('0' & rD_data), to_integer(unsigned(rS_data))));
-						end if;
+						s_output <= std_logic_vector(shift_right(unsigned('0' & data1), to_integer(unsigned(data2))));
 					when OPC_ROL =>
-						if en_imm = '1' then
-							s_output(15 downto 0) <= std_logic_vector(rotate_left(unsigned(rD_data), to_integer(unsigned(immediate))));
-						else
-							s_output(15 downto 0) <= std_logic_vector(rotate_left(unsigned(rD_data), to_integer(unsigned(rS_data))));
-						end if;
-						s_output(16) <= '0';
-					when OPC_CMP  => 
-						if en_imm = '1' then
-							s_output     <= std_logic_vector(unsigned(rD_data(15) & rD_data) - unsigned(immediate(15) & immediate));
-							s_data1_sign <= rD_data(15);
-							s_data2_sign <= not immediate(15);
-						else
-							s_output     <= std_logic_vector(unsigned(rD_data(15) & rD_data) - unsigned(rS_data(15) & rS_data));
-							s_data1_sign <= rD_data(15);
-							s_data2_sign <= not rS_data(15);
-						end if;
+						s_output(15 downto 0) <= std_logic_vector(rotate_left(unsigned(data1), to_integer(unsigned(data2))));
+						s_output(16)          <= '0';
+					when OPC_CMP =>
+						s_output     <= std_logic_vector(unsigned(data1(15) & data1) - unsigned(data2(15) & data2));
+						s_data1_sign <= data1(15);
+						s_data2_sign <= not data2(15);
+
 					when others => s_output <= '0' & X"0000";
 				end case;
 
 			end if;
 		end if;
-	end process proc;
+	end process alu_proc;
 
 end architecture behavior;
 
