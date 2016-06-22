@@ -5,11 +5,12 @@ use ieee.numeric_std.all;
 use work.cpu_constants.all;
 entity control is
 	port(
-		clk     : in  std_logic;
-		en      : in  std_logic;
-		rst     : in  std_logic;
-		en_mem  : in  std_logic;
-		control : out std_logic_vector(CONTROL_BIT_MAX downto 0)
+		clk      : in  std_logic;
+		en       : in  std_logic;
+		rst      : in  std_logic;
+		en_mem   : in  std_logic;
+		mem_wait : in  std_logic;
+		control  : out std_logic_vector(CONTROL_BIT_MAX downto 0)
 	);
 end entity control;
 architecture behavior of control is
@@ -27,7 +28,11 @@ begin
 					--basically a FSM
 					case s_control is
 						when STATE_FETCH =>
-							s_control <= STATE_DECODE;
+							if mem_wait = '1' then
+								s_control <= STATE_FETCH;
+							else
+								s_control <= STATE_DECODE;
+							end if;
 						when STATE_DECODE =>
 							s_control <= STATE_REG_READ;
 						when STATE_REG_READ =>
@@ -39,11 +44,15 @@ begin
 								s_control <= STATE_REG_WR;
 							end if;
 						when STATE_MEM =>
-							s_control <= STATE_REG_WR;
+							if mem_wait = '1' then
+								s_control <= STATE_MEM;
+							else
+								s_control <= STATE_REG_WR;
+							end if;
 						when STATE_REG_WR =>
 							s_control <= STATE_FETCH;
-						when others  => 
-							s_control  <= STATE_FETCH;
+						when others =>
+							s_control <= STATE_FETCH;
 					end case;
 				end if;
 			end if;
