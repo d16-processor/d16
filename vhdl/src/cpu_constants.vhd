@@ -34,7 +34,28 @@ package cpu_constants is
 	constant OPC_STCP    : std_logic_vector(7 downto 0) := X"1E";
 	constant OPC_ADC     : std_logic_vector(7 downto 0) := X"1F";
 	constant OPC_SBB     : std_logic_vector(7 downto 0) := X"20";
+	
+	constant OPC_ADDI  : std_logic_vector(7 downto 0) := X"81";
+	constant OPC_SUBI  : std_logic_vector(7 downto 0) := X"82";
+	constant OPC_PUSHI : std_logic_vector(7 downto 0) := X"83";
+	constant OPC_MOVI  : std_logic_vector(7 downto 0) := X"8D";
+	constant OPC_ANDI  : std_logic_vector(7 downto 0) := X"8E";
+	constant OPC_ORI   : std_logic_vector(7 downto 0) := X"8F";
+	constant OPC_XORI  : std_logic_vector(7 downto 0) := X"90";
+	constant OPC_LDI   : std_logic_vector(7 downto 0) := X"93";
+	constant OPC_STI   : std_logic_vector(7 downto 0) := X"94";
+	constant OPC_CMPI  : std_logic_vector(7 downto 0) := X"95";
+	constant OPC_JMPI  : std_logic_vector(7 downto 0) := X"96";
+	constant OPC_CALLI : std_logic_vector(7 downto 0) := X"97";
+	constant OPC_SHLI  : std_logic_vector(7 downto 0) := X"99";
+	constant OPC_SHRI  : std_logic_vector(7 downto 0) := X"9A";
+	constant OPC_ROLI  : std_logic_vector(7 downto 0) := X"9B";
+	constant OPC_RCLI  : std_logic_vector(7 downto 0) := X"9C";
+	constant OPC_ADCI  : std_logic_vector(7 downto 0) := X"9F";
+	constant OPC_SBBI  : std_logic_vector(7 downto 0) := X"A0";
+	
 
+	
 	constant FLAG_BIT_ZERO     : integer := 0;
 	constant FLAG_BIT_CARRY    : integer := 1;
 	constant FLAG_BIT_SIGN     : integer := 2;

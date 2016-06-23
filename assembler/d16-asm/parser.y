@@ -44,7 +44,9 @@ instruction:
     |   OPCODE REGISTER COMMA CP_REGISTER NEWLINE{$$=new_instruction_rc($1,$2,$4);}
     |   OPCODE CP_REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_cr($1,$2,$4);}
     |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_rr($1,$2,$5);}
-    |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$3,$6);}
+    |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$6,$3);}
+	|	OPCODE REGISTER COMMA LBRACKET IMMEDIATE RBRACKET NEWLINE{$$=new_instruction_ri($1,$2,$5);}
+	|	OPCODE LBRACKET IMMEDIATE RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_ri($1,$6,$3);}
     |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
 
 ;

@@ -1,9 +1,9 @@
+nop
 mov r0,#0
-mov r1,#1
+mov r2,#3
+mov r1,#0xfeed
 add r0,r1
-add r0,r1
-shl r0,r1
-cmp r0,r1
-mov r2,#15
-add r2,r0
-adc r1,r3
+add r2,r2
+st [r0],r2
+ld r3,[r2]
+ld r4,[#45]

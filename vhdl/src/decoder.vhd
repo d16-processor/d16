@@ -75,7 +75,7 @@ begin
 				s_rS_sel      <= instruction(5 downto 3);
 				s_immediate   <= X"0000";
 			end if;
-			if opcode = OPC_ST or opcode = OPC_LD then
+			if opcode = OPC_ST or opcode = OPC_LD or opcode=OPC_LDI or opcode = OPC_STI then
 				en_mem  <= '1';
 			else
 				en_mem  <= '0';

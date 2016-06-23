@@ -204,7 +204,7 @@ begin
 	en_pc            <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ else '0';
 	en_register      <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
 	mem_enable       <= '1';
-	mem_write_enable <= '1' when control_state = STATE_MEM and instruction(15 downto 8) = OPC_ST else '0';
+	mem_write_enable <= '1' when control_state = STATE_MEM and ('0' & instruction(14 downto 8)) = OPC_ST else '0';
 	reg_write_enable  <= alu_wr_en when control_state = STATE_REG_WR else '0';
 	immediate  <= mem_data_out when next_word = '1' else dec_immediate;
 	rd_data_in <= mem_data_out when en_mem = '1' else alu_output;
