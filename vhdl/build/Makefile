@@ -27,6 +27,10 @@ pc_tb: cpu_constants.o pc_unit.o pc_tb.o
 	ghdl -e pc_tb
 	./pc_tb --stop-time=150ns --vcd=dump.vcd
 	gtkwave dump.vcd
+core_tb: cpu_constants.o core_tb.o pc_unit.o alu.o control.o decoder.o mem.o register_unit.o
+	ghdl -e core_tb
+	./core_tb --stop-time=500ns --vcd=dump.vcd
+	gtkwave dump.vcd
 %_tb: cpu_constants.o %.o %_tb.o
 	ghdl -e $@
 	./$@ --stop-time=150ns --vcd=dump.vcd
@@ -39,3 +43,7 @@ alu_tb.o: ../tests/alu_tb.vhd ../src/alu.vhd
 %.o: ../src/%.vhd
 	ghdl -a $< 
 
+clean:
+	-rm -f *.o
+	-rm -f *_tb
+	

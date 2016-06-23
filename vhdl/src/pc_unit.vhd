@@ -12,7 +12,7 @@ entity pc_unit is
 	);
 end entity pc_unit;
 architecture behavior of pc_unit is
-	signal pc : std_logic_vector(15 downto 0);
+	signal pc : std_logic_vector(15 downto 0)  := X"0000";
 begin
 	pc_out  <= pc;
 	name : process (clk) is

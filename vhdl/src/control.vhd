@@ -22,7 +22,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
-				s_control <= "000001";
+				s_control <= STATE_ALU;
 			else
 				if en = '1' then
 					--basically a FSM
