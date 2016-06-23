@@ -32,8 +32,8 @@ package cpu_constants is
 	constant OPC_RCL     : std_logic_vector(7 downto 0) := X"1C";
 	constant OPC_LDCP    : std_logic_vector(7 downto 0) := X"1D";
 	constant OPC_STCP    : std_logic_vector(7 downto 0) := X"1E";
-	constant OPC_ADC	 : std_logic_vector(7 downto 0) := X"1F";
-	constant OPC_SBB	 : std_logic_vector(7 downto 0) := X"20"; 
+	constant OPC_ADC     : std_logic_vector(7 downto 0) := X"1F";
+	constant OPC_SBB     : std_logic_vector(7 downto 0) := X"20";
 
 	constant FLAG_BIT_ZERO     : integer := 0;
 	constant FLAG_BIT_CARRY    : integer := 1;
@@ -56,16 +56,18 @@ package cpu_constants is
 	constant CONDITION_L      : std_logic_vector(3 downto 0) := "1110";
 	constant CONDITION_ALWAYS : std_logic_vector(3 downto 0) := "1111";
 
-	
-	constant CONTROL_BIT_MAX      : integer := 5;
-	                                                                         
-	constant STATE_FETCH    : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "000001"; 
-	constant STATE_DECODE   : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "000010"; 
-	constant STATE_REG_READ : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "000100"; 
-	constant STATE_ALU      : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "001000"; 
-	constant STATE_MEM      : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "010000"; 
-	constant STATE_REG_WR   : std_logic_vector(CONTROL_BIT_MAX downto 0)  := "100000";
-	
-	type e_pc_op is (NOP, INC,SET,RESET);
-	 
+	constant CONTROL_BIT_MAX : integer := 5;
+
+	constant STATE_FETCH    : std_logic_vector(CONTROL_BIT_MAX downto 0) := "000001";
+	constant STATE_DECODE   : std_logic_vector(CONTROL_BIT_MAX downto 0) := "000010";
+	constant STATE_REG_READ : std_logic_vector(CONTROL_BIT_MAX downto 0) := "000100";
+	constant STATE_ALU      : std_logic_vector(CONTROL_BIT_MAX downto 0) := "001000";
+	constant STATE_MEM      : std_logic_vector(CONTROL_BIT_MAX downto 0) := "010000";
+	constant STATE_REG_WR   : std_logic_vector(CONTROL_BIT_MAX downto 0) := "100000";
+
+	constant PC_NOP   : std_logic_vector(1 downto 0) := "00";
+	constant PC_INC   : std_logic_vector(1 downto 0) := "01";
+	constant PC_SET   : std_logic_vector(1 downto 0) := "10";
+	constant PC_RESET : std_logic_vector(1 downto 0) := "11";
+
 end cpu_constants;                                                           

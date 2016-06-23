@@ -11,14 +11,14 @@ architecture behavior of pc_tb is
 			clk    : in  std_logic;
 			en     : in  std_logic;
 			pc_in  : in  std_logic_vector(15 downto 0);
-			pc_op  : in  e_pc_op;
+			pc_op  : in  std_logic_vector(1 downto 0);
 			pc_out : out std_logic_vector(15 downto 0)
 		);
 	end component pc_unit;
 	signal clk          : std_logic;
 	signal en           : std_logic;
 	signal pc_in        : std_logic_vector(15 downto 0);
-	signal pc_op        : e_pc_op;
+	signal pc_op        : std_logic_vector(1 downto 0);
 	signal pc_out       : std_logic_vector(15 downto 0);
 	constant clk_period : time := 10 ns;
 begin
@@ -41,18 +41,18 @@ begin
 	begin
 		wait for clk_period;
 		en  <= '1';
-		pc_op  <= RESET;
+		pc_op  <= PC_RESET;
 		wait for clk_period;
 		assert pc_out = X"0000" report "Incorrect PC Value after reset" severity failure;
-		pc_op  <= INC;
+		pc_op  <= PC_INC;
 		wait for 5*clk_period;
 		assert pc_out = X"0005" report "Incorrect PC Value after pc increment" severity failure;
 		
-		pc_op  <= SET;
+		pc_op  <= PC_SET;
 		pc_in  <= X"1D43";
 		wait for clk_period;
 		assert pc_out = X"1d43" report "Incorrect PC Value after pc set" severity failure;
-		pc_op  <= INC;
+		pc_op  <= PC_INC;
 		wait for 4*clk_period;
 		assert pc_out = X"1d47" report "Incorrect PC Value after pc increment" severity failure;
 		en  <= '0';

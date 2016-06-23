@@ -53,7 +53,7 @@ architecture behavior of core_tb is
 			clk    : in  std_logic;
 			en     : in  std_logic;
 			pc_in  : in  std_logic_vector(15 downto 0);
-			pc_op  : in  e_pc_op;
+			pc_op  : in  std_logic_vector(1 downto 0);
 			pc_out : out std_logic_vector(15 downto 0)
 		);
 	end component pc_unit;
@@ -109,7 +109,7 @@ architecture behavior of core_tb is
 	signal next_word        : std_logic;
 	--PC Unit signals
 	signal pc_in            : std_logic_vector(15 downto 0);
-	signal pc_op            : e_pc_op;
+	signal pc_op            : std_logic_vector(1 downto 0);
 	signal pc_out           : std_logic_vector(15 downto 0);
 	--register unit signals;
 	signal rD_data_in       : std_logic_vector(15 downto 0);
@@ -198,9 +198,9 @@ begin
 		);
 	en_alu      <= '1' when control_state = STATE_ALU else '0';
 	en_decoder  <= '1' when control_state = STATE_DECODE else '0';
-	en_pc       <= '1' when control_state = STATE_DECODE or control_state = STATE_REG_WR else '0';
+	en_pc       <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ else '0';
 	en_register <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
-	mem_enable  <= '1' when control_state = STATE_REG_WR or control_state = STATE_MEM else '0';
+	mem_enable  <= '1' ;
 	mem_write_enable  <= '1' when control_state = STATE_MEM and instruction(15 downto 8) = OPC_ST else '0';
 	mem_data_in  <= rS_data;
 	immediate   <= mem_data_out when next_word = '1' else dec_immediate;
@@ -224,21 +224,25 @@ begin
 				case control_state is
 					when STATE_FETCH =>
 						instruction <= mem_data_out;
-						pc_op       <= INC;
+						
 					when STATE_MEM =>
 						mem_addr         <= pc_out;
-						
+					when STATE_REG_WR  => 
+						pc_op  <= PC_INC;
 					when STATE_ALU  => 
 						if en_mem = '0' then
 							mem_addr  <= pc_out;
 						end if;
+						
 						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
+					
 					when STATE_DECODE =>
 						flags_in  <= flags_out;
-						if instruction(15) = '1' then
-							pc_op <= INC;
+						mem_addr  <= pc_out;
+						if mem_data_out(15) = '1' then
+							pc_op <= PC_INC;
 						else
-							pc_op <= NOP;
+							pc_op <= PC_NOP;
 						end if;
 
 					when others =>
