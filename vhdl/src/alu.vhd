@@ -15,6 +15,7 @@ entity alu is
 		flags_in      : in  std_logic_vector(3 downto 0);
 		should_branch : out std_logic;
 		output        : out std_logic_vector(15 downto 0);
+		mem_data      : out std_logic_vector(15 downto 0);
 		write         : out std_logic;
 		flags_out     : out std_logic_vector(3 downto 0)
 	);
@@ -27,6 +28,8 @@ architecture behavior of alu is
 	signal s_data2_sign : std_logic;
 	signal s_flags      : std_logic_vector(3 downto 0);
 	signal ov_op        : std_logic;
+	signal s_mem_data   : std_logic_vector(15 downto 0);
+
 	pure function get_should_branch(flags : std_logic_vector(3 downto 0); code : std_logic_vector(3 downto 0)) return std_logic is
 	begin
 		case code is
@@ -74,6 +77,7 @@ begin
 	s_flags(FLAG_BIT_SIGN)     <= s_output(15);
 	s_flags(FLAG_BIT_OVERFLOW) <= '1' when ov_op = '1' and s_data1_sign = s_data2_sign and s_data1_sign /= s_output(15) else '0';
 	flags_out                  <= s_flags;
+	mem_data                   <= s_mem_data;
 	alu_proc : process(clk) is
 		variable data1 : std_logic_vector(15 downto 0);
 		variable data2 : std_logic_vector(15 downto 0);
@@ -95,6 +99,8 @@ begin
 				case alu_control is
 					when OPC_CMP =>
 						write <= '0';
+					when OPC_ST  => 
+						write  <= '0';
 					when others =>
 						write <= '1';
 				end case;
@@ -148,10 +154,15 @@ begin
 						s_data1_sign <= data1(15);
 						s_data2_sign <= not data2(15);
 					when OPC_JMP =>
-						s_output      <= '0' & data1;
+						s_output        <= '0' & data1;
 						s_should_branch <= get_should_branch(flags_in, condition);
-
-					when others => s_output <= '0' & X"0000";
+					when OPC_ST =>
+						
+						s_mem_data            <= data1;
+						
+					when OPC_LD  => 
+						
+					when others => s_output   <= '0' & X"0000";
 				end case;
 
 			end if;

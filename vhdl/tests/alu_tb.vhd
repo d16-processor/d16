@@ -19,6 +19,7 @@ architecture behavior of alu_tb is
 			flags_in      : in  std_logic_vector(3 downto 0);
 			should_branch : out std_logic;
 			output        : out std_logic_vector(15 downto 0);
+			mem_data      : out std_logic_vector(15 downto 0);
 			write         : out std_logic;
 			flags_out     : out std_logic_vector(3 downto 0)
 		);
@@ -36,13 +37,15 @@ architecture behavior of alu_tb is
 	signal s_flags_in      : std_logic_vector(3 downto 0);
 	signal s_flags_out     : std_logic_vector(3 downto 0);
 	signal s_write_en      : std_logic;
+	signal s_mem_data      : std_logic_vector(15 downto 0);
 	signal s_condition     : std_logic_vector(3 downto 0);
 	constant clk_period    : time := 10 ns;
 
 begin
 	uut : entity work.alu
 		port map(
-			condition => s_condition,
+			mem_data      => s_mem_data,
+			condition     => s_condition,
 			clk           => s_clk,
 			en            => s_en,
 			alu_control   => s_alu_control,
@@ -126,9 +129,9 @@ begin
 		s_immediate   <= X"0006";
 		wait for clk_period;
 		assert s_output = X"E943" report "Incorrect value after ROL" severity failure;
-		s_alu_control  <= OPC_ADC;
-		s_flags_in  <= (FLAG_BIT_CARRY  => '1', others  => '0');
-		s_rD_data  <= X"0001";
+		s_alu_control <= OPC_ADC;
+		s_flags_in    <= (FLAG_BIT_CARRY => '1', others => '0');
+		s_rD_data     <= X"0001";
 		wait for clk_period;
 		assert s_output = X"0008" report "Incorrect value after ADC" severity failure;
 		wait;

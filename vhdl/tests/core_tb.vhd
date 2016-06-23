@@ -19,6 +19,7 @@ architecture behavior of core_tb is
 			flags_in      : in  std_logic_vector(3 downto 0);
 			should_branch : out std_logic;
 			output        : out std_logic_vector(15 downto 0);
+			mem_data      : out std_logic_vector(15 downto 0);
 			write         : out std_logic;
 			flags_out     : out std_logic_vector(3 downto 0)
 		);
@@ -82,11 +83,11 @@ architecture behavior of core_tb is
 		);
 	end component mem;
 
-	signal clk              : std_logic;
-	signal rst              : std_logic;
+	signal clk         : std_logic;
+	signal rst         : std_logic;
 	--ALU specific signals
-	signal alu_control      : std_logic_vector(7 downto 0);
-	
+	signal alu_control : std_logic_vector(7 downto 0);
+
 	signal rD_data          : std_logic_vector(15 downto 0);
 	signal rS_data          : std_logic_vector(15 downto 0);
 	signal immediate        : std_logic_vector(15 downto 0);
@@ -125,6 +126,7 @@ architecture behavior of core_tb is
 	signal en_pc            : std_logic;
 	signal en_register      : std_logic;
 	signal mem_enable       : std_logic;
+	signal alu_wr_en : std_logic;
 	constant clk_period     : time := 10 ns;
 begin
 	alu_inst : component alu
@@ -140,7 +142,8 @@ begin
 			flags_in      => flags_in,
 			should_branch => should_branch,
 			output        => alu_output,
-			write         => reg_write_enable,
+			mem_data      => mem_data_in,
+			write         => alu_wr_en,
 			flags_out     => flags_out
 		);
 	control_inst : component control
@@ -196,16 +199,16 @@ begin
 			data_out     => mem_data_out,
 			mem_wait     => mem_wait
 		);
-	en_alu      <= '1' when control_state = STATE_ALU else '0';
-	en_decoder  <= '1' when control_state = STATE_DECODE else '0';
-	en_pc       <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ else '0';
-	en_register <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
-	mem_enable  <= '1' ;
-	mem_write_enable  <= '1' when control_state = STATE_MEM and instruction(15 downto 8) = OPC_ST else '0';
-	mem_data_in  <= rS_data;
-	immediate   <= mem_data_out when next_word = '1' else dec_immediate;
-	rd_data_in  <= alu_output;
-	pc_in   <= alu_output;
+	en_alu           <= '1' when control_state = STATE_ALU else '0';
+	en_decoder       <= '1' when control_state = STATE_DECODE else '0';
+	en_pc            <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ else '0';
+	en_register      <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
+	mem_enable       <= '1';
+	mem_write_enable <= '1' when control_state = STATE_MEM and instruction(15 downto 8) = OPC_ST else '0';
+	reg_write_enable  <= alu_wr_en when control_state = STATE_REG_WR else '0';
+	immediate  <= mem_data_out when next_word = '1' else dec_immediate;
+	rd_data_in <= mem_data_out when en_mem = '1' else alu_output;
+	pc_in      <= alu_output;
 	clk_proc : process is
 	begin
 		clk <= '0';
@@ -217,28 +220,36 @@ begin
 	begin
 		if rising_edge(clk) and en = '1' then
 			if rst = '1' then
-				flags_in  <= "0000";
+				flags_in <= "0000";
 			else
-				
-				
 				case control_state is
 					when STATE_FETCH =>
 						instruction <= mem_data_out;
-						
+
 					when STATE_MEM =>
-						mem_addr         <= pc_out;
-					when STATE_REG_WR  => 
-						pc_op  <= PC_INC;
-					when STATE_ALU  => 
+						mem_addr <= pc_out;
+
+					when STATE_REG_WR =>
+						pc_op    <= PC_INC;
+						mem_addr <= pc_out;
+
+					when STATE_ALU =>
 						if en_mem = '0' then
-							mem_addr  <= pc_out;
+							mem_addr <= pc_out;
+						else
+							if en_immediate = '1' then
+								mem_addr <= immediate;
+							else
+								mem_addr <= rS_data;
+							end if;
+
 						end if;
-						
+
 						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
-					
+
 					when STATE_DECODE =>
-						flags_in  <= flags_out;
-						mem_addr  <= pc_out;
+						flags_in <= flags_out;
+						mem_addr <= pc_out;
 						if mem_data_out(15) = '1' then
 							pc_op <= PC_INC;
 						else

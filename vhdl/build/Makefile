@@ -41,7 +41,7 @@ ifdef WAVE
 endif
 core_tb: cpu_constants.o core_tb.o pc_unit.o alu.o control.o decoder.o mem.o register_unit.o mem.bin
 	ghdl -e core_tb
-	./core_tb --stop-time=500ns --vcd=dump.vcd
+	./core_tb --stop-time=700ns --vcd=dump.vcd
 ifdef WAVE
 	gtkwave dump.vcd
 endif
