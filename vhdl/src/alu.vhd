@@ -22,11 +22,11 @@ end alu;
 architecture behavior of alu is
 	signal s_output        : std_logic_vector(16 downto 0) := (others => '0');
 	signal s_should_branch : std_logic                     := '0';
-	
-	signal s_data1_sign    : std_logic;
-	signal s_data2_sign    : std_logic;
 
-	signal ov_op : std_logic;
+	signal s_data1_sign : std_logic;
+	signal s_data2_sign : std_logic;
+	signal s_flags      : std_logic_vector(3 downto 0);
+	signal ov_op        : std_logic;
 	pure function get_should_branch(flags : std_logic_vector(3 downto 0); code : std_logic_vector(3 downto 0)) return std_logic is
 	begin
 		case code is
@@ -69,11 +69,11 @@ architecture behavior of alu is
 begin
 	output                     <= s_output(15 downto 0);
 	should_branch              <= s_should_branch;
-	flags_out(FLAG_BIT_ZERO)     <= '1' when s_output(15 downto 0) = X"0000" else '0';
-	flags_out(FLAG_BIT_CARRY)    <= s_output(16);
-	flags_out(FLAG_BIT_SIGN)     <= s_output(15);
-	flags_out(FLAG_BIT_OVERFLOW) <= '1' when ov_op = '1' and s_data1_sign = s_data2_sign and s_data1_sign /= s_output(15) else '0';
-	
+	s_flags(FLAG_BIT_ZERO)     <= '1' when s_output(15 downto 0) = X"0000" else '0';
+	s_flags(FLAG_BIT_CARRY)    <= s_output(16);
+	s_flags(FLAG_BIT_SIGN)     <= s_output(15);
+	s_flags(FLAG_BIT_OVERFLOW) <= '1' when ov_op = '1' and s_data1_sign = s_data2_sign and s_data1_sign /= s_output(15) else '0';
+	flags_out                  <= s_flags;
 	alu_proc : process(clk) is
 		variable data1 : std_logic_vector(15 downto 0);
 		variable data2 : std_logic_vector(15 downto 0);
@@ -87,7 +87,7 @@ begin
 					data2 := rS_data;
 				end if;
 				case alu_control is     --overflow signals
-					when OPC_ADD|OPC_SUB|OPC_ADC|OPC_SBB =>
+					when OPC_ADD | OPC_SUB | OPC_ADC | OPC_SBB =>
 						ov_op <= '1';
 					when others =>
 						ov_op <= '0';
@@ -108,11 +108,11 @@ begin
 						s_output     <= std_logic_vector(unsigned(data1(15) & data1) - unsigned(data2(15) & data2));
 						s_data1_sign <= data1(15);
 						s_data2_sign <= not data2(15);
-					when OPC_ADC  => 
-						s_output  <= std_logic_vector(unsigned(data1(15) & data1) + unsigned(data2(15) & data2) + ('0' & flags_in(FLAG_BIT_CARRY)));
-						s_data1_sign  <= data1(15);
-						s_data2_sign  <= data2(15);
-					when OPC_SBB  => 
+					when OPC_ADC =>
+						s_output     <= std_logic_vector(unsigned(data1(15) & data1) + unsigned(data2(15) & data2) + ('0' & flags_in(FLAG_BIT_CARRY)));
+						s_data1_sign <= data1(15);
+						s_data2_sign <= data2(15);
+					when OPC_SBB =>
 						s_output     <= std_logic_vector(unsigned(data1(15) & data1) - unsigned(data2(15) & data2) - ('0' & flags_in(FLAG_BIT_CARRY)));
 						s_data1_sign <= data1(15);
 						s_data2_sign <= not data2(15);
@@ -147,10 +147,10 @@ begin
 						s_output     <= std_logic_vector(unsigned(data1(15) & data1) - unsigned(data2(15) & data2));
 						s_data1_sign <= data1(15);
 						s_data2_sign <= not data2(15);
-					when OPC_JMP => 
-						s_output  <= '0' & data1;
-						should_branch  <= get_should_branch(flags_in, condition);
-	
+					when OPC_JMP =>
+						s_output      <= '0' & data1;
+						should_branch <= get_should_branch(flags_in, condition);
+
 					when others => s_output <= '0' & X"0000";
 				end case;
 

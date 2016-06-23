@@ -214,9 +214,10 @@ begin
 	begin
 		if rising_edge(clk) and en = '1' then
 			if rst = '1' then
-				flags_out  <= "0000";
+				
 			else
-				flags_out <= flags_in;
+				flags_in <= flags_out;
+				
 				case control_state is
 					when STATE_FETCH =>
 						instruction <= mem_data_out;
@@ -228,6 +229,7 @@ begin
 						if en_mem = '0' then
 							mem_addr  <= pc_out;
 						end if;
+						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
 					when STATE_DECODE =>
 						if instruction(15) = '1' then
 							pc_op <= INC;
@@ -244,6 +246,7 @@ begin
 	stim_proc : process is
 	begin
 		rst <= '1';
+		flags_in  <= "0000";
 		wait for clk_period;
 		rst <= '0';
 		en  <= '1';
