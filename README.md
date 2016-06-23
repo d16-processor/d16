@@ -27,7 +27,8 @@ make
 # CPU 
 A general layout of the CPU is provided here, this is subject to change during the project
 ![alt text](https://raw.githubusercontent.com/C-Elegans/d16/master/D16%20Cpu%20Diagram.png "D16 CPU Diagram")
-
+The CPU's execution cycle will take between 4 and 6 cycles, and will look something like this:
+![alt text](https://raw.githubusercontent.com/C-Elegans/d16/master/CPU%20Execution.png "D16 Execution Diagram")
 ## Module testbenches
 All testbenches can be run from the makefile in `vhdl/build/`
 The makefile assumes that you have both GHDL and gtkwave installed and in your path. 

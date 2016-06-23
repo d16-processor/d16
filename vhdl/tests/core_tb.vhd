@@ -69,6 +69,20 @@ architecture behavior of core_tb is
 			rS_data_out : out std_logic_vector(15 downto 0)
 		);
 	end component register_unit;
+	component mem
+		port(
+			clk          : in  std_logic;
+			rst          : in  std_logic;
+			en           : in  std_logic;
+			write_enable : in  std_logic;
+			addr         : in  std_logic_vector(15 downto 0);
+			data_in      : in  std_logic_vector(15 downto 0);
+			data_out     : out std_logic_vector(15 downto 0);
+			mem_wait     : out std_logic
+		);
+	end component mem;
+	signal clk : std_logic;
+	signal rst: std_logic;
 begin
 	
 end architecture behavior;
