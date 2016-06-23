@@ -201,8 +201,11 @@ begin
 	en_pc       <= '1' when control_state = STATE_DECODE or control_state = STATE_REG_WR else '0';
 	en_register <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
 	mem_enable  <= '1' when control_state = STATE_REG_WR or control_state = STATE_MEM else '0';
+	mem_write_enable  <= '1' when control_state = STATE_MEM and instruction(15 downto 8) = OPC_ST else '0';
+	mem_data_in  <= rS_data;
 	immediate   <= mem_data_out when next_word = '1' else dec_immediate;
 	rd_data_in  <= alu_output;
+	pc_in   <= alu_output;
 	clk_proc : process is
 	begin
 		clk <= '0';
@@ -214,9 +217,9 @@ begin
 	begin
 		if rising_edge(clk) and en = '1' then
 			if rst = '1' then
-				
+				flags_in  <= "0000";
 			else
-				flags_in <= flags_out;
+				
 				
 				case control_state is
 					when STATE_FETCH =>
@@ -224,13 +227,14 @@ begin
 						pc_op       <= INC;
 					when STATE_MEM =>
 						mem_addr         <= pc_out;
-						mem_write_enable <= '0';
+						
 					when STATE_ALU  => 
 						if en_mem = '0' then
 							mem_addr  <= pc_out;
 						end if;
 						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
 					when STATE_DECODE =>
+						flags_in  <= flags_out;
 						if instruction(15) = '1' then
 							pc_op <= INC;
 						else
@@ -246,7 +250,6 @@ begin
 	stim_proc : process is
 	begin
 		rst <= '1';
-		flags_in  <= "0000";
 		wait for clk_period;
 		rst <= '0';
 		en  <= '1';

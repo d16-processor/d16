@@ -149,7 +149,7 @@ begin
 						s_data2_sign <= not data2(15);
 					when OPC_JMP =>
 						s_output      <= '0' & data1;
-						should_branch <= get_should_branch(flags_in, condition);
+						s_should_branch <= get_should_branch(flags_in, condition);
 
 					when others => s_output <= '0' & X"0000";
 				end case;

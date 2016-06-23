@@ -22,9 +22,11 @@ architecture behavior of mem is
 	signal mem_storage : mem_storage_t;
 
 begin
+	mem_wait  <= '0';
 	mem_proc : process(clk) is
 		FILE file_in : t_char_file OPEN read_mode is "./mem.bin";
 		variable char_buffer : character;
+		
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
