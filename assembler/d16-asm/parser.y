@@ -51,11 +51,11 @@ instruction:
 	|	OPCODE REGISTER COMMA LBRACKET NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,0,$5,false,false);}
 	|	OPCODE LBRACKET NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$6,$3,false,false);}
 	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,0,$6,true,false);}
-	|	OPCODE BYTE_FLAG LBRACKET NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$4,$7,true,false);}
+	|	OPCODE BYTE_FLAG LBRACKET NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$7,$4,true,false);}
 	|	OPCODE REGISTER COMMA LBRACKET REGISTER PLUS NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,$5,$7,false,true);}
-	|	OPCODE LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$3,$8,$5,false,true);}
+	|	OPCODE LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$8,$3,$5,false,true);}
 	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER PLUS NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,$6,$8,true,true);}
-	|	OPCODE BYTE_FLAG LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$4,$9,$6,true,true);}
+	|	OPCODE BYTE_FLAG LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$9,$4,$6,true,true);}
     |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
 
 ;

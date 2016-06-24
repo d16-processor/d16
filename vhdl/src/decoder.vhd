@@ -5,17 +5,19 @@ use IEEE.numeric_std.ALL;
 use work.cpu_constants.ALL;
 entity decoder is
 	port(
-		clk          : in  std_logic;
-		en           : in  std_logic;
-		instruction  : in  std_logic_vector(15 downto 0);
-		alu_control  : out std_logic_vector(7 downto 0);
-		rD_sel       : out std_logic_vector(2 downto 0);
-		rS_sel       : out std_logic_vector(2 downto 0);
-		immediate    : out std_logic_vector(15 downto 0);
-		en_immediate : out std_logic;
-		next_word    : out std_logic;
-		en_mem       : out std_logic;
-		condition    : out std_logic_vector(3 downto 0)
+		clk              : in  std_logic;
+		en               : in  std_logic;
+		instruction      : in  std_logic_vector(15 downto 0);
+		alu_control      : out std_logic_vector(7 downto 0);
+		rD_sel           : out std_logic_vector(2 downto 0);
+		rS_sel           : out std_logic_vector(2 downto 0);
+		immediate        : out std_logic_vector(15 downto 0);
+		en_immediate     : out std_logic;
+		next_word        : out std_logic;
+		en_mem           : out std_logic;
+		mem_displacement : out std_logic;
+		mem_byte         : out std_logic;
+		condition        : out std_logic_vector(3 downto 0)
 	);
 
 end decoder;
@@ -26,8 +28,7 @@ architecture behavior of decoder is
 	signal s_immediate   : std_logic_vector(15 downto 0);
 	signal s_en_imm      : std_logic;
 	signal s_next_word   : std_logic;
-	
-	
+
 begin
 	alu_control  <= s_alu_control;
 	rD_sel       <= s_rD_sel;
@@ -35,7 +36,7 @@ begin
 	immediate    <= s_immediate;
 	en_immediate <= s_en_imm;
 	next_word    <= s_next_word;
-	
+
 	process(clk, en)
 		variable opcode : std_logic_vector(7 downto 0);
 
@@ -48,7 +49,7 @@ begin
 				s_next_word   <= '0';
 
 				s_immediate <= X"00" & instruction(7 downto 0);
-				case instruction(15 downto 8) is
+				case opcode is
 					when OPC_MOVB_R0 =>
 						s_rD_sel <= "000";
 					when OPC_MOVB_R1 =>
@@ -75,20 +76,28 @@ begin
 				s_rS_sel      <= instruction(5 downto 3);
 				s_immediate   <= X"0000";
 			end if;
-			if opcode = OPC_ST or opcode = OPC_LD or opcode=OPC_LDI or opcode = OPC_STI then
-				en_mem  <= '1';
+			if opcode = OPC_ST or opcode = OPC_LD or opcode = OPC_LDI or opcode = OPC_STI then
+				en_mem <= '1';
+				mem_byte  <= instruction(7);
 			else
-				en_mem  <= '0';
+				mem_byte  <= '0';
+				en_mem <= '0';
 			end if;
+			if opcode = OPC_LDI or opcode = OPC_STI then
+				mem_displacement  <= instruction(6);
+			else
+				mem_displacement  <=  '0';
+			end if;
+			
 			if opcode = OPC_JMP then
-				condition  <= instruction(6 downto 3);
-			else 
-				condition  <= "0000";
+				condition <= instruction(6 downto 3);
+			else
+				condition <= "0000";
 			end if;
 
 		end if;
 	end process;
-	
+
 end behavior;
 
 	

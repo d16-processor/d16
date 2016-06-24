@@ -8,20 +8,21 @@ end alu_tb;
 architecture behavior of alu_tb is
 	component alu
 		port(
-			clk           : in  std_logic;
-			en            : in  std_logic;
-			alu_control   : in  std_logic_vector(7 downto 0);
-			en_imm        : in  std_logic;
-			rD_data       : in  std_logic_vector(15 downto 0);
-			rS_data       : in  std_logic_vector(15 downto 0);
-			immediate     : in  std_logic_vector(15 downto 0);
-			condition     : in  std_logic_vector(3 downto 0);
-			flags_in      : in  std_logic_vector(3 downto 0);
-			should_branch : out std_logic;
-			output        : out std_logic_vector(15 downto 0);
-			mem_data      : out std_logic_vector(15 downto 0);
-			write         : out std_logic;
-			flags_out     : out std_logic_vector(3 downto 0)
+			clk              : in  std_logic;
+			en               : in  std_logic;
+			alu_control      : in  std_logic_vector(7 downto 0);
+			en_imm           : in  std_logic;
+			rD_data          : in  std_logic_vector(15 downto 0);
+			rS_data          : in  std_logic_vector(15 downto 0);
+			immediate        : in  std_logic_vector(15 downto 0);
+			condition        : in  std_logic_vector(3 downto 0);
+			flags_in         : in  std_logic_vector(3 downto 0);
+			mem_displacement : in  std_logic;
+			should_branch    : out std_logic;
+			output           : out std_logic_vector(15 downto 0);
+			mem_data         : out std_logic_vector(15 downto 0);
+			write            : out std_logic;
+			flags_out        : out std_logic_vector(3 downto 0)
 		);
 	end component alu;
 	signal s_clk         : std_logic := '0';
@@ -32,32 +33,34 @@ architecture behavior of alu_tb is
 	signal s_rS_data     : std_logic_vector(15 downto 0);
 	signal s_immediate   : std_logic_vector(15 downto 0);
 
-	signal s_should_branch : std_logic;
-	signal s_output        : std_logic_vector(15 downto 0);
-	signal s_flags_in      : std_logic_vector(3 downto 0);
-	signal s_flags_out     : std_logic_vector(3 downto 0);
-	signal s_write_en      : std_logic;
-	signal s_mem_data      : std_logic_vector(15 downto 0);
-	signal s_condition     : std_logic_vector(3 downto 0);
-	constant clk_period    : time := 10 ns;
+	signal s_should_branch  : std_logic;
+	signal s_output         : std_logic_vector(15 downto 0);
+	signal s_flags_in       : std_logic_vector(3 downto 0);
+	signal s_flags_out      : std_logic_vector(3 downto 0);
+	signal s_write_en       : std_logic;
+	signal s_mem_data       : std_logic_vector(15 downto 0);
+	signal s_condition      : std_logic_vector(3 downto 0);
+	signal mem_displacement : std_logic := '0';
+	constant clk_period     : time      := 10 ns;
 
 begin
 	uut : entity work.alu
 		port map(
-			mem_data      => s_mem_data,
-			condition     => s_condition,
-			clk           => s_clk,
-			en            => s_en,
-			alu_control   => s_alu_control,
-			en_imm        => s_en_imm,
-			rD_data       => s_rD_data,
-			rS_data       => s_rS_data,
-			immediate     => s_immediate,
-			flags_in      => s_flags_in,
-			should_branch => s_should_branch,
-			output        => s_output,
-			write         => s_write_en,
-			flags_out     => s_flags_out
+			mem_displacement => mem_displacement,
+			mem_data         => s_mem_data,
+			condition        => s_condition,
+			clk              => s_clk,
+			en               => s_en,
+			alu_control      => s_alu_control,
+			en_imm           => s_en_imm,
+			rD_data          => s_rD_data,
+			rS_data          => s_rS_data,
+			immediate        => s_immediate,
+			flags_in         => s_flags_in,
+			should_branch    => s_should_branch,
+			output           => s_output,
+			write            => s_write_en,
+			flags_out        => s_flags_out
 		);
 	clk_proc : process is
 	begin

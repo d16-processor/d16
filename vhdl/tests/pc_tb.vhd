@@ -46,7 +46,7 @@ begin
 		assert pc_out = X"0000" report "Incorrect PC Value after reset" severity failure;
 		pc_op  <= PC_INC;
 		wait for 5*clk_period;
-		assert pc_out = X"0005" report "Incorrect PC Value after pc increment" severity failure;
+		assert pc_out = X"000A" report "Incorrect PC Value after pc increment" severity failure;
 		
 		pc_op  <= PC_SET;
 		pc_in  <= X"1D43";
@@ -54,7 +54,7 @@ begin
 		assert pc_out = X"1d43" report "Incorrect PC Value after pc set" severity failure;
 		pc_op  <= PC_INC;
 		wait for 4*clk_period;
-		assert pc_out = X"1d47" report "Incorrect PC Value after pc increment" severity failure;
+		assert pc_out = X"1d4B" report "Incorrect PC Value after pc increment" severity failure;
 		en  <= '0';
 		wait;
 	end process stim_proc;

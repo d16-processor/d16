@@ -4,20 +4,21 @@ use ieee.numeric_std.all;
 use work.cpu_constants.all;
 entity alu is
 	port(
-		clk           : in  std_logic;
-		en            : in  std_logic;
-		alu_control   : in  std_logic_vector(7 downto 0);
-		en_imm        : in  std_logic;
-		rD_data       : in  std_logic_vector(15 downto 0);
-		rS_data       : in  std_logic_vector(15 downto 0);
-		immediate     : in  std_logic_vector(15 downto 0);
-		condition     : in  std_logic_vector(3 downto 0);
-		flags_in      : in  std_logic_vector(3 downto 0);
-		should_branch : out std_logic;
-		output        : out std_logic_vector(15 downto 0);
-		mem_data      : out std_logic_vector(15 downto 0);
-		write         : out std_logic;
-		flags_out     : out std_logic_vector(3 downto 0)
+		clk              : in  std_logic;
+		en               : in  std_logic;
+		alu_control      : in  std_logic_vector(7 downto 0);
+		en_imm           : in  std_logic;
+		rD_data          : in  std_logic_vector(15 downto 0);
+		rS_data          : in  std_logic_vector(15 downto 0);
+		immediate        : in  std_logic_vector(15 downto 0);
+		condition        : in  std_logic_vector(3 downto 0);
+		flags_in         : in  std_logic_vector(3 downto 0);
+		mem_displacement : in  std_logic;
+		should_branch    : out std_logic;
+		output           : out std_logic_vector(15 downto 0);
+		mem_data         : out std_logic_vector(15 downto 0);
+		write            : out std_logic;
+		flags_out        : out std_logic_vector(3 downto 0)
 	);
 end alu;
 architecture behavior of alu is
@@ -99,8 +100,8 @@ begin
 				case alu_control is
 					when OPC_CMP =>
 						write <= '0';
-					when OPC_ST  => 
-						write  <= '0';
+					when OPC_ST =>
+						write <= '0';
 					when others =>
 						write <= '1';
 				end case;
@@ -157,11 +158,19 @@ begin
 						s_output        <= '0' & data1;
 						s_should_branch <= get_should_branch(flags_in, condition);
 					when OPC_ST =>
-						
-						s_mem_data            <= data1;
-						
-					when OPC_LD  => 
-						
+						if mem_displacement = '1' then
+							s_output(15 downto 0) <= std_logic_vector(unsigned(rS_data) + unsigned(immediate));
+						else
+							s_output(15 downto 0) <= data2;
+						end if;
+						s_mem_data <= data1;
+
+					when OPC_LD =>
+						if mem_displacement = '1' then
+							s_output(15 downto 0) <= std_logic_vector(unsigned(rS_data) + unsigned(immediate));
+						else
+							s_output(15 downto 0) <= data2;
+						end if;
 					when others => s_output   <= '0' & X"0000";
 				end case;
 

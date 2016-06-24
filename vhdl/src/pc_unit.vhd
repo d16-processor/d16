@@ -23,7 +23,7 @@ begin
 					when PC_NOP =>
 						pc <= pc;
 					when PC_INC =>
-						pc <= std_logic_vector(unsigned(pc) + 1);
+						pc <= std_logic_vector(unsigned(pc) + 2);
 					when PC_SET =>
 						pc <= pc_in;
 					when PC_RESET =>

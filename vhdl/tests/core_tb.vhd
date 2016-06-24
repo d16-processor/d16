@@ -8,20 +8,21 @@ end core_tb;
 architecture behavior of core_tb is
 	component alu
 		port(
-			clk           : in  std_logic;
-			en            : in  std_logic;
-			alu_control   : in  std_logic_vector(7 downto 0);
-			en_imm        : in  std_logic;
-			rD_data       : in  std_logic_vector(15 downto 0);
-			rS_data       : in  std_logic_vector(15 downto 0);
-			immediate     : in  std_logic_vector(15 downto 0);
-			condition     : in  std_logic_vector(3 downto 0);
-			flags_in      : in  std_logic_vector(3 downto 0);
-			should_branch : out std_logic;
-			output        : out std_logic_vector(15 downto 0);
-			mem_data      : out std_logic_vector(15 downto 0);
-			write         : out std_logic;
-			flags_out     : out std_logic_vector(3 downto 0)
+			clk              : in  std_logic;
+			en               : in  std_logic;
+			alu_control      : in  std_logic_vector(7 downto 0);
+			en_imm           : in  std_logic;
+			rD_data          : in  std_logic_vector(15 downto 0);
+			rS_data          : in  std_logic_vector(15 downto 0);
+			immediate        : in  std_logic_vector(15 downto 0);
+			condition        : in  std_logic_vector(3 downto 0);
+			flags_in         : in  std_logic_vector(3 downto 0);
+			mem_displacement : in  std_logic;
+			should_branch    : out std_logic;
+			output           : out std_logic_vector(15 downto 0);
+			mem_data         : out std_logic_vector(15 downto 0);
+			write            : out std_logic;
+			flags_out        : out std_logic_vector(3 downto 0)
 		);
 	end component alu;
 	component control
@@ -36,17 +37,19 @@ architecture behavior of core_tb is
 	end component control;
 	component decoder
 		port(
-			clk          : in  std_logic;
-			en           : in  std_logic;
-			instruction  : in  std_logic_vector(15 downto 0);
-			alu_control  : out std_logic_vector(7 downto 0);
-			rD_sel       : out std_logic_vector(2 downto 0);
-			rS_sel       : out std_logic_vector(2 downto 0);
-			immediate    : out std_logic_vector(15 downto 0);
-			en_immediate : out std_logic;
-			next_word    : out std_logic;
-			en_mem       : out std_logic;
-			condition    : out std_logic_vector(3 downto 0)
+			clk              : in  std_logic;
+			en               : in  std_logic;
+			instruction      : in  std_logic_vector(15 downto 0);
+			alu_control      : out std_logic_vector(7 downto 0);
+			rD_sel           : out std_logic_vector(2 downto 0);
+			rS_sel           : out std_logic_vector(2 downto 0);
+			immediate        : out std_logic_vector(15 downto 0);
+			en_immediate     : out std_logic;
+			next_word        : out std_logic;
+			en_mem           : out std_logic;
+			mem_displacement : out std_logic;
+			mem_byte         : out std_logic;
+			condition        : out std_logic_vector(3 downto 0)
 		);
 	end component decoder;
 	component pc_unit
@@ -76,6 +79,8 @@ architecture behavior of core_tb is
 			rst          : in  std_logic;
 			en           : in  std_logic;
 			write_enable : in  std_logic;
+			byte_select  : in  std_logic;
+			byte_enable  : in  std_logic;
 			addr         : in  std_logic_vector(15 downto 0);
 			data_in      : in  std_logic_vector(15 downto 0);
 			data_out     : out std_logic_vector(15 downto 0);
@@ -108,6 +113,8 @@ architecture behavior of core_tb is
 	signal dec_immediate    : std_logic_vector(15 downto 0);
 	signal en_immediate     : std_logic;
 	signal next_word        : std_logic;
+	signal mem_byte         : std_logic;
+	signal mem_displacement : std_logic;
 	--PC Unit signals
 	signal pc_in            : std_logic_vector(15 downto 0);
 	signal pc_op            : std_logic_vector(1 downto 0);
@@ -116,7 +123,10 @@ architecture behavior of core_tb is
 	signal rD_data_in       : std_logic_vector(15 downto 0);
 	--mem unit signals
 	signal mem_write_enable : std_logic;
+	signal byte_enable      : std_logic;
+	signal byte_select      : std_logic;
 	signal mem_addr         : std_logic_vector(15 downto 0);
+	signal mem_addr_out     : std_logic_vector(15 downto 0);
 	signal mem_data_in      : std_logic_vector(15 downto 0);
 	signal mem_data_out     : std_logic_vector(15 downto 0);
 	--enable signals
@@ -126,25 +136,26 @@ architecture behavior of core_tb is
 	signal en_pc            : std_logic;
 	signal en_register      : std_logic;
 	signal mem_enable       : std_logic;
-	signal alu_wr_en : std_logic;
+	signal alu_wr_en        : std_logic;
 	constant clk_period     : time := 10 ns;
 begin
 	alu_inst : component alu
 		port map(
-			clk           => clk,
-			en            => en_alu,
-			alu_control   => alu_control,
-			en_imm        => en_immediate,
-			rD_data       => rD_data,
-			rS_data       => rS_data,
-			immediate     => immediate,
-			condition     => condition,
-			flags_in      => flags_in,
-			should_branch => should_branch,
-			output        => alu_output,
-			mem_data      => mem_data_in,
-			write         => alu_wr_en,
-			flags_out     => flags_out
+			mem_displacement => mem_displacement,
+			clk              => clk,
+			en               => en_alu,
+			alu_control      => alu_control,
+			en_imm           => en_immediate,
+			rD_data          => rD_data,
+			rS_data          => rS_data,
+			immediate        => immediate,
+			condition        => condition,
+			flags_in         => flags_in,
+			should_branch    => should_branch,
+			output           => alu_output,
+			mem_data         => mem_data_in,
+			write            => alu_wr_en,
+			flags_out        => flags_out
 		);
 	control_inst : component control
 		port map(
@@ -157,17 +168,19 @@ begin
 		);
 	decoder_inst : component decoder
 		port map(
-			clk          => clk,
-			en           => en_decoder,
-			instruction  => instruction,
-			alu_control  => alu_control,
-			rD_sel       => rD_sel,
-			rS_sel       => rS_sel,
-			immediate    => dec_immediate,
-			en_immediate => en_immediate,
-			next_word    => next_word,
-			en_mem       => en_mem,
-			condition    => condition
+			clk              => clk,
+			en               => en_decoder,
+			instruction      => instruction,
+			alu_control      => alu_control,
+			rD_sel           => rD_sel,
+			rS_sel           => rS_sel,
+			immediate        => dec_immediate,
+			en_immediate     => en_immediate,
+			next_word        => next_word,
+			en_mem           => en_mem,
+			condition        => condition,
+			mem_byte         => mem_byte,
+			mem_displacement => mem_displacement
 		);
 	pc_unit_inst : component pc_unit
 		port map(
@@ -190,6 +203,8 @@ begin
 		);
 	mem_inst : component mem
 		port map(
+			byte_select  => byte_select,
+			byte_enable  => byte_enable,
 			clk          => clk,
 			rst          => rst,
 			en           => mem_enable,
@@ -205,10 +220,14 @@ begin
 	en_register      <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
 	mem_enable       <= '1';
 	mem_write_enable <= '1' when control_state = STATE_MEM and ('0' & instruction(14 downto 8)) = OPC_ST else '0';
-	reg_write_enable  <= alu_wr_en when control_state = STATE_REG_WR else '0';
-	immediate  <= mem_data_out when next_word = '1' else dec_immediate;
-	rd_data_in <= mem_data_out when en_mem = '1' else alu_output;
-	pc_in      <= alu_output;
+	reg_write_enable <= alu_wr_en when control_state = STATE_REG_WR else '0';
+	immediate        <= mem_data_out when next_word = '1' else dec_immediate;
+	rd_data_in       <= mem_data_out when en_mem = '1' else alu_output;
+	pc_in            <= alu_output;
+	mem_addr_out     <= alu_output when control_state = STATE_MEM else pc_out;
+	byte_select      <= mem_addr_out(0);
+	byte_enable      <= mem_byte when control_state = STATE_MEM else '0';
+	mem_addr         <= '0' & mem_addr_out(15 downto 1);
 	clk_proc : process is
 	begin
 		clk <= '0';
@@ -226,30 +245,16 @@ begin
 					when STATE_FETCH =>
 						instruction <= mem_data_out;
 
-					when STATE_MEM =>
-						mem_addr <= pc_out;
-
+					when STATE_MEM    =>
 					when STATE_REG_WR =>
-						pc_op    <= PC_INC;
-						mem_addr <= pc_out;
+						pc_op <= PC_INC;
 
 					when STATE_ALU =>
-						if en_mem = '0' then
-							mem_addr <= pc_out;
-						else
-							if en_immediate = '1' then
-								mem_addr <= immediate;
-							else
-								mem_addr <= rS_data;
-							end if;
-
-						end if;
-
 						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
 
 					when STATE_DECODE =>
 						flags_in <= flags_out;
-						mem_addr <= pc_out;
+
 						if mem_data_out(15) = '1' then
 							pc_op <= PC_INC;
 						else

@@ -100,6 +100,7 @@ Instruction* new_instruction_mem(OP* op, int rD, int rS, bool byte){
 }
 Instruction* new_instruction_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement){
 	Instruction *i = gen_instruction_internal(op);
+	i->op_type|= 0x80;
 	i->rD = rD;
 	i->rS = rS;
 	i->immediate=immediate;

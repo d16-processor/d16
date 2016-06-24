@@ -8,6 +8,8 @@ entity mem is
 		rst          : in  std_logic;
 		en           : in  std_logic;
 		write_enable : in  std_logic;
+		byte_select  : in  std_logic;
+		byte_enable  : in  std_logic;
 		addr         : in  std_logic_vector(15 downto 0);
 		data_in      : in  std_logic_vector(15 downto 0);
 		data_out     : out std_logic_vector(15 downto 0);
@@ -49,8 +51,15 @@ begin
 					if unsigned(addr) < 64 then
 						data_out <= mem_storage(to_integer(unsigned(addr)));
 						if write_enable = '1' then
+							if byte_enable = '1' then
+								if byte_select = '1' then
+									mem_storage(to_integer(unsigned(addr)))(15 downto 8) <= data_in(7 downto 0);
+								else
+									mem_storage(to_integer(unsigned(addr)))(7 downto 0) <= data_in(7 downto 0);
+								end if;
+							else
 							mem_storage(to_integer(unsigned(addr))) <= data_in;
-
+							end if;
 						end if;
 					end if;
 				end if;
