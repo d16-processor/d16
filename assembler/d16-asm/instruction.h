@@ -34,7 +34,7 @@ enum _Dir_Type{
     D_WORD,
     D_ASCIZ,
 };
-typedef enum{
+typedef enum _condition_code{
 	NV=0,
 	EQ=1,
 	NE,
@@ -129,10 +129,10 @@ Instruction* new_instruction_cr(OP*,int,int);
 Instruction* new_instruction_rc(OP*,int,int);
 Instruction* new_instruction_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
 Instruction* new_instruction_mem(OP* op, int rD, int rS, bool byte);
-Instruction* new_instruction_jmp(OP* op, int immediate, condition_code cc);
+Instruction* new_instruction_jmp(OP* op, int rD, condition_code cc);
 Instruction* new_instruction_jmpi(OP* op, int immediate, condition_code cc);
 Instruction* new_instruction_directive(Dir_Type, void* data);
-
+char* cc_to_str(condition_code cc);
 int instruction_length(Instruction*);
 uint8_t build_reg_selector(Instruction *);
 uint8_t build_shift_selector(Instruction* i);

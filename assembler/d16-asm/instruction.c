@@ -57,8 +57,12 @@ Instruction* new_instruction(OP* op){
 Instruction* new_instruction_r(OP* op, int rD){
     Instruction *i = gen_instruction_internal(op);
     i->rD = rD;
-    i->type= I_TYPE_R;
-    return i;
+	if(i->op_type == JMP){
+		i->type = I_TYPE_JMP;
+	}else{
+		i->type= I_TYPE_R;
+    }
+	return i;
 
 }
 Instruction* new_instruction_rr(OP* op, int rD, int rS){
@@ -123,6 +127,7 @@ Instruction* new_instruction_jmpi(OP* op, int imm, condition_code cc){
 	i->rD = 0;
 	i->cc = cc;
 	i->type= I_TYPE_JMPI;
+	
 	return i;
 }
 
@@ -181,4 +186,9 @@ int instruction_length(Instruction* i){
 	}
 
     return 1;
+}
+char* cc_strs[] = {"nv","eq","ne","os","oc","hi","ls","p","n","cs","cc","ge","g","le","l","al"};
+char* cc_to_str(condition_code cc){
+
+	return cc_strs[cc];
 }

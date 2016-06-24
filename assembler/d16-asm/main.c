@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "parser.h"
+#include <string.h>
 #include <glib.h>
 #include "instruction.h"
 extern int yyparse (void);
@@ -63,7 +64,39 @@ void print_elem(void* element, void* data){
         case I_TYPE_DIRECTIVE:
             printf("%s %d",i->opcode, *(int*)i->dir_data);
             break;
-
+		case I_TYPE_MEM:
+			if(i->op_type == LD){
+				printf("%s r%d,[r%d]",i->opcode,i->rD,i->rS);
+			}else{
+				printf("%s [r%d],r%d",i->opcode,i->rS,i->rD);
+			}
+			break;
+		case I_TYPE_MEMI:{
+				char opcode_new[8];
+				char address[12];
+				if(i->flags & M_BYTE){
+					snprintf(opcode_new, sizeof(opcode_new), "%s.b",i->opcode);
+				}else{
+					strncpy(opcode_new, i->opcode, sizeof(opcode_new));
+				}
+				if(i->flags & M_DISP){
+					snprintf(address, sizeof(address), "r%d+0x%04x",i->rS,i->immediate);
+				}else{
+					snprintf(address, sizeof(address), "0x%04x",i->immediate);
+				}
+				if(i->op_type == LD){
+					printf("%s r%d,[%s]",opcode_new,i->rD,address);
+				}else{
+					printf("%s [%s],r%d",opcode_new,address,i->rD);
+				}
+				break;
+			}
+		case I_TYPE_JMP:
+			printf("%s.%s r%d",i->opcode,cc_to_str(i->cc), i->rD);
+			break;
+		case I_TYPE_JMPI:
+			printf("%s.%s 0x%04x",i->opcode,cc_to_str(i->cc), i->immediate);
+			break;
     }
     printf(" length: %d\n",instruction_length(i));
     

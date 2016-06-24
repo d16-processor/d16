@@ -17,12 +17,14 @@
     int ival;
     struct _Instruction* instr;
     struct _OP* op;
+	
 }
 
 %error-verbose
 
 %token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD BYTE_FLAG PLUS
 %token <op> OPCODE
+%token <ival> CONDITION_CODE
 %token <sval> IDENTIFIER
 %token <ival> REGISTER IMMEDIATE CP_REGISTER NUMBER
 %type <instr> instruction
@@ -57,6 +59,8 @@ instruction:
 	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER PLUS NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,$6,$8,true,true);}
 	|	OPCODE BYTE_FLAG LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$9,$4,$6,true,true);}
 	|   OPCODE NUMBER NEWLINE {$$=new_instruction_jmpi($1,$2,AL);} //jump
+	|   OPCODE CONDITION_CODE NUMBER NEWLINE {$$=new_instruction_jmpi($1,$3,$2);}
+	|   OPCODE CONDITION_CODE REGISTER NEWLINE {$$=new_instruction_jmp($1,$3,$2);}
     |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
 
 ;

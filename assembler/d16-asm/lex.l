@@ -47,6 +47,23 @@ stcp {yylval.op = op(strdup(yytext),STCP); return OPCODE;};
 adc {yylval.op = op(strdup(yytext), ADC); return OPCODE;};
 sbb {yylval.op = op(strdup(yytext), SBB); return OPCODE;};
 
+\.nv {yylval.ival = NV; return CONDITION_CODE;}
+\.eq {yylval.ival = EQ; return CONDITION_CODE;}
+\.ne {yylval.ival = NE; return CONDITION_CODE;}
+\.os {yylval.ival = OS; return CONDITION_CODE;}
+\.oc {yylval.ival = OC; return CONDITION_CODE;}
+\.hi {yylval.ival = HI; return CONDITION_CODE;}
+\.ls {yylval.ival = LS; return CONDITION_CODE;}
+\.p {yylval.ival = P; return CONDITION_CODE;}
+\.n {yylval.ival = N; return CONDITION_CODE;}
+\.cs {yylval.ival = CS; return CONDITION_CODE;}
+\.cc {yylval.ival = CC; return CONDITION_CODE;}
+\.ge {yylval.ival = GE; return CONDITION_CODE;}
+\.g {yylval.ival = G; return CONDITION_CODE;}
+\.le {yylval.ival = LE; return CONDITION_CODE;}
+\.l {yylval.ival = L; return CONDITION_CODE;}
+\.al {yylval.ival = AL; return CONDITION_CODE;}
+
 #-?[0-9]* {yylval.ival = atoi(yytext+1); return IMMEDIATE;};
 #0x[0-9a-fA-F]* {yylval.ival = (int)strtol(yytext+1,NULL,16); return IMMEDIATE;};
 -?[0-9]+ {yylval.ival = atoi(yytext); return NUMBER;}

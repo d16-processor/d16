@@ -2,3 +2,5 @@ nop
 st.b [r1+0x20],r0
 st.b [0x20],r0
 jmp 0x2
+jmp.ne 0x4
+jmp.cc r1
