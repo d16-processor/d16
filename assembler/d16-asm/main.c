@@ -107,6 +107,15 @@ void assemble_instruction(Instruction* i, uint16_t** data){
             *data+=1;
         }
     }
+	else if (i->type == I_TYPE_JMPI|| i->type == I_TYPE_JMP){
+		**data = i->op_type <<8 | build_jmp_selector(i);
+		*data += 1;
+		if(i->type == I_TYPE_JMPI){
+			**data = i->immediate;
+			*data += 1;
+		}
+
+	}
     else{
         **data = i->op_type<<8 | build_reg_selector(i);
         *data += 1;

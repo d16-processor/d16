@@ -106,6 +106,12 @@ begin
 						write <= '1';
 				end case;
 				case alu_control is
+				when OPC_JMP  => 
+					s_should_branch <= get_should_branch(flags_in, condition);
+				when others  => 
+					s_should_branch  <= '0';
+				end case;
+				case alu_control is
 					when OPC_ADD =>
 						s_output     <= std_logic_vector(unsigned(data1(15) & data1) + unsigned(data2(15) & data2));
 						s_data1_sign <= data1(15);
@@ -155,8 +161,12 @@ begin
 						s_data1_sign <= data1(15);
 						s_data2_sign <= not data2(15);
 					when OPC_JMP =>
-						s_output        <= '0' & data1;
-						s_should_branch <= get_should_branch(flags_in, condition);
+						if en_imm = '1' then
+							s_output <= '0' & immediate;
+						else
+							s_output <= '0' & data1;
+						end if;
+						
 					when OPC_ST =>
 						if mem_displacement = '1' then
 							s_output(15 downto 0) <= std_logic_vector(unsigned(rS_data) + unsigned(immediate));
@@ -171,7 +181,7 @@ begin
 						else
 							s_output(15 downto 0) <= data2;
 						end if;
-					when others => s_output   <= '0' & X"0000";
+					when others => s_output <= '0' & X"0000";
 				end case;
 
 			end if;

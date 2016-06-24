@@ -21,7 +21,9 @@ typedef enum{
     I_TYPE_CR,
     I_TYPE_DIRECTIVE,
 	I_TYPE_MEM,
-	I_TYPE_MEMI
+	I_TYPE_MEMI,
+	I_TYPE_JMP,
+	I_TYPE_JMPI
 }Instruction_Type;
 typedef enum {
 	M_NONE=0,
@@ -32,6 +34,24 @@ enum _Dir_Type{
     D_WORD,
     D_ASCIZ,
 };
+typedef enum{
+	NV=0,
+	EQ=1,
+	NE,
+	OS,
+	OC,
+	HI,
+	LS,
+	P,
+	N,
+	CS,
+	CC,
+	GE,
+	G,
+	LE,
+	L,
+	AL=15
+} condition_code;
 typedef enum _Dir_Type Dir_Type;
 enum _Op_Type{
 	NOP=0,
@@ -91,6 +111,7 @@ struct _Instruction{
     int rD;
     int rS;
     int immediate;
+	condition_code cc;
     Op_Type op_type;
     Instruction_Type type;
     Dir_Type dir_type;
@@ -108,9 +129,13 @@ Instruction* new_instruction_cr(OP*,int,int);
 Instruction* new_instruction_rc(OP*,int,int);
 Instruction* new_instruction_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
 Instruction* new_instruction_mem(OP* op, int rD, int rS, bool byte);
+Instruction* new_instruction_jmp(OP* op, int immediate, condition_code cc);
+Instruction* new_instruction_jmpi(OP* op, int immediate, condition_code cc);
 Instruction* new_instruction_directive(Dir_Type, void* data);
+
 int instruction_length(Instruction*);
 uint8_t build_reg_selector(Instruction *);
 uint8_t build_shift_selector(Instruction* i);
 uint8_t build_mem_selector(Instruction* i);
+uint8_t build_jmp_selector(Instruction* i);
 #endif /* instruction_h */

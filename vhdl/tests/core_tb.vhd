@@ -247,8 +247,11 @@ begin
 
 					when STATE_MEM    =>
 					when STATE_REG_WR =>
-						pc_op <= PC_INC;
-
+						if should_branch = '1' then
+							pc_op <= PC_SET;
+						else
+							pc_op <= PC_INC;
+						end if;
 					when STATE_ALU =>
 						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
 

@@ -109,6 +109,23 @@ Instruction* new_instruction_memi(OP* op, int rD, int rS, int immediate, bool by
 	i->type= I_TYPE_MEMI;
 	return i;
 }
+Instruction* new_instruction_jmp(OP* op, int rD, condition_code cc){
+	Instruction *i = gen_instruction_internal(op);
+	i->rD = rD;
+	i->cc = cc;
+	i->type= I_TYPE_JMP;
+	return i;
+}
+Instruction* new_instruction_jmpi(OP* op, int imm, condition_code cc){
+	Instruction *i = gen_instruction_internal(op);
+	i->immediate = imm;
+	i->op_type |= 0x80;
+	i->rD = 0;
+	i->cc = cc;
+	i->type= I_TYPE_JMPI;
+	return i;
+}
+
 Instruction* new_instruction_directive(Dir_Type type, void* data){
     Instruction *i = calloc(1, sizeof(Instruction));
     i->dir_type = type;
@@ -139,6 +156,9 @@ uint8_t build_mem_selector(Instruction* i){
 uint8_t build_shift_selector(Instruction* i){
     return i->rD || (i->immediate & 0xF)<<3;
 }
+uint8_t build_jmp_selector(Instruction* i){
+	return (i->cc&0xf)<<3|i->rD;
+}
 
 int instruction_length(Instruction* i){
     if(i->type == I_TYPE_RIMM){
@@ -154,6 +174,9 @@ int instruction_length(Instruction* i){
         }
         return 2;
     }else if(i->type == I_TYPE_MEMI){
+		return 2;
+	}
+	else if(i->type == I_TYPE_JMPI){
 		return 2;
 	}
 

@@ -89,7 +89,7 @@ begin
 				mem_displacement  <=  '0';
 			end if;
 			
-			if opcode = OPC_JMP then
+			if opcode = OPC_JMP or opcode = OPC_JMPI then
 				condition <= instruction(6 downto 3);
 			else
 				condition <= "0000";

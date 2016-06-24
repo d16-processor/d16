@@ -56,6 +56,7 @@ instruction:
 	|	OPCODE LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$8,$3,$5,false,true);}
 	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER PLUS NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,$6,$8,true,true);}
 	|	OPCODE BYTE_FLAG LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$9,$4,$6,true,true);}
+	|   OPCODE NUMBER NEWLINE {$$=new_instruction_jmpi($1,$2,AL);} //jump
     |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
 
 ;
