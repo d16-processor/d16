@@ -13,12 +13,13 @@
 \n {return NEWLINE;};
 [ \t]          ;
 , {return COMMA;}
-\x5b {printf("[ Bracket\n");return LBRACKET;};
-\x5d {printf("] Bracket\n");return RBRACKET;};
+\x5b {return LBRACKET;};
+\x5d {return RBRACKET;};
 [cC][rR][0-9][1-9]? {yylval.ival = atoi(yytext+2); return CP_REGISTER;}
 [rR][0-7] {yylval.ival = yytext[1] - '0'; return REGISTER;}
 .dw {return DIRECTIVE_WORD;}
-
+\.b {return BYTE_FLAG;}
+\+ {return PLUS;}
 
 nop {yylval.op = op(strdup(yytext),NOP); return OPCODE;};
 add {yylval.op = op(strdup(yytext),ADD); return OPCODE;};

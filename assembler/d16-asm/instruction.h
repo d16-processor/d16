@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <glib.h>
+#include <stdbool.h>
 typedef enum{
     I_TYPE_NONE,
     I_TYPE_R,
@@ -18,8 +19,15 @@ typedef enum{
     I_TYPE_RIMM,
     I_TYPE_RC,
     I_TYPE_CR,
-    I_TYPE_DIRECTIVE 
+    I_TYPE_DIRECTIVE,
+	I_TYPE_MEM,
+	I_TYPE_MEMI
 }Instruction_Type;
+typedef enum {
+	M_NONE=0,
+	M_BYTE=2,
+	M_DISP=1
+} mem_flags;
 enum _Dir_Type{
     D_WORD,
     D_ASCIZ,
@@ -86,6 +94,7 @@ struct _Instruction{
     Op_Type op_type;
     Instruction_Type type;
     Dir_Type dir_type;
+	mem_flags flags;
     void* dir_data;
 };
 typedef struct _Instruction Instruction;
@@ -97,8 +106,11 @@ Instruction* new_instruction_rr(OP*,int,int);
 Instruction* new_instruction_ri(OP*,int,int);
 Instruction* new_instruction_cr(OP*,int,int);
 Instruction* new_instruction_rc(OP*,int,int);
+Instruction* new_instruction_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
+Instruction* new_instruction_mem(OP* op, int rD, int rS, bool byte);
 Instruction* new_instruction_directive(Dir_Type, void* data);
 int instruction_length(Instruction*);
 uint8_t build_reg_selector(Instruction *);
 uint8_t build_shift_selector(Instruction* i);
+uint8_t build_mem_selector(Instruction* i);
 #endif /* instruction_h */

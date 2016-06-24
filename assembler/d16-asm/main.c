@@ -93,7 +93,15 @@ void assemble_instruction(Instruction* i, uint16_t** data){
             **data = i->immediate & 0xffff;
             *data += 1;
         }
-    }else if (i->type == I_TYPE_DIRECTIVE){
+    }else if(i->type == I_TYPE_MEM){
+		**data = i->op_type<<8 | build_mem_selector(i);
+		*data += 1;
+	}else if(i->type == I_TYPE_MEMI){
+		**data = i->op_type<<8 | build_mem_selector(i);
+		*data += 1;
+		**data = i->immediate & 0xffff;
+		*data += 1;
+	}else if (i->type == I_TYPE_DIRECTIVE){
         if(i->dir_type == D_WORD){
             **data = *(int*)i->dir_data;
             *data+=1;

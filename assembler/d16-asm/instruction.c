@@ -8,7 +8,6 @@
 
 #include "instruction.h"
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 char* opcodes_str[] = {
     "nop",
@@ -91,6 +90,24 @@ Instruction* new_instruction_rc(OP* op, int rD, int rS){
     i->type= I_TYPE_RC;
     return i;
 }
+Instruction* new_instruction_mem(OP* op, int rD, int rS, bool byte){
+	Instruction *i = gen_instruction_internal(op);
+	i->rD = rD;
+	i->rS = rS;
+	i->flags = byte ? M_BYTE : M_NONE;
+	i->type= I_TYPE_MEM;
+	return i;
+}
+Instruction* new_instruction_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement){
+	Instruction *i = gen_instruction_internal(op);
+	i->rD = rD;
+	i->rS = rS;
+	i->immediate=immediate;
+	i->flags = byte ? M_BYTE : M_NONE;
+	i->flags |= displacement ? M_DISP : M_NONE;
+	i->type= I_TYPE_MEMI;
+	return i;
+}
 Instruction* new_instruction_directive(Dir_Type type, void* data){
     Instruction *i = calloc(1, sizeof(Instruction));
     i->dir_type = type;
@@ -115,6 +132,9 @@ uint8_t build_reg_selector(Instruction* i){
     }
     return 0;
 }
+uint8_t build_mem_selector(Instruction* i){
+	return (i->flags &3) << 6 | (i->rS & 7)<<3 | (i->rD & 0x7);
+}
 uint8_t build_shift_selector(Instruction* i){
     return i->rD || (i->immediate & 0xF)<<3;
 }
@@ -132,7 +152,9 @@ int instruction_length(Instruction* i){
             return 1;
         }
         return 2;
-    }
+    }else if(i->type == I_TYPE_MEMI){
+		return 2;
+	}
 
     return 1;
 }
