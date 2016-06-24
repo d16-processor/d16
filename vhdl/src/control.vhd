@@ -5,12 +5,13 @@ use ieee.numeric_std.all;
 use work.cpu_constants.all;
 entity control is
 	port(
-		clk      : in  std_logic;
-		en       : in  std_logic;
-		rst      : in  std_logic;
-		en_mem   : in  std_logic;
-		mem_wait : in  std_logic;
-		control  : out std_logic_vector(CONTROL_BIT_MAX downto 0)
+		clk           : in  std_logic;
+		en            : in  std_logic;
+		rst           : in  std_logic;
+		en_mem        : in  std_logic;
+		mem_wait      : in  std_logic;
+		should_branch : in  std_logic;
+		control       : out std_logic_vector(CONTROL_BIT_MAX downto 0)
 	);
 end entity control;
 architecture behavior of control is
@@ -50,7 +51,15 @@ begin
 								s_control <= STATE_REG_WR;
 							end if;
 						when STATE_REG_WR =>
-							s_control <= STATE_FETCH;
+							if should_branch = '1' then
+								s_control  <= STATE_PC_DELAY;
+							else
+								s_control <= STATE_FETCH;
+							end if;
+						when STATE_PC_DELAY  => 
+							s_control  <= STATE_BRANCH_DELAY;
+						when STATE_BRANCH_DELAY  => 
+							s_control  <= STATE_FETCH;
 						when others =>
 							s_control <= STATE_FETCH;
 					end case;

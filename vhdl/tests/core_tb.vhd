@@ -27,12 +27,13 @@ architecture behavior of core_tb is
 	end component alu;
 	component control
 		port(
-			clk      : in  std_logic;
-			en       : in  std_logic;
-			rst      : in  std_logic;
-			en_mem   : in  std_logic;
-			mem_wait : in  std_logic;
-			control  : out std_logic_vector(CONTROL_BIT_MAX downto 0)
+			clk           : in  std_logic;
+			en            : in  std_logic;
+			rst           : in  std_logic;
+			en_mem        : in  std_logic;
+			mem_wait      : in  std_logic;
+			should_branch : in  std_logic;
+			control       : out std_logic_vector(CONTROL_BIT_MAX downto 0)
 		);
 	end component control;
 	component decoder
@@ -159,6 +160,7 @@ begin
 		);
 	control_inst : component control
 		port map(
+			should_branch => should_branch,
 			clk      => clk,
 			en       => en,
 			rst      => rst,
@@ -216,7 +218,7 @@ begin
 		);
 	en_alu           <= '1' when control_state = STATE_ALU else '0';
 	en_decoder       <= '1' when control_state = STATE_DECODE else '0';
-	en_pc            <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ else '0';
+	en_pc            <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ or control_state = STATE_PC_DELAY else '0';
 	en_register      <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
 	mem_enable       <= '1';
 	mem_write_enable <= '1' when control_state = STATE_MEM and ('0' & instruction(14 downto 8)) = OPC_ST else '0';
@@ -252,6 +254,8 @@ begin
 						else
 							pc_op <= PC_INC;
 						end if;
+					when STATE_PC_DELAY  => 
+						pc_op  <= PC_INC;
 					when STATE_ALU =>
 						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
 

@@ -34,7 +34,7 @@ package cpu_constants is
 	constant OPC_STCP    : std_logic_vector(7 downto 0) := X"1E";
 	constant OPC_ADC     : std_logic_vector(7 downto 0) := X"1F";
 	constant OPC_SBB     : std_logic_vector(7 downto 0) := X"20";
-	
+
 	constant OPC_ADDI  : std_logic_vector(7 downto 0) := X"81";
 	constant OPC_SUBI  : std_logic_vector(7 downto 0) := X"82";
 	constant OPC_PUSHI : std_logic_vector(7 downto 0) := X"83";
@@ -53,9 +53,7 @@ package cpu_constants is
 	constant OPC_RCLI  : std_logic_vector(7 downto 0) := X"9C";
 	constant OPC_ADCI  : std_logic_vector(7 downto 0) := X"9F";
 	constant OPC_SBBI  : std_logic_vector(7 downto 0) := X"A0";
-	
 
-	
 	constant FLAG_BIT_ZERO     : integer := 0;
 	constant FLAG_BIT_CARRY    : integer := 1;
 	constant FLAG_BIT_SIGN     : integer := 2;
@@ -77,14 +75,16 @@ package cpu_constants is
 	constant CONDITION_L      : std_logic_vector(3 downto 0) := "1110";
 	constant CONDITION_ALWAYS : std_logic_vector(3 downto 0) := "1111";
 
-	constant CONTROL_BIT_MAX : integer := 5;
+	constant CONTROL_BIT_MAX : integer := 7;
 
-	constant STATE_FETCH    : std_logic_vector(CONTROL_BIT_MAX downto 0) := "000001";
-	constant STATE_DECODE   : std_logic_vector(CONTROL_BIT_MAX downto 0) := "000010";
-	constant STATE_REG_READ : std_logic_vector(CONTROL_BIT_MAX downto 0) := "000100";
-	constant STATE_ALU      : std_logic_vector(CONTROL_BIT_MAX downto 0) := "001000";
-	constant STATE_MEM      : std_logic_vector(CONTROL_BIT_MAX downto 0) := "010000";
-	constant STATE_REG_WR   : std_logic_vector(CONTROL_BIT_MAX downto 0) := "100000";
+	constant STATE_FETCH        : std_logic_vector(CONTROL_BIT_MAX downto 0) := "00000001";
+	constant STATE_DECODE       : std_logic_vector(CONTROL_BIT_MAX downto 0) := "00000010";
+	constant STATE_REG_READ     : std_logic_vector(CONTROL_BIT_MAX downto 0) := "00000100";
+	constant STATE_ALU          : std_logic_vector(CONTROL_BIT_MAX downto 0) := "00001000";
+	constant STATE_MEM          : std_logic_vector(CONTROL_BIT_MAX downto 0) := "00010000";
+	constant STATE_REG_WR       : std_logic_vector(CONTROL_BIT_MAX downto 0) := "00100000";
+	constant STATE_PC_DELAY     : std_logic_vector(CONTROL_BIT_MAX downto 0) := "01000000";
+	constant STATE_BRANCH_DELAY : std_logic_vector(CONTROL_BIT_MAX downto 0) := "10000000";
 
 	constant PC_NOP   : std_logic_vector(1 downto 0) := "00";
 	constant PC_INC   : std_logic_vector(1 downto 0) := "01";

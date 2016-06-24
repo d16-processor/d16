@@ -102,6 +102,8 @@ begin
 						write <= '0';
 					when OPC_ST =>
 						write <= '0';
+					when OPC_JMP  => 
+						write  <= '0';
 					when others =>
 						write <= '1';
 				end case;

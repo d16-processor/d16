@@ -4,13 +4,14 @@
     #include "instruction.h"
     #define YY_NO_INPUT
     extern int yylex();
+	int yyline = 1;
 %}
 %option header-file="lex.yy.h"
 %option noyywrap
 %option nounput
 
 %%
-\n {return NEWLINE;};
+\n {yyline++;return NEWLINE;};
 [ \t]          ;
 , {return COMMA;}
 \x5b {return LBRACKET;};
