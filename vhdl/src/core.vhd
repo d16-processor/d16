@@ -2,11 +2,24 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.cpu_constants.all;
-entity core_tb is
-end core_tb;
+entity core is
+	port (
+		clk : in std_logic;
+		rst : in std_logic;
+		en : in std_logic;
+		mem_wait: in std_logic;
+		mem_data_in : out std_logic_vector(15 downto 0);
+		mem_addr: out std_logic_vector(15 downto 0);
+		mem_data_out : in std_logic_vector(15 downto 0);
+		mem_byte_enable : out std_logic;
+		mem_byte_select : out std_logic;
+		mem_write_enable : out std_logic;
+		mem_enable : out std_logic
+	);
+end entity core;
 
-architecture behavior of core_tb is
-	component alu
+architecture behavior of core is
+component alu
 		port(
 			clk              : in  std_logic;
 			en               : in  std_logic;
@@ -89,8 +102,6 @@ architecture behavior of core_tb is
 		);
 	end component mem;
 
-	signal clk         : std_logic;
-	signal rst         : std_logic;
 	--ALU specific signals
 	signal alu_control : std_logic_vector(7 downto 0);
 
@@ -105,7 +116,6 @@ architecture behavior of core_tb is
 	signal reg_write_enable : std_logic;
 	--Control unit signals
 	signal en_mem           : std_logic;
-	signal mem_wait         : std_logic;
 	signal control_state    : std_logic_vector(CONTROL_BIT_MAX downto 0);
 	--Decoder specific signals
 	signal instruction      : std_logic_vector(15 downto 0);
@@ -123,22 +133,14 @@ architecture behavior of core_tb is
 	--register unit signals;
 	signal rD_data_in       : std_logic_vector(15 downto 0);
 	--mem unit signals
-	signal mem_write_enable : std_logic;
-	signal byte_enable      : std_logic;
-	signal byte_select      : std_logic;
-	signal mem_addr         : std_logic_vector(15 downto 0);
+	
 	signal mem_addr_out     : std_logic_vector(15 downto 0);
-	signal mem_data_in      : std_logic_vector(15 downto 0);
-	signal mem_data_out     : std_logic_vector(15 downto 0);
 	--enable signals
 	signal en_alu           : std_logic;
-	signal en               : std_logic;
 	signal en_decoder       : std_logic;
 	signal en_pc            : std_logic;
 	signal en_register      : std_logic;
-	signal mem_enable       : std_logic;
 	signal alu_wr_en        : std_logic;
-	constant clk_period     : time := 10 ns;
 begin
 	alu_inst : component alu
 		port map(
@@ -203,19 +205,7 @@ begin
 			rD_data_out => rD_data,
 			rS_data_out => rS_data
 		);
-	mem_inst : component mem
-		port map(
-			byte_select  => byte_select,
-			byte_enable  => byte_enable,
-			clk          => clk,
-			rst          => rst,
-			en           => mem_enable,
-			write_enable => mem_write_enable,
-			addr         => mem_addr,
-			data_in      => mem_data_in,
-			data_out     => mem_data_out,
-			mem_wait     => mem_wait
-		);
+	
 	en_alu           <= '1' when control_state = STATE_ALU else '0';
 	en_decoder       <= '1' when control_state = STATE_DECODE else '0';
 	en_pc            <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ or control_state = STATE_PC_DELAY else '0';
@@ -227,17 +217,9 @@ begin
 	rd_data_in       <= mem_data_out when en_mem = '1' else alu_output;
 	pc_in            <= alu_output;
 	mem_addr_out     <= alu_output when control_state = STATE_MEM else pc_out;
-	byte_select      <= mem_addr_out(0);
-	byte_enable      <= mem_byte when control_state = STATE_MEM else '0';
+	mem_byte_select      <= mem_addr_out(0);
+	mem_byte_enable      <= mem_byte when control_state = STATE_MEM else '0';
 	mem_addr         <= '0' & mem_addr_out(15 downto 1);
-	
-	clk_proc : process is
-	begin
-		clk <= '0';
-		wait for clk_period / 2;
-		clk <= '1';
-		wait for clk_period / 2;
-	end process clk_proc;
 	core_proc : process(clk, en) is
 	begin
 		if rising_edge(clk) and en = '1' then
@@ -274,14 +256,4 @@ begin
 			end if;
 		end if;
 	end process core_proc;
-
-	stim_proc : process is
-	begin
-		rst <= '1';
-		wait for clk_period;
-		rst <= '0';
-		en  <= '1';
-
-		wait;
-	end process stim_proc;
 end architecture behavior;

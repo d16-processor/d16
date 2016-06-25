@@ -45,6 +45,14 @@ core_tb: cpu_constants.o core_tb.o pc_unit.o alu.o control.o decoder.o mem.o reg
 ifdef WAVE
 	gtkwave dump.vcd
 endif
+
+cpu_tb: cpu_constants.o cpu_tb.o core.o pc_unit.o alu.o control.o decoder.o mem.o register_unit.o mem.bin
+	ghdl -e cpu_tb
+	./cpu_tb --stop-time=700ns --vcd=dump.vcd
+ifdef WAVE
+	gtkwave dump.vcd
+endif
+
 %_tb: cpu_constants.o %.o %_tb.o
 	ghdl -e $@
 	./$@ --stop-time=150ns --vcd=dump.vcd
