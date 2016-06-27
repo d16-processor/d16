@@ -13,6 +13,11 @@
 		0A4CA7551D14C5A200BC8619 /* test.s in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0A4CA7531D14C43A00BC8619 /* test.s */; };
 		0A4CA7571D14C66700BC8619 /* libglib-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */; };
 		0A4CA75A1D14C70B00BC8619 /* instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7581D14C70B00BC8619 /* instruction.c */; };
+		0A83EABE1D2099340014DF78 /* test_instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EABA1D2099340014DF78 /* test_instruction.c */; };
+		0A83EABF1D2099340014DF78 /* unity.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EABC1D2099340014DF78 /* unity.c */; };
+		0A83EAC11D209A810014DF78 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EAC01D209A810014DF78 /* main.c */; };
+		0A83EAC41D209C240014DF78 /* instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7581D14C70B00BC8619 /* instruction.c */; };
+		0A83EAC51D209C500014DF78 /* libglib-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -27,6 +32,14 @@
 			);
 			script = "# $(YACC)\n/usr/bin/bison -d -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c ${INPUT_FILE_PATH}";
 		};
+		0A83EA6C1D2065D00014DF78 /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = pattern.proxy;
+			isEditable = 1;
+			outputFiles = (
+			);
+		};
 /* End PBXBuildRule section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,6 +52,15 @@
 				0A4CA7551D14C5A200BC8619 /* test.s in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0A83EAB11D2099260014DF78 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -54,6 +76,13 @@
 		0A4CA7591D14C70B00BC8619 /* instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instruction.h; sourceTree = "<group>"; };
 		0A4CA75D1D1620F400BC8619 /* configure.ac */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = configure.ac; sourceTree = "<group>"; };
 		0A4CA75F1D16230C00BC8619 /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		0A83EAB31D2099260014DF78 /* d16-tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "d16-tests"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A83EABA1D2099340014DF78 /* test_instruction.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_instruction.c; sourceTree = "<group>"; };
+		0A83EABB1D2099340014DF78 /* unity_internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unity_internals.h; sourceTree = "<group>"; };
+		0A83EABC1D2099340014DF78 /* unity.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unity.c; sourceTree = "<group>"; };
+		0A83EABD1D2099340014DF78 /* unity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unity.h; sourceTree = "<group>"; };
+		0A83EAC01D209A810014DF78 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		0A83EAC21D209AB00014DF78 /* test_instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_instruction.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +94,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0A83EAB01D2099260014DF78 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A83EAC51D209C500014DF78 /* libglib-2.0.0.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -73,6 +110,7 @@
 			children = (
 				0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */,
 				0A4CA7441D14C01400BC8619 /* d16-asm */,
+				0A83EAB41D2099260014DF78 /* d16-tests */,
 				0A4CA7431D14C01400BC8619 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -81,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				0A4CA7421D14C01400BC8619 /* d16-asm */,
+				0A83EAB31D2099260014DF78 /* d16-tests */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -101,6 +140,19 @@
 			path = "d16-asm";
 			sourceTree = "<group>";
 		};
+		0A83EAB41D2099260014DF78 /* d16-tests */ = {
+			isa = PBXGroup;
+			children = (
+				0A83EABA1D2099340014DF78 /* test_instruction.c */,
+				0A83EAC21D209AB00014DF78 /* test_instruction.h */,
+				0A83EABB1D2099340014DF78 /* unity_internals.h */,
+				0A83EABC1D2099340014DF78 /* unity.c */,
+				0A83EABD1D2099340014DF78 /* unity.h */,
+				0A83EAC01D209A810014DF78 /* main.c */,
+			);
+			path = "d16-tests";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -113,6 +165,7 @@
 				0A4CA7401D14C01400BC8619 /* CopyFiles */,
 			);
 			buildRules = (
+				0A83EA6C1D2065D00014DF78 /* PBXBuildRule */,
 				0A4CA7601D18375700BC8619 /* PBXBuildRule */,
 			);
 			dependencies = (
@@ -120,6 +173,23 @@
 			name = "d16-asm";
 			productName = "d16-asm";
 			productReference = 0A4CA7421D14C01400BC8619 /* d16-asm */;
+			productType = "com.apple.product-type.tool";
+		};
+		0A83EAB21D2099260014DF78 /* d16-tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0A83EAB71D2099260014DF78 /* Build configuration list for PBXNativeTarget "d16-tests" */;
+			buildPhases = (
+				0A83EAAF1D2099260014DF78 /* Sources */,
+				0A83EAB01D2099260014DF78 /* Frameworks */,
+				0A83EAB11D2099260014DF78 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "d16-tests";
+			productName = "d16-tests";
+			productReference = 0A83EAB31D2099260014DF78 /* d16-tests */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -132,6 +202,9 @@
 				ORGANIZATIONNAME = "Michael Nolan";
 				TargetAttributes = {
 					0A4CA7411D14C01400BC8619 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+					0A83EAB21D2099260014DF78 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
 				};
@@ -149,6 +222,7 @@
 			projectRoot = "";
 			targets = (
 				0A4CA7411D14C01400BC8619 /* d16-asm */,
+				0A83EAB21D2099260014DF78 /* d16-tests */,
 			);
 		};
 /* End PBXProject section */
@@ -162,6 +236,17 @@
 				0A4CA74F1D14C03900BC8619 /* parser.y in Sources */,
 				0A4CA74D1D14C03200BC8619 /* lex.l in Sources */,
 				0A4CA7461D14C01400BC8619 /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0A83EAAF1D2099260014DF78 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A83EAC41D209C240014DF78 /* instruction.c in Sources */,
+				0A83EABE1D2099340014DF78 /* test_instruction.c in Sources */,
+				0A83EABF1D2099340014DF78 /* unity.c in Sources */,
+				0A83EAC11D209A810014DF78 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,8 +338,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
-					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
 					"/usr/local/Cellar/glib/2.46.2/lib/glib-2.0/include",
+					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -268,13 +353,37 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
-					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
 					"/usr/local/Cellar/glib/2.46.2/lib/glib-2.0/include",
+					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/Cellar/glib/2.46.2/lib,
 				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		0A83EAB81D2099260014DF78 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"/usr/local/Cellar/glib/2.46.2/lib/glib-2.0/include",
+					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
+				);
+				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/glib/2.46.2/lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0A83EAB91D2099260014DF78 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"/usr/local/Cellar/glib/2.46.2/lib/glib-2.0/include",
+					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
+				);
+				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/glib/2.46.2/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -299,6 +408,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		0A83EAB71D2099260014DF78 /* Build configuration list for PBXNativeTarget "d16-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A83EAB81D2099260014DF78 /* Debug */,
+				0A83EAB91D2099260014DF78 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
