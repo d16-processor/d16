@@ -1,6 +1,6 @@
 language: c
 before_install:
-    - sudo apt-get install libglib-2.0.0 bison flex
+    - sudo apt-get install libglib2.0-dev bison flex
     - cd assembler/d16-asm
     - ./autogen.sh
     - ./configure
