@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ([2.69])
+AC_PREREQ([2.6])
 AC_INIT([d16-asm], [0.1], [mtnolan2640@gmail.com])
 AM_INIT_AUTOMAKE([0.1 foreign subdir-objects])
 AC_CONFIG_SRCDIR([instruction.c])
