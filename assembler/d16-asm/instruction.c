@@ -58,7 +58,8 @@ Instruction* new_instruction_r(OP* op, int rD){
     Instruction *i = gen_instruction_internal(op);
     i->rD = rD;
 	if(i->op_type == JMP){
-		i->type = I_TYPE_JMP;
+		printf("Cannot use this function for generating jump instructions!\n");
+		exit(1);
 	}else{
 		i->type= I_TYPE_R;
     }
@@ -159,7 +160,7 @@ uint8_t build_mem_selector(Instruction* i){
 	return (i->flags &3) << 6 | (i->rS & 7)<<3 | (i->rD & 0x7);
 }
 uint8_t build_shift_selector(Instruction* i){
-    return i->rD || (i->immediate & 0xF)<<3;
+    return i->rD | (i->immediate & 0xF)<<3;
 }
 uint8_t build_jmp_selector(Instruction* i){
 	return (i->cc&0xf)<<3|i->rD;
