@@ -10,3 +10,4 @@ stamp-h1
 Makefile
 config.*
 configure
+test-driver

@@ -15,9 +15,11 @@
 		0A4CA75A1D14C70B00BC8619 /* instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7581D14C70B00BC8619 /* instruction.c */; };
 		0A83EABE1D2099340014DF78 /* test_instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EABA1D2099340014DF78 /* test_instruction.c */; };
 		0A83EABF1D2099340014DF78 /* unity.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EABC1D2099340014DF78 /* unity.c */; };
-		0A83EAC11D209A810014DF78 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EAC01D209A810014DF78 /* main.c */; };
+		0A83EAC11D209A810014DF78 /* testing_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EAC01D209A810014DF78 /* testing_main.c */; };
 		0A83EAC41D209C240014DF78 /* instruction.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7581D14C70B00BC8619 /* instruction.c */; };
 		0A83EAC51D209C500014DF78 /* libglib-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4CA7561D14C66700BC8619 /* libglib-2.0.0.dylib */; };
+		0A83EAC81D21BA340014DF78 /* test_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EAC61D21BA340014DF78 /* test_main.c */; };
+		0A83EAC91D21BA7C0014DF78 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7451D14C01400BC8619 /* main.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -81,8 +83,10 @@
 		0A83EABB1D2099340014DF78 /* unity_internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unity_internals.h; sourceTree = "<group>"; };
 		0A83EABC1D2099340014DF78 /* unity.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unity.c; sourceTree = "<group>"; };
 		0A83EABD1D2099340014DF78 /* unity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unity.h; sourceTree = "<group>"; };
-		0A83EAC01D209A810014DF78 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		0A83EAC01D209A810014DF78 /* testing_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = testing_main.c; sourceTree = "<group>"; };
 		0A83EAC21D209AB00014DF78 /* test_instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_instruction.h; sourceTree = "<group>"; };
+		0A83EAC61D21BA340014DF78 /* test_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_main.c; sourceTree = "<group>"; };
+		0A83EAC71D21BA340014DF78 /* test_main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_main.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,7 +152,9 @@
 				0A83EABB1D2099340014DF78 /* unity_internals.h */,
 				0A83EABC1D2099340014DF78 /* unity.c */,
 				0A83EABD1D2099340014DF78 /* unity.h */,
-				0A83EAC01D209A810014DF78 /* main.c */,
+				0A83EAC01D209A810014DF78 /* testing_main.c */,
+				0A83EAC61D21BA340014DF78 /* test_main.c */,
+				0A83EAC71D21BA340014DF78 /* test_main.h */,
 			);
 			path = "d16-tests";
 			sourceTree = "<group>";
@@ -243,10 +249,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A83EAC91D21BA7C0014DF78 /* main.c in Sources */,
 				0A83EAC41D209C240014DF78 /* instruction.c in Sources */,
 				0A83EABE1D2099340014DF78 /* test_instruction.c in Sources */,
 				0A83EABF1D2099340014DF78 /* unity.c in Sources */,
-				0A83EAC11D209A810014DF78 /* main.c in Sources */,
+				0A83EAC11D209A810014DF78 /* testing_main.c in Sources */,
+				0A83EAC81D21BA340014DF78 /* test_main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,6 +380,7 @@
 					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/glib/2.46.2/lib;
+				OTHER_CFLAGS = "-DTESTING";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -384,6 +393,7 @@
 					"/usr/local/Cellar/glib/2.46.2/include/glib-2.0",
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/glib/2.46.2/lib;
+				OTHER_CFLAGS = "-DTESTING";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

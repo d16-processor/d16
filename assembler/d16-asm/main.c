@@ -12,9 +12,11 @@
 #include <string.h>
 #include <glib.h>
 #include "instruction.h"
+
+FILE* output_file;
+#ifndef TESTING
 extern int yyparse (void);
 extern FILE* yyin;
-FILE* output_file;
 int main(int argc, const char * argv[]) {
     
     if(argc != 3){
@@ -40,6 +42,7 @@ int main(int argc, const char * argv[]) {
     fclose(o);
     return 0;
 }
+#endif
 void print_elem(void* element, void* data){
     Instruction* i = (Instruction* ) element;
     switch (i->type) {

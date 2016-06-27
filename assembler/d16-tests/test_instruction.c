@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include "unity.h"
 #include "instruction.h"
-
+#include "main.h"
 void test_op(void){
 	struct _OP* op_test = op("add", ADD);
 	TEST_ASSERT_MESSAGE(op_test != NULL, "op() returned a null pointer!");
@@ -84,9 +84,18 @@ void test_reg_selector(void){
 void test_shift_selector(void){
 	Instruction* i = new_instruction_ri(op("shl",SHL), 4, 5);
 	TEST_ASSERT_EQUAL_INT_MESSAGE(5<<3|4, build_shift_selector(i), "Incorrect selector for shli");
-
+	free(i);
 }
-
+void test_mem_selector(void){
+	Instruction* i = new_instruction_memi(op("st", ST), 3, 2, 456, false, true);
+	TEST_ASSERT_EQUAL_INT_MESSAGE(1<<6|2<<3|3, build_mem_selector(i), "Incorrect selector for memi");
+	free(i);
+}
+void test_jmp_selector(void){
+	Instruction* i = new_instruction_jmpi(op("jmp",JMP), 34, OS);
+	TEST_ASSERT_EQUAL_INT_MESSAGE(OS <<3, build_jmp_selector(i), "Incorrect selector for jmp");
+	free(i);
+}
 void test_instruction_length(void){
 	Instruction *rr = new_instruction_rr(op("add",ADD), 3, 2);
 	Instruction *ri = new_instruction_ri(op("xor",XOR), 0, 234);
@@ -112,6 +121,7 @@ void test_instruction_length(void){
 
 }
 void test_instruction_run_all_tests(void){
+	printf("Run all tests for instruction.c\n");
 	RUN_TEST(test_op);
 	RUN_TEST(test_instruction_1);
 	RUN_TEST(test_instruction_r_2);
@@ -122,5 +132,7 @@ void test_instruction_run_all_tests(void){
 	RUN_TEST(test_instruction_jmpi_3);
 	RUN_TEST(test_reg_selector);
 	RUN_TEST(test_shift_selector);
+	RUN_TEST(test_mem_selector);
+	RUN_TEST(test_jmp_selector);
 	RUN_TEST(test_instruction_length);
 }

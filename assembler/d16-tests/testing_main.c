@@ -9,8 +9,10 @@
 #include <stdio.h>
 #include "unity.h"
 #include "test_instruction.h"
+#include "test_main.h"
 int main(void){
 	UNITY_BEGIN();
 	test_instruction_run_all_tests();
+	main_run_all_tests();
 	return UNITY_END();
 }
