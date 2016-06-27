@@ -11,3 +11,5 @@ Makefile
 config.*
 configure
 test-driver
+d16_tests*
+test-suite.log
