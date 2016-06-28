@@ -1,5 +1,5 @@
 
-tests: reg_tb decoder_tb alu_tb
+tests: reg_tb decoder_tb alu_tb control_tb pc_tb mem_tb
 tests-list:
 	@echo "tests:"
 	@echo "	reg_tb"

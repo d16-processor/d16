@@ -9,12 +9,13 @@ end control_tb;
 architecture behavior of control_tb is
 	component control
 		port(
-			clk      : in  std_logic;
-			en       : in  std_logic;
-			rst      : in  std_logic;
-			en_mem   : in  std_logic;
-			mem_wait : in  std_logic;
-			control  : out std_logic_vector(CONTROL_BIT_MAX downto 0)
+			clk           : in  std_logic;
+			en            : in  std_logic;
+			rst           : in  std_logic;
+			en_mem        : in  std_logic;
+			mem_wait      : in  std_logic;
+			should_branch : in  std_logic;
+			control       : out std_logic_vector(CONTROL_BIT_MAX downto 0)
 		);
 	end component control;
 
@@ -24,10 +25,12 @@ architecture behavior of control_tb is
 	signal en_mem       : std_logic;
 	signal mem_wait     : std_logic;
 	signal control_in   : std_logic_vector(CONTROL_BIT_MAX downto 0);
+	signal should_branch : std_logic;
 	constant clk_period : time := 10 ns;
 begin
 	uut : component control
 		port map(
+			should_branch => should_branch,
 			mem_wait => mem_wait,
 			clk     => clk,
 			en      => en,
