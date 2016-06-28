@@ -18,18 +18,19 @@
     int ival;
     struct _Instruction* instr;
     struct _OP* op;
-	
+	struct _Addr* addr;
 }
 
 %error-verbose
 
-%token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD BYTE_FLAG PLUS
+%token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD BYTE_FLAG PLUS COLON
 %token <op> OPCODE
 %token <ival> CONDITION_CODE
-%token <sval> IDENTIFIER
+%token <sval> IDENTIFIER LABEL
 %token <ival> REGISTER IMMEDIATE CP_REGISTER NUMBER
 %type <instr> instruction
 %type <list> program
+%type <addr> address
 %start start
 
 %%
@@ -39,31 +40,36 @@ program:
 	|program NEWLINE {$$=$1;}
     | {$$=NULL;}
 ;
+address:
+		IMMEDIATE {$$=addr_from_immediate($1);}
+	|	IDENTIFIER {$$=addr_from_label($1);}
+	|	NUMBER	{$$=addr_from_immediate($1);}
+;
 //Instruction* new_instrution_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
 instruction:
         OPCODE NEWLINE{$$=new_instruction($1);}
     |   OPCODE REGISTER NEWLINE {$$=new_instruction_r($1,$2);}
     |   OPCODE REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$2,$4);}
-    |   OPCODE REGISTER COMMA IMMEDIATE NEWLINE{$$=new_instruction_ri($1,$2,$4);}
+    |   OPCODE REGISTER COMMA address NEWLINE{$$=new_instruction_ri($1,$2,$4);}
     |   OPCODE REGISTER COMMA CP_REGISTER NEWLINE{$$=new_instruction_rc($1,$2,$4);}
     |   OPCODE CP_REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_cr($1,$2,$4);}
     |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_mem($1,$2,$5,false);}
     |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_mem($1,$6,$3,false);}
 	|   OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_mem($1,$3,$6,true);}
 	|   OPCODE BYTE_FLAG LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_mem($1,$7,$4,true);}
-	|	OPCODE REGISTER COMMA LBRACKET NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,0,$5,false,false);}
-	|	OPCODE LBRACKET NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$6,$3,false,false);}
-	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,0,$6,true,false);}
-	|	OPCODE BYTE_FLAG LBRACKET NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$7,$4,true,false);}
-	|	OPCODE REGISTER COMMA LBRACKET REGISTER PLUS NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,$5,$7,false,true);}
-	|	OPCODE LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$8,$3,$5,false,true);}
-	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER PLUS NUMBER RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,$6,$8,true,true);}
-	|	OPCODE BYTE_FLAG LBRACKET REGISTER PLUS NUMBER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$9,$4,$6,true,true);}
-	|   OPCODE NUMBER NEWLINE {$$=new_instruction_jmpi($1,$2,AL);} //jump
-	|   OPCODE CONDITION_CODE NUMBER NEWLINE {$$=new_instruction_jmpi($1,$3,$2);}
+	|	OPCODE REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,0,$5,false,false);}
+	|	OPCODE LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$6,$3,false,false);}
+	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,0,$6,true,false);}
+	|	OPCODE BYTE_FLAG LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$7,$4,true,false);}
+	|	OPCODE REGISTER COMMA LBRACKET REGISTER PLUS address RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,$5,$7,false,true);}
+	|	OPCODE LBRACKET REGISTER PLUS address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$8,$3,$5,false,true);}
+	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER PLUS address RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,$6,$8,true,true);}
+	|	OPCODE BYTE_FLAG LBRACKET REGISTER PLUS address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$9,$4,$6,true,true);}
+	|   OPCODE address NEWLINE {$$=new_instruction_jmpi($1,$2,AL);} //jump
+	|   OPCODE CONDITION_CODE address NEWLINE {$$=new_instruction_jmpi($1,$3,$2);}
 	|   OPCODE CONDITION_CODE REGISTER NEWLINE {$$=new_instruction_jmp($1,$3,$2);}
     |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
-
+	|   LABEL {$$=new_instruction_label(strdup($1));}
 ;
 
 

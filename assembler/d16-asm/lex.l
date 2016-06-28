@@ -21,7 +21,7 @@
 .dw {return DIRECTIVE_WORD;}
 \.b {return BYTE_FLAG;}
 \+ {return PLUS;}
-
+\: {return COLON;}
 nop {yylval.op = op(strdup(yytext),NOP); return OPCODE;};
 add {yylval.op = op(strdup(yytext),ADD); return OPCODE;};
 sub {yylval.op = op(strdup(yytext),SUB); return OPCODE;};
@@ -69,7 +69,16 @@ sbb {yylval.op = op(strdup(yytext), SBB); return OPCODE;};
 #0x[0-9a-fA-F]* {yylval.ival = (int)strtol(yytext+1,NULL,16); return IMMEDIATE;};
 -?[0-9]+ {yylval.ival = atoi(yytext); return NUMBER;}
 0x[0-9a-fA-F]+ {yylval.ival = (int)strtol(yytext,NULL,16); return NUMBER;};
-'[a-zA-z][a-zA-Z0-9]*' {printf("Identifier %s\n",yytext);yylval.sval = strdup(yytext); return IDENTIFIER;};
+[a-zA-Z][a-zA-Z0-9]*\: {
+	char* label = strdup(yytext);
+	char* colon = strchr(label,':');
+	*colon = '\0';
+	yylval.sval = label;
+	printf("label: %s\n",label);
+	return LABEL;
+}
+[a-zA-Z][a-zA-Z0-9]* {printf("Identifier %s\n",yytext);yylval.sval = strdup(yytext); return IDENTIFIER;};
+
 . {return yytext[0];}
 
 %%

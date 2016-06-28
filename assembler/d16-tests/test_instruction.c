@@ -38,11 +38,11 @@ void test_instruction_rr_3(void){
 	free(i);
 }
 void test_instruction_ri_3(void){
-	Instruction* i = new_instruction_ri(op("add",ADD), 5, 345);
+	Instruction* i = new_instruction_ri(op("add",ADD), 5, addr_from_immediate(345));
 	TEST_ASSERT_EQUAL_INT(I_TYPE_RIMM, i->type);
 	TEST_ASSERT_EQUAL_INT_MESSAGE(ADDI, i->op_type, "Incorrect opcode");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(5, i->rD, "Incorrect rD value");
-	TEST_ASSERT_EQUAL_INT_MESSAGE(345, i->immediate, "Incorrect immediate");
+	TEST_ASSERT_EQUAL_INT_MESSAGE(345, i->address->immediate, "Incorrect immediate");
 	free(i);
 }
 void test_instruction_mem_4(void){
@@ -54,19 +54,19 @@ void test_instruction_mem_4(void){
 	free(i);
 }
 void test_instruction_memi_5(void){
-	Instruction *i = new_instruction_memi(op("st",ST), 3, 4, 2567, false, true);
+	Instruction *i = new_instruction_memi(op("st",ST), 3, 4, addr_from_immediate(2567), false, true);
 	TEST_ASSERT_EQUAL_INT(I_TYPE_MEMI, i->type);
 	TEST_ASSERT_EQUAL_INT_MESSAGE(3, i->rD, "Incorrect rD value");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(4, i->rS, "Incorrect rS value");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(M_DISP, i->flags, "Incorrect MEM flags");
-	TEST_ASSERT_EQUAL_INT_MESSAGE(2567, i->immediate, "Incorrect Immediate");
+	TEST_ASSERT_EQUAL_INT_MESSAGE(2567, i->address->immediate, "Incorrect Immediate");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(STI, i->op_type, "Incorrect opcode");
 	free(i);
 }
 void test_instruction_jmpi_3(void){
-	Instruction* i = new_instruction_jmpi(op("jmp",JMP), 23, EQ);
+	Instruction* i = new_instruction_jmpi(op("jmp",JMP), addr_from_immediate(23), EQ);
 	TEST_ASSERT_EQUAL_INT(I_TYPE_JMPI,i->type);
-	TEST_ASSERT_EQUAL_INT_MESSAGE(23, i->immediate, "Incorrect Immediate");
+	TEST_ASSERT_EQUAL_INT_MESSAGE(23, i->address->immediate, "Incorrect Immediate");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(EQ, i->cc, "Incorrect Condition code");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(JMPI, i->op_type, "Incorrect opcode");
 	free(i);
@@ -76,34 +76,34 @@ void test_reg_selector(void){
 	uint8_t sel = build_reg_selector(i);
 	TEST_ASSERT_EQUAL_INT(0b00011100, sel);
 	free(i);
-	Instruction* i2 = new_instruction_ri(op("add",ADD), 3, 45);
+	Instruction* i2 = new_instruction_ri(op("add",ADD), 3, addr_from_immediate(45));
 	sel = build_reg_selector(i2);
 	TEST_ASSERT_EQUAL_INT(0b00000011, sel);
 	free(i2);
 }
 void test_shift_selector(void){
-	Instruction* i = new_instruction_ri(op("shl",SHL), 4, 5);
+	Instruction* i = new_instruction_ri(op("shl",SHL), 4, addr_from_immediate(5));
 	TEST_ASSERT_EQUAL_INT_MESSAGE(5<<3|4, build_shift_selector(i), "Incorrect selector for shli");
 	free(i);
 }
 void test_mem_selector(void){
-	Instruction* i = new_instruction_memi(op("st", ST), 3, 2, 456, false, true);
+	Instruction* i = new_instruction_memi(op("st", ST), 3, 2, addr_from_immediate(456), false, true);
 	TEST_ASSERT_EQUAL_INT_MESSAGE(1<<6|2<<3|3, build_mem_selector(i), "Incorrect selector for memi");
 	free(i);
 }
 void test_jmp_selector(void){
-	Instruction* i = new_instruction_jmpi(op("jmp",JMP), 34, OS);
+	Instruction* i = new_instruction_jmpi(op("jmp",JMP), addr_from_immediate(34), OS);
 	TEST_ASSERT_EQUAL_INT_MESSAGE(OS <<3, build_jmp_selector(i), "Incorrect selector for jmp");
 	free(i);
 }
 void test_instruction_length(void){
 	Instruction *rr = new_instruction_rr(op("add",ADD), 3, 2);
-	Instruction *ri = new_instruction_ri(op("xor",XOR), 0, 234);
-	Instruction *memi = new_instruction_memi(op("ld",LD), 3, 4, 1234, false, false);
-	Instruction *shift = new_instruction_ri(op("shl",SHL), 3, 2);
-	Instruction *mov_special = new_instruction_ri(op("mov",MOV), 3, 24);
-	Instruction *mov_general = new_instruction_ri(op("mov",MOV), 5, 1456);
-	Instruction *jmpi = new_instruction_jmpi(op("jmp",JMP), 34, AL);
+	Instruction *ri = new_instruction_ri(op("xor",XOR), 0, addr_from_immediate(234));
+	Instruction *memi = new_instruction_memi(op("ld",LD), 3, 4, addr_from_immediate(1234), false, false);
+	Instruction *shift = new_instruction_ri(op("shl",SHL), 3, addr_from_immediate(2));
+	Instruction *mov_special = new_instruction_ri(op("mov",MOV), 3, addr_from_immediate(24));
+	Instruction *mov_general = new_instruction_ri(op("mov",MOV), 5, addr_from_immediate(1456));
+	Instruction *jmpi = new_instruction_jmpi(op("jmp",JMP), addr_from_immediate(34), AL);
 	TEST_ASSERT_EQUAL_INT_MESSAGE(1, instruction_length(rr), "Incorrect RR instruction length");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(ri), "Incorrect RI instruction length");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(memi), "Incorrect MemI instruction length");

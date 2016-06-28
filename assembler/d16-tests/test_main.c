@@ -29,7 +29,7 @@ void test_assemble_ADD(void){
 }
 void test_assemble_SUBI(void){
 	test_reset();
-	Instruction* i = new_instruction_ri(op("sub",SUB), 2, 0xf34d);
+	Instruction* i = new_instruction_ri(op("sub",SUB), 2, addr_from_immediate(0xf34d));
 	assemble_instruction(i, &ptr_copy);
 	uint16_t array_compare[] ={0x8202,0xf34d,0};
 	TEST_ASSERT_EQUAL_HEX16_ARRAY(array_compare, data, 3);
@@ -37,7 +37,7 @@ void test_assemble_SUBI(void){
 }
 void test_assemble_SHRI(void){
 	test_reset();
-	Instruction* i = new_instruction_ri(op("shr",SHR), 4, 3);
+	Instruction* i = new_instruction_ri(op("shr",SHR), 4, addr_from_immediate(3));
 	assemble_instruction(i, &ptr_copy);
 	uint16_t array_compare[] ={0x9a1c,0};
 	TEST_ASSERT_EQUAL_HEX16_ARRAY(array_compare, data, 2);

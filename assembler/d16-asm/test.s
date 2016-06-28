@@ -1,4 +1,6 @@
 nop
-mov r0,#4
+test:
+mov r0,end
 sub r0,#1
-jmp.ne 2
+jmp.ne test
+end:

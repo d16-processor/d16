@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <glib.h>
 #include <stdbool.h>
+#include "label.h"
 typedef enum{
     I_TYPE_NONE,
     I_TYPE_R,
@@ -23,7 +24,8 @@ typedef enum{
 	I_TYPE_MEM,
 	I_TYPE_MEMI,
 	I_TYPE_JMP,
-	I_TYPE_JMPI
+	I_TYPE_JMPI,
+	I_TYPE_LABEL
 }Instruction_Type;
 typedef enum {
 	M_NONE=0,
@@ -110,7 +112,7 @@ struct _Instruction{
     char* opcode;
     int rD;
     int rS;
-    int immediate;
+    Address* address;
 	condition_code cc;
     Op_Type op_type;
     Instruction_Type type;
@@ -120,18 +122,21 @@ struct _Instruction{
 };
 typedef struct _Instruction Instruction;
 struct _OP* op(char*,enum _Op_Type);
-
+void init_hash_table(void);
 Instruction* new_instruction(OP*);
 Instruction* new_instruction_r(OP*,int);
 Instruction* new_instruction_rr(OP*,int,int);
-Instruction* new_instruction_ri(OP*,int,int);
+Instruction* new_instruction_ri(OP*,int,Address* addr);
 Instruction* new_instruction_cr(OP*,int,int);
 Instruction* new_instruction_rc(OP*,int,int);
-Instruction* new_instruction_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
+Instruction* new_instruction_memi(OP* op, int rD, int rS, Address* addr, bool byte, bool displacement);
 Instruction* new_instruction_mem(OP* op, int rD, int rS, bool byte);
 Instruction* new_instruction_jmp(OP* op, int rD, condition_code cc);
-Instruction* new_instruction_jmpi(OP* op, int immediate, condition_code cc);
+Instruction* new_instruction_jmpi(OP* op, Address* addr, condition_code cc);
 Instruction* new_instruction_directive(Dir_Type, void* data);
+Instruction* new_instruction_label(char* name);
+void set_label_address(const char* label_name, unsigned int address);
+void resolve_address(Address* addr);
 char* cc_to_str(condition_code cc);
 int instruction_length(Instruction*);
 uint8_t build_reg_selector(Instruction *);
