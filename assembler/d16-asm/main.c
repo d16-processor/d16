@@ -47,31 +47,31 @@ void print_elem(void* element, void* data){
     Instruction* i = (Instruction* ) element;
     switch (i->type) {
         case I_TYPE_NONE:
-            printf("%s",i->opcode);
+            fprintf(stdout,"%s",i->opcode);
             break;
         case I_TYPE_R:
-            printf("%s r%d", i->opcode, i->rD);
+            fprintf(stdout,"%s r%d", i->opcode, i->rD);
             break;
         case I_TYPE_RR:
-            printf("%s r%d, r%d",i->opcode,i->rD, i->rS);
+            fprintf(stdout,"%s r%d, r%d",i->opcode,i->rD, i->rS);
             break;
         case I_TYPE_RIMM:
-            printf("%s r%d, #%d",i->opcode,i->rD,i->immediate);
+            fprintf(stdout,"%s r%d, #%d",i->opcode,i->rD,i->immediate);
             break;
         case I_TYPE_CR:
-            printf("%s cr%d, r%d",i->opcode,i->rD, i->rS);
+            fprintf(stdout,"%s cr%d, r%d",i->opcode,i->rD, i->rS);
             break;
         case I_TYPE_RC:
-            printf("%s r%d, cr%d", i->opcode, i->rD, i->rS);
+            fprintf(stdout,"%s r%d, cr%d", i->opcode, i->rD, i->rS);
             break;
         case I_TYPE_DIRECTIVE:
-            printf("%s %d",i->opcode, *(int*)i->dir_data);
+            fprintf(stdout,"%s %d",i->opcode, *(int*)i->dir_data);
             break;
 		case I_TYPE_MEM:
 			if(i->op_type == LD){
-				printf("%s r%d,[r%d]",i->opcode,i->rD,i->rS);
+				fprintf(stdout,"%s r%d,[r%d]",i->opcode,i->rD,i->rS);
 			}else{
-				printf("%s [r%d],r%d",i->opcode,i->rS,i->rD);
+				fprintf(stdout,"%s [r%d],r%d",i->opcode,i->rS,i->rD);
 			}
 			break;
 		case I_TYPE_MEMI:{
@@ -88,20 +88,20 @@ void print_elem(void* element, void* data){
 					snprintf(address, sizeof(address), "0x%04x",i->immediate);
 				}
 				if(i->op_type == LD){
-					printf("%s r%d,[%s]",opcode_new,i->rD,address);
+					fprintf(stdout,"%s r%d,[%s]",opcode_new,i->rD,address);
 				}else{
-					printf("%s [%s],r%d",opcode_new,address,i->rD);
+					fprintf(stdout,"%s [%s],r%d",opcode_new,address,i->rD);
 				}
 				break;
 			}
 		case I_TYPE_JMP:
-			printf("%s.%s r%d",i->opcode,cc_to_str(i->cc), i->rD);
+			fprintf(stdout,"%s.%s r%d",i->opcode,cc_to_str(i->cc), i->rD);
 			break;
 		case I_TYPE_JMPI:
-			printf("%s.%s 0x%04x",i->opcode,cc_to_str(i->cc), i->immediate);
+			fprintf(stdout,"%s.%s 0x%04x",i->opcode,cc_to_str(i->cc), i->immediate);
 			break;
     }
-    printf(" length: %d\n",instruction_length(i));
+    fprintf(stdout," length: %d\n",instruction_length(i));
     
 }
 void free_elem(void* element){
@@ -163,7 +163,7 @@ void process_list(struct _GList* list){
     size_t output_size = 0;
     g_list_foreach(list, &print_elem, NULL);
     g_list_foreach(list, &sum_program_length , &output_size);
-    printf("Program length: %zu\n",output_size);
+    fprintf(stdout,"Program length: %zu\n",output_size);
     output_size *= 2;
     uint16_t* buffer = malloc(output_size);
     uint16_t* buf_save = buffer;
@@ -171,7 +171,7 @@ void process_list(struct _GList* list){
     fwrite(buf_save, sizeof(uint8_t), output_size, output_file);
     #ifdef DEBUG
     for(int i=0;i<output_size/2;i++){
-        printf("0x%04x\n",buf_save[i]);
+        fprintf(stdout,"0x%04x\n",buf_save[i]);
     }
     #endif
     g_list_free_full(list, &free_elem);
