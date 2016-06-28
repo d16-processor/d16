@@ -10,9 +10,11 @@
 #include "unity.h"
 #include "test_instruction.h"
 #include "test_main.h"
+#include "test_label.h"
 int main(void){
 	UNITY_BEGIN();
 	test_instruction_run_all_tests();
+	test_label_run_all_tests();
 	main_run_all_tests();
 	return UNITY_END();
 }

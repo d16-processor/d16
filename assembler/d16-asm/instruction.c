@@ -168,6 +168,7 @@ void resolve_address(Address* addr){
 			if(g_hash_table_contains(labels, addr->lblname)){
 				addr->immediate = GPOINTER_TO_INT(g_hash_table_lookup(labels, addr->lblname));
 				free(addr->lblname);
+				addr->lblname = NULL;
 			}else{
 				fprintf(stderr, "No label named %s",addr->lblname);
 				exit(1);

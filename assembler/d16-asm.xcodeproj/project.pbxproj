@@ -22,6 +22,7 @@
 		0A83EAC91D21BA7C0014DF78 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A4CA7451D14C01400BC8619 /* main.c */; };
 		0A83EACC1D2306AA0014DF78 /* label.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EACA1D2306AA0014DF78 /* label.c */; };
 		0A83EACD1D23140B0014DF78 /* label.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EACA1D2306AA0014DF78 /* label.c */; };
+		0A83EAD01D232BB60014DF78 /* test_label.c in Sources */ = {isa = PBXBuildFile; fileRef = 0A83EACE1D232BB60014DF78 /* test_label.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -91,6 +92,8 @@
 		0A83EAC71D21BA340014DF78 /* test_main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_main.h; sourceTree = "<group>"; };
 		0A83EACA1D2306AA0014DF78 /* label.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = label.c; sourceTree = "<group>"; };
 		0A83EACB1D2306AA0014DF78 /* label.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = label.h; sourceTree = "<group>"; };
+		0A83EACE1D232BB60014DF78 /* test_label.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_label.c; sourceTree = "<group>"; };
+		0A83EACF1D232BB60014DF78 /* test_label.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test_label.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +164,8 @@
 				0A83EAC01D209A810014DF78 /* testing_main.c */,
 				0A83EAC61D21BA340014DF78 /* test_main.c */,
 				0A83EAC71D21BA340014DF78 /* test_main.h */,
+				0A83EACE1D232BB60014DF78 /* test_label.c */,
+				0A83EACF1D232BB60014DF78 /* test_label.h */,
 			);
 			path = "d16-tests";
 			sourceTree = "<group>";
@@ -260,6 +265,7 @@
 				0A83EAC91D21BA7C0014DF78 /* main.c in Sources */,
 				0A83EAC41D209C240014DF78 /* instruction.c in Sources */,
 				0A83EABE1D2099340014DF78 /* test_instruction.c in Sources */,
+				0A83EAD01D232BB60014DF78 /* test_label.c in Sources */,
 				0A83EABF1D2099340014DF78 /* unity.c in Sources */,
 				0A83EAC11D209A810014DF78 /* testing_main.c in Sources */,
 				0A83EAC81D21BA340014DF78 /* test_main.c in Sources */,

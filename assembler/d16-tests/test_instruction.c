@@ -120,6 +120,20 @@ void test_instruction_length(void){
 	free(jmpi);
 
 }
+void test_labels(void){
+	init_hash_table();
+	Instruction* i = new_instruction_label("test");
+	TEST_ASSERT_EQUAL_STRING("test", i->opcode);
+	TEST_ASSERT(i->type = I_TYPE_LABEL);
+	set_label_address("test", 34);
+	Address* a = addr_from_label(strdup("test"));
+	resolve_address(a);
+	TEST_ASSERT_EQUAL_INT_MESSAGE(34,a->immediate, "Incorrect label address");
+	free(a);
+	free(i);
+
+
+}
 void test_instruction_run_all_tests(void){
 	printf("Run all tests for instruction.c\n");
 	RUN_TEST(test_op);
@@ -135,4 +149,5 @@ void test_instruction_run_all_tests(void){
 	RUN_TEST(test_mem_selector);
 	RUN_TEST(test_jmp_selector);
 	RUN_TEST(test_instruction_length);
+	RUN_TEST(test_labels);
 }
