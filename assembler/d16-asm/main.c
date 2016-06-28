@@ -168,7 +168,7 @@ void process_list(struct _GList* list){
     uint16_t* buffer = malloc(output_size);
     uint16_t* buf_save = buffer;
     g_list_foreach(list, (void(*)(void*,void*))&assemble_instruction, &buffer);
-    fwrite(buf_save, sizeof(uint16_t), output_size/2, output_file);
+    fwrite(buf_save, sizeof(uint8_t), output_size, output_file);
     #ifdef DEBUG
     for(int i=0;i<output_size/2;i++){
         printf("0x%04x\n",buf_save[i]);
