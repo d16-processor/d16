@@ -163,7 +163,7 @@ void process_list(struct _GList* list){
     size_t output_size = 0;
     g_list_foreach(list, &print_elem, NULL);
     g_list_foreach(list, &sum_program_length , &output_size);
-    printf("Program length: %ld\n",output_size);
+    printf("Program length: %zu\n",output_size);
     output_size *= 2;
     uint16_t* buffer = malloc(output_size);
     uint16_t* buf_save = buffer;
