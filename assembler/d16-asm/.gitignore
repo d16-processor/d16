@@ -13,3 +13,6 @@ configure
 test-driver
 d16_tests*
 test-suite.log
+missing
+ylwrap
+depcomp
