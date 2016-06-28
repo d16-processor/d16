@@ -170,7 +170,7 @@ void resolve_address(Address* addr){
 				free(addr->lblname);
 				addr->lblname = NULL;
 			}else{
-				fprintf(stderr, "No label named %s",addr->lblname);
+				fprintf(stderr, "No label named %s\n",addr->lblname);
 				exit(1);
 			}
 		}
