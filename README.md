@@ -22,12 +22,14 @@ cd assembler/d16-asm
 ./autogen.sh
 ./configure
 make
+#optional
+make check
 ```
 
 # CPU 
 A general layout of the CPU is provided here, this is subject to change during the project
 ![alt text](https://raw.githubusercontent.com/C-Elegans/d16/master/D16%20Cpu%20Diagram.png "D16 CPU Diagram")
-The CPU's execution cycle will take between 4 and 6 cycles, and will look something like this:
+The CPU's execution cycle takes 5 cycles for most instructions, 6 cycles for memory, and 7 for jumps
 ![alt text](https://raw.githubusercontent.com/C-Elegans/d16/master/CPU%20Execution.png "D16 Execution Diagram")
 ## Module testbenches
 All testbenches can be run from the makefile in `vhdl/build/`
