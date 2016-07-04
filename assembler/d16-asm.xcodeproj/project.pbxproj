@@ -37,14 +37,6 @@
 			);
 			script = "# $(YACC)\n/usr/bin/bison -d -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.c ${INPUT_FILE_PATH}";
 		};
-		0A83EA6C1D2065D00014DF78 /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			fileType = pattern.proxy;
-			isEditable = 1;
-			outputFiles = (
-			);
-		};
 /* End PBXBuildRule section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -182,7 +174,6 @@
 				0A4CA7401D14C01400BC8619 /* CopyFiles */,
 			);
 			buildRules = (
-				0A83EA6C1D2065D00014DF78 /* PBXBuildRule */,
 				0A4CA7601D18375700BC8619 /* PBXBuildRule */,
 			);
 			dependencies = (
@@ -440,6 +431,7 @@
 				0A83EAB91D2099260014DF78 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
