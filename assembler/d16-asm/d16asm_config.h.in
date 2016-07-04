@@ -1,0 +1,2 @@
+#define d16asm_VERSION_MAJOR @d16asm_VERSION_MAJOR@
+#define d16asm_VERSION_MINOR @d16asm_VERSION_MINOR@
