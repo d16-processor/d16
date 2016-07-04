@@ -48,7 +48,13 @@ address:
 //Instruction* new_instrution_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
 instruction:
         OPCODE NEWLINE{$$=new_instruction($1);}
-    |   OPCODE REGISTER NEWLINE {$$=new_instruction_r($1,$2);}
+    |   OPCODE REGISTER NEWLINE {
+		if($1->type == JMP ){
+			$$=new_instruction_jmp($1,$2,AL);
+		}else{
+			$$=new_instruction_r($1,$2);
+		}
+	}
     |   OPCODE REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$2,$4);}
     |   OPCODE REGISTER COMMA address NEWLINE{$$=new_instruction_ri($1,$2,$4);}
     |   OPCODE REGISTER COMMA CP_REGISTER NEWLINE{$$=new_instruction_rc($1,$2,$4);}
