@@ -49,19 +49,29 @@ address:
 //Instruction* new_instrution_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
 instruction:
         OPCODE NEWLINE{$$=new_instruction($1);}
-    |   OPCODE REGISTER NEWLINE {$$=new_instruction_r($1,$2);}
+    |   OPCODE REGISTER NEWLINE {
+		if($1->type == JMP ){
+			$$=new_instruction_jmp($1,$2,AL);
+		}else{
+			$$=new_instruction_r($1,$2);
+		}
+	}
     |   OPCODE REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$2,$4);}
     |   OPCODE REGISTER COMMA address NEWLINE{$$=new_instruction_ri($1,$2,$4);}
     |   OPCODE REGISTER COMMA CP_REGISTER NEWLINE{$$=new_instruction_rc($1,$2,$4);}
     |   OPCODE CP_REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_cr($1,$2,$4);}
-    |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_mem($1,$2,$5,false);}
-    |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_mem($1,$6,$3,false);}
-	|   OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_mem($1,$3,$6,true);}
-	|   OPCODE BYTE_FLAG LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_mem($1,$7,$4,true);}
-	|	OPCODE REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,0,$5,false,false);}
-	|	OPCODE LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$6,$3,false,false);}
+    |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_mem($1,$2,$5,false);}//ld r3,[r4]
+    |   OPCODE LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_mem($1,$6,$3,false);}//st [r4],r3
+
+	|   OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_mem($1,$3,$6,true);}//ld.b r3,[r4]
+	|   OPCODE BYTE_FLAG LBRACKET REGISTER RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_mem($1,$7,$4,true);}//st.b [r4],r3
+
+	|	OPCODE REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,0,$5,false,false);}//ld r3,[23]
+	|	OPCODE LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$6,0,$3,false,false);}//st [23], r3
+
 	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,0,$6,true,false);}
-	|	OPCODE BYTE_FLAG LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,0,$7,$4,true,false);}
+	|	OPCODE BYTE_FLAG LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$7,0,$4,true,false);}
+
 	|	OPCODE REGISTER COMMA LBRACKET REGISTER PLUS address RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,$5,$7,false,true);}
 	|	OPCODE LBRACKET REGISTER PLUS address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$8,$3,$5,false,true);}
 	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET REGISTER PLUS address RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,$6,$8,true,true);}
