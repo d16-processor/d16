@@ -8,7 +8,7 @@
 
 #include "test_main.h"
 #include <stdlib.h>
-#include "main.h"
+#include "assembler.h"
 #include "unity.h"
 #include <string.h>
 uint16_t data[128];

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include "unity.h"
 #include "instruction.h"
-#include "main.h"
+#include "assembler.h"
 void test_op(void){
 	struct _OP* op_test = op("add", ADD);
 	TEST_ASSERT_MESSAGE(op_test != NULL, "op() returned a null pointer!");

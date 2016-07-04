@@ -14,36 +14,6 @@
 #include "instruction.h"
 
 FILE* output_file;
-#ifndef TESTING
-extern int yyparse (void);
-extern FILE* yyin;
-int main(int argc, const char * argv[]) {
-    
-    if(argc != 3){
-        fprintf(stderr, "Usage d16-asm [file] [output]\n");
-        exit(-1);
-    }
-    FILE* f = fopen(argv[1], "r");
-    FILE* o = fopen(argv[2], "wb");
-    if(f == NULL){
-        fprintf(stderr, "Error opening file %s\n",argv[1]);
-        exit(-1);
-    }
-    if(o == NULL){
-        fprintf(stderr, "Error opening file %s for writing\n",argv[2]);
-        exit(2);
-    }
-    yyin = f;
-    output_file = o;
-	init_hash_table();
-    do {
-        yyparse();
-    } while (!feof(yyin));
-    fclose(f);
-    fclose(o);
-    return 0;
-}
-#endif
 void print_elem(void* element, void* data){
     Instruction* i = (Instruction* ) element;
 	char addr_string[128];
@@ -177,8 +147,7 @@ void assemble_instruction(Instruction* i, uint16_t** data){
 	free(i->address);
 
 }
-void process_list(struct _GList* list){
-
+void process_list(struct _GList* list, FILE* output_file){
     size_t output_size = 0;
     g_list_foreach(list, &print_elem, NULL);
     g_list_foreach(list, &sum_program_length , &output_size);

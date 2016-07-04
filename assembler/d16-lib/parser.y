@@ -1,17 +1,17 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include "main.h"
+    #include "assembler.h"
     #include "string.h"
     #include "instruction.h"
     #define YYDEBUG 1
     extern int yylex();
     extern int yyparse();
     extern FILE* yyin;
-	extern int yyline;
-    void yyerror(const char* s);
-    
-    %}
+    extern int yyline;
+    void yyerror(FILE * output_file, const char* s);
+%}
+
 %union{
     char* sval;
     struct _GList* list;
@@ -31,10 +31,11 @@
 %type <instr> instruction
 %type <list> program
 %type <addr> address
+%parse-param {FILE* output_file}
 %start start
 
 %%
-start: program {process_list($1);};
+start: program {process_list($1, output_file);};
 program:
     program instruction{$$=g_list_append($$, $2);}
 	|program NEWLINE {$$=$1;}
@@ -74,7 +75,7 @@ instruction:
 
 
 %%
-void yyerror(const char* s){
+void yyerror(FILE * output_file, const char* s){
     fprintf(stderr, "Parse error on line %d: %s\n",yyline,s);
     exit(1);
 }

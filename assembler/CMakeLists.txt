@@ -1,0 +1,15 @@
+cmake_minimum_required (VERSION 3.0)
+project (d16-asm)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+set(TARGET_GROUP production CACHE STRING "Group to build")
+
+add_subdirectory(d16-lib)
+if(TARGET_GROUP STREQUAL production)
+    add_subdirectory(d16-main)
+elseif(TARGET_GROUP STREQUAL test)
+    add_subdirectory(d16-tests)
+else()
+    message(FATAL_ERROR "Given TARGET_GROUP unknown")
+endif()
+

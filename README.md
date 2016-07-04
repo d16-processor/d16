@@ -8,22 +8,20 @@ The cpu is written in VHDL and is simulatable with GHDL.
 The included assembler is written in C, and uses bison and flex for parsing. It's not of the best quality, but it works.
 
 
-It can be built on OS X by:
+It can be built by:
 
 ```
-cd assembler
-xcodebuild
+cd d16/assembler/build
+cmake ..; make
+./d16-main/d16 <file> <output>
 ```
 
-and on linux by:
+Tests can be run by
 
 ```
-cd assembler/d16-asm
-./autogen.sh
-./configure
-make
-#optional
-make check
+cd d16/assembler/build
+cmake -DTARGET_GROUP=test ..; make
+./d16-tests/testing_main
 ```
 
 # CPU 
