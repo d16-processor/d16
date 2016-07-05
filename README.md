@@ -3,7 +3,8 @@ This is a simple(ish) 16 bit cpu formed in a collaboration between C-Elegans, fl
 The cpu is a load-store architecture, with variable length instructions (multiples of 16 bits) and 7 GP registers.
 The cpu is written in VHDL and is simulatable with GHDL.
 
-
+Current build health:
+[![CircleCI](https://circleci.com/gh/C-Elegans/d16.svg?style=svg)](https://circleci.com/gh/C-Elegans/d16)
 ## D16 Assembler
 The included assembler is written in C, and uses bison and flex for parsing. It's not of the best quality, but it works.
 
