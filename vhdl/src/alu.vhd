@@ -183,6 +183,8 @@ begin
 						else
 							s_output(15 downto 0) <= data2;
 						end if;
+					when OPC_SET =>
+						s_output(15 downto 0) <=X"000" & "000" & get_should_branch(flags_in,condition);
 					when others => s_output <= '0' & X"0000";
 				end case;
 
