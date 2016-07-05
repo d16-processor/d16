@@ -69,8 +69,8 @@ instruction:
 	|	OPCODE REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,0,$5,false,false);}//ld r3,[23]
 	|	OPCODE LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$6,0,$3,false,false);}//st [23], r3
 
-	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,0,$6,true,false);}
-	|	OPCODE BYTE_FLAG LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$7,0,$4,true,false);}
+	|	OPCODE BYTE_FLAG REGISTER COMMA LBRACKET address RBRACKET NEWLINE{$$=new_instruction_memi($1,$3,0,$6,true,false);}//ld.b r3,[23]
+	|	OPCODE BYTE_FLAG LBRACKET address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$7,0,$4,true,false);}//st.b [23],r3
 
 	|	OPCODE REGISTER COMMA LBRACKET REGISTER PLUS address RBRACKET NEWLINE{$$=new_instruction_memi($1,$2,$5,$7,false,true);}
 	|	OPCODE LBRACKET REGISTER PLUS address RBRACKET COMMA REGISTER NEWLINE{$$=new_instruction_memi($1,$8,$3,$5,false,true);}
