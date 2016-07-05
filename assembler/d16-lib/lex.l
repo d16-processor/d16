@@ -47,7 +47,7 @@ ldcp {yylval.op = op(strdup(yytext),LDCP); return OPCODE;};
 stcp {yylval.op = op(strdup(yytext),STCP); return OPCODE;};
 adc {yylval.op = op(strdup(yytext), ADC); return OPCODE;};
 sbb {yylval.op = op(strdup(yytext), SBB); return OPCODE;};
-
+set {yylval.op = op(strdup(yytext), SET); return OPCODE;};
 \.nv {yylval.ival = NV; return CONDITION_CODE;}
 \.eq {yylval.ival = EQ; return CONDITION_CODE;}
 \.ne {yylval.ival = NE; return CONDITION_CODE;}

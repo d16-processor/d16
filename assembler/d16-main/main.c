@@ -15,6 +15,7 @@
 
 extern int yyparse (FILE* output_file);
 extern FILE* yyin;
+extern int yydebug;
 int main(int argc, const char * argv[]) {
     
     if(argc != 3){
