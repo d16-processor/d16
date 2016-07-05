@@ -106,9 +106,6 @@ void assemble_instruction(Instruction* i, uint16_t** data){
 			if(i->op_type == MOVB){
 				**data = (i->op_type + (i->rD & 7)) << 8 | (i->address->immediate & 0xff);
 				*data+=1;
-			}else if(i->op_type == SHLI || i->op_type == SHRI || i->op_type == ROLI || i->op_type == RCLI){
-				**data = i->op_type<<8 | build_shift_selector(i);
-				*data += 1;
 			}
 			else{
 				**data = i->op_type<<8 | build_reg_selector(i);

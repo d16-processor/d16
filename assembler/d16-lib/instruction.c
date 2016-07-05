@@ -200,15 +200,12 @@ int instruction_length(Instruction* i){
 		return 0;
 	}
     if(i->type == I_TYPE_RIMM){
-        if(i->op_type == MOVI && i->address->type == ADDR_IMMEDIATE){
-			if(((unsigned)i->address->immediate) <255){
+        if(i->op_type == MOVI && i->address->type == ADDR_IMMEDIATE) {
+			if (((unsigned) i->address->immediate) < 255) {
 				i->op_type = MOVB;
 				return 1;
 			}
-        }
-        else if(i->op_type == SHLI || i->op_type == SHRI || i->op_type == ROLI || i->op_type == RCLI){
-            return 1;
-        }
+		}
         if(i->op_type == MOVB){
             return 1;
         }

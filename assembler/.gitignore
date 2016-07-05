@@ -18,6 +18,8 @@ CTestTestfile.cmake
 # Icon must end with two \r
 Icon
 
+### CLion ###
+.idea/*
 
 # Thumbnails
 ._*
