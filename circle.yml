@@ -11,6 +11,7 @@ test:
     - mkdir assembler/build/
     - cd assembler/build; cmake -DTARGET_GROUP=production .. && make all
     - cd assembler/build; cmake -DTARGET_GROUP=test .. && make all && ./d16-tests/testing_main | tee testout.txt
+    - sudo cp assembler/build/d16-main/d16 /usr/local/bin
     - cd vhdl/build; make
   post:
     - assembler/d16-tests/Unity/auto/parseOutput.rb -xml assembler/build/testout.txt

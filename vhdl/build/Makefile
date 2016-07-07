@@ -14,6 +14,14 @@ reg_tb: register_unit.o register_unit_tb.o
 ifdef WAVE
 	gtkwave dump.vcd
 endif
+mem_tb: mem.o mem_tb.o mem.bin
+	ghdl -e mem_tb
+	./mem_tb --stop-time=500ns --vcd=dump.vcd
+ifdef WAVE
+	gtkwave dump.vcd
+endif
+
+
 decoder_tb: cpu_constants.o decoder.o decoder_tb.o 
 	ghdl -e decoder_tb
 	./decoder_tb --stop-time=200ns --vcd=dump.vcd
