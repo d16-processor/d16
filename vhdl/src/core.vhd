@@ -252,7 +252,7 @@ begin
 					when STATE_PC_DELAY =>
 						pc_op <= PC_INC;
 					when STATE_ALU =>
-						report "ALU Output: " & integer'image(to_integer(unsigned(alu_output)));
+						
 
 					when STATE_DECODE =>
 						flags_in <= flags_out;

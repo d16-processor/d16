@@ -19,7 +19,7 @@ entity alu is
 		mem_data         : out std_logic_vector(15 downto 0);
 		write            : out std_logic;
 		flags_out        : out std_logic_vector(3 downto 0);
-		SP_out           : out std_logic_vector(15 downto 0) );
+		SP_out           : out std_logic_vector(15 downto 0));
 end alu;
 architecture behavior of alu is
 	signal s_output        : std_logic_vector(16 downto 0) := (others => '0');
@@ -104,8 +104,8 @@ begin
 						write <= '0';
 					when OPC_JMP =>
 						write <= '0';
-					when OPC_PUSH  => 
-						write  <= '0';
+					when OPC_PUSH =>
+						write <= '0';
 					when others =>
 						write <= '1';
 				end case;
@@ -193,11 +193,13 @@ begin
 						else
 							s_mem_data <= rD_data;
 						end if;
-						
+
 						s_output(15 downto 0) <= std_logic_vector(signed(rS_data) - 2);
-						SP_out <= std_logic_vector(signed(rS_data) - 2);
-						
-					when others => s_output <= '0' & X"0000";
+						SP_out                <= std_logic_vector(signed(rS_data) - 2);
+					when OPC_POP =>
+						s_output(15 downto 0) <= rS_data;
+						SP_out                <= std_logic_vector(signed(rS_data) + 2);
+					when others => s_output   <= '0' & X"0000";
 				end case;
 
 			end if;

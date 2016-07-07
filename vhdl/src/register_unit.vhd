@@ -26,6 +26,8 @@ begin
 			rS_data_out <= registers(to_integer(unsigned(rS_sel)));
 			if wr_en = '1' then
 				registers(to_integer(unsigned(rD_sel))) <= rD_data_in;
+				report "Wrote " & integer'image(to_integer(unsigned(rD_data_in))) & " to register r" &
+				integer'image(to_integer(unsigned(rD_sel)));
 			end if;
 			if rS_wr_en = '1' then
 				registers(to_integer(unsigned(rS_sel))) <= rS_data_in;
