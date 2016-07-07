@@ -82,7 +82,7 @@ begin
 					s_rS_sel <= instruction(5 downto 3);
 				end if;
 			end if;
-			if opcode = OPC_ST or opcode = OPC_LD or opcode = OPC_LDI or opcode = OPC_STI then
+			if opcode = OPC_ST or opcode = OPC_LD or opcode = OPC_LDI or opcode = OPC_STI or opcode = OPC_PUSH then
 				en_mem   <= '1';
 				mem_byte <= instruction(7);
 			else

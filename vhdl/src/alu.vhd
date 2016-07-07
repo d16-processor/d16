@@ -104,6 +104,8 @@ begin
 						write <= '0';
 					when OPC_JMP =>
 						write <= '0';
+					when OPC_PUSH  => 
+						write  <= '0';
 					when others =>
 						write <= '1';
 				end case;
@@ -194,6 +196,7 @@ begin
 						
 						s_output(15 downto 0) <= std_logic_vector(signed(rS_data) - 2);
 						SP_out <= std_logic_vector(signed(rS_data) - 2);
+						
 					when others => s_output <= '0' & X"0000";
 				end case;
 

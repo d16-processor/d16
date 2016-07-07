@@ -3,23 +3,23 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.cpu_constants.all;
 entity core is
-	port (
-		clk : in std_logic;
-		rst : in std_logic;
-		en : in std_logic;
-		mem_wait: in std_logic;
-		mem_data_in : out std_logic_vector(15 downto 0);
-		mem_addr: out std_logic_vector(15 downto 0);
-		mem_data_out : in std_logic_vector(15 downto 0);
-		mem_byte_enable : out std_logic;
-		mem_byte_select : out std_logic;
+	port(
+		clk              : in  std_logic;
+		rst              : in  std_logic;
+		en               : in  std_logic;
+		mem_wait         : in  std_logic;
+		mem_data_in      : out std_logic_vector(15 downto 0);
+		mem_addr         : out std_logic_vector(15 downto 0);
+		mem_data_out     : in  std_logic_vector(15 downto 0);
+		mem_byte_enable  : out std_logic;
+		mem_byte_select  : out std_logic;
 		mem_write_enable : out std_logic;
-		mem_enable : out std_logic
+		mem_enable       : out std_logic
 	);
 end entity core;
 
 architecture behavior of core is
-component alu
+	component alu
 		port(
 			clk              : in  std_logic;
 			en               : in  std_logic;
@@ -35,7 +35,8 @@ component alu
 			output           : out std_logic_vector(15 downto 0);
 			mem_data         : out std_logic_vector(15 downto 0);
 			write            : out std_logic;
-			flags_out        : out std_logic_vector(3 downto 0)
+			flags_out        : out std_logic_vector(3 downto 0);
+			SP_out           : out std_logic_vector(15 downto 0)
 		);
 	end component alu;
 	component control
@@ -84,7 +85,9 @@ component alu
 			rS_sel      : in  std_logic_vector(2 downto 0);
 			rD_data_in  : in  std_logic_vector(15 downto 0);
 			rD_data_out : out std_logic_vector(15 downto 0);
-			rS_data_out : out std_logic_vector(15 downto 0)
+			rS_data_out : out std_logic_vector(15 downto 0);
+			rS_data_in  : in  std_logic_vector(15 downto 0);
+			rS_wr_en    : in  std_logic
 		);
 	end component register_unit;
 	component mem
@@ -114,6 +117,7 @@ component alu
 	signal condition        : std_logic_vector(3 downto 0);
 	signal alu_output       : std_logic_vector(15 downto 0);
 	signal reg_write_enable : std_logic;
+	signal SP_Out           : std_logic_vector(15 downto 0);
 	--Control unit signals
 	signal en_mem           : std_logic;
 	signal control_state    : std_logic_vector(CONTROL_BIT_MAX downto 0);
@@ -121,6 +125,7 @@ component alu
 	signal instruction      : std_logic_vector(15 downto 0);
 	signal rD_sel           : std_logic_vector(2 downto 0);
 	signal rS_sel           : std_logic_vector(2 downto 0);
+
 	signal dec_immediate    : std_logic_vector(15 downto 0);
 	signal en_immediate     : std_logic;
 	signal next_word        : std_logic;
@@ -132,15 +137,17 @@ component alu
 	signal pc_out           : std_logic_vector(15 downto 0);
 	--register unit signals;
 	signal rD_data_in       : std_logic_vector(15 downto 0);
+	signal rS_data_in       : std_logic_vector(15 downto 0);
+	signal rS_wr_en         : std_logic;
 	--mem unit signals
-	
-	signal mem_addr_out     : std_logic_vector(15 downto 0);
+
+	signal mem_addr_out : std_logic_vector(15 downto 0);
 	--enable signals
-	signal en_alu           : std_logic;
-	signal en_decoder       : std_logic;
-	signal en_pc            : std_logic;
-	signal en_register      : std_logic;
-	signal alu_wr_en        : std_logic;
+	signal en_alu       : std_logic;
+	signal en_decoder   : std_logic;
+	signal en_pc        : std_logic;
+	signal en_register  : std_logic;
+	signal alu_wr_en    : std_logic;
 begin
 	alu_inst : component alu
 		port map(
@@ -158,7 +165,8 @@ begin
 			output           => alu_output,
 			mem_data         => mem_data_in,
 			write            => alu_wr_en,
-			flags_out        => flags_out
+			flags_out        => flags_out,
+			SP_out           => SP_Out
 		);
 	control_inst : component control
 		port map(
@@ -196,6 +204,8 @@ begin
 		);
 	register_unit_inst : component register_unit
 		port map(
+			rs_data_in  => rs_data_in,
+			rs_wr_en    => rs_wr_en,
 			clk         => clk,
 			en          => en_register,
 			wr_en       => reg_write_enable,
@@ -205,21 +215,23 @@ begin
 			rD_data_out => rD_data,
 			rS_data_out => rS_data
 		);
-	
+
 	en_alu           <= '1' when control_state = STATE_ALU else '0';
 	en_decoder       <= '1' when control_state = STATE_DECODE else '0';
 	en_pc            <= '1' when control_state = STATE_FETCH or control_state = STATE_REG_READ or control_state = STATE_PC_DELAY else '0';
 	en_register      <= '1' when control_state = STATE_REG_READ or control_state = STATE_REG_WR else '0';
 	mem_enable       <= '1';
-	mem_write_enable <= '1' when control_state = STATE_MEM and ('0' & instruction(14 downto 8)) = OPC_ST else '0';
+	mem_write_enable <= '1' when control_state = STATE_MEM and (('0' & instruction(14 downto 8)) = OPC_ST or ('0' & instruction(14 downto 8)) = OPC_PUSH) else '0';
 	reg_write_enable <= alu_wr_en when control_state = STATE_REG_WR else '0';
 	immediate        <= mem_data_out when next_word = '1' else dec_immediate;
 	rd_data_in       <= mem_data_out when en_mem = '1' else alu_output;
 	pc_in            <= alu_output;
 	mem_addr_out     <= alu_output when control_state = STATE_MEM else pc_out;
-	mem_byte_select      <= mem_addr_out(0);
-	mem_byte_enable      <= mem_byte when control_state = STATE_MEM else '0';
+	mem_byte_select  <= mem_addr_out(0);
+	mem_byte_enable  <= mem_byte when control_state = STATE_MEM else '0';
 	mem_addr         <= '0' & mem_addr_out(15 downto 1);
+	rS_data_in  <= SP_Out;
+	rS_wr_en  <= '1' when (('0' & instruction(14 downto 8)) = OPC_PUSH or ('0' & instruction(14 downto 8)) = OPC_POP) and control_state = STATE_REG_WR else '0';
 	core_proc : process(clk, en) is
 	begin
 		if rising_edge(clk) and en = '1' then
