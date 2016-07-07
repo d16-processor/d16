@@ -76,13 +76,13 @@ begin
 				s_rD_sel      <= instruction(2 downto 0);
 
 				s_immediate <= X"0000";
-				if opcode = OPC_PUSH or OPCODE = OPC_POP then
+				if opcode = OPC_PUSH or opcode = OPC_POP or opcode = OPC_PUSHI then
 					s_rS_sel <= "111";  --Stack pointer
 				else
 					s_rS_sel <= instruction(5 downto 3);
 				end if;
 			end if;
-			if opcode = OPC_ST or opcode = OPC_LD or opcode = OPC_LDI or opcode = OPC_STI or opcode = OPC_PUSH then
+			if opcode = OPC_ST or opcode = OPC_LD or opcode = OPC_LDI or opcode = OPC_STI or opcode = OPC_PUSH or opcode = OPC_PUSHI then
 				en_mem   <= '1';
 				mem_byte <= instruction(7);
 			else
