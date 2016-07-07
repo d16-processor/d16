@@ -66,6 +66,7 @@ begin
 						s_rD_sel <= "110";
 					when OPC_MOVB_R7 =>
 						s_rD_sel <= "111";
+
 					when others =>
 				end case;
 			else
@@ -73,22 +74,27 @@ begin
 				s_en_imm      <= instruction(15);
 				s_next_word   <= instruction(15);
 				s_rD_sel      <= instruction(2 downto 0);
-				s_rS_sel      <= instruction(5 downto 3);
-				s_immediate   <= X"0000";
+
+				s_immediate <= X"0000";
+				if opcode = OPC_PUSH or OPCODE = OPC_POP then
+					s_rS_sel <= "111";  --Stack pointer
+				else
+					s_rS_sel <= instruction(5 downto 3);
+				end if;
 			end if;
 			if opcode = OPC_ST or opcode = OPC_LD or opcode = OPC_LDI or opcode = OPC_STI then
-				en_mem <= '1';
-				mem_byte  <= instruction(7);
+				en_mem   <= '1';
+				mem_byte <= instruction(7);
 			else
-				mem_byte  <= '0';
-				en_mem <= '0';
+				mem_byte <= '0';
+				en_mem   <= '0';
 			end if;
 			if opcode = OPC_LDI or opcode = OPC_STI then
-				mem_displacement  <= instruction(6);
+				mem_displacement <= instruction(6);
 			else
-				mem_displacement  <=  '0';
+				mem_displacement <= '0';
 			end if;
-			
+
 			if opcode = OPC_JMP or opcode = OPC_JMPI or opcode = OPC_SET then
 				condition <= instruction(6 downto 3);
 			else

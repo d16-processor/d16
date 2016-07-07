@@ -22,7 +22,8 @@ architecture behavior of alu_tb is
 			output           : out std_logic_vector(15 downto 0);
 			mem_data         : out std_logic_vector(15 downto 0);
 			write            : out std_logic;
-			flags_out        : out std_logic_vector(3 downto 0)
+			flags_out        : out std_logic_vector(3 downto 0);
+			SP_out           : out std_logic_vector(15 downto 0)
 		);
 	end component alu;
 	signal s_clk         : std_logic := '0';
@@ -41,6 +42,7 @@ architecture behavior of alu_tb is
 	signal s_mem_data       : std_logic_vector(15 downto 0);
 	signal s_condition      : std_logic_vector(3 downto 0);
 	signal mem_displacement : std_logic := '0';
+	signal SP_out           : std_logic_vector(15 downto 0);
 	constant clk_period     : time      := 10 ns;
 
 begin
@@ -60,7 +62,8 @@ begin
 			should_branch    => s_should_branch,
 			output           => s_output,
 			write            => s_write_en,
-			flags_out        => s_flags_out
+			flags_out        => s_flags_out,
+			SP_out           => SP_out
 		);
 	clk_proc : process is
 	begin
@@ -137,6 +140,13 @@ begin
 		s_rD_data     <= X"0001";
 		wait for clk_period;
 		assert s_output = X"0008" report "Incorrect value after ADC" severity failure;
+		s_alu_control <= OPC_PUSH;
+		s_rD_data     <= X"0567";
+		s_rS_data     <= X"0100";
+		wait for clk_period;
+		assert s_output = X"00FE";
+		assert SP_out = X"00FE";
+		assert s_mem_data = X"0567";
 		wait;
 	end process stim_proc;
 

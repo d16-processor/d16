@@ -18,8 +18,8 @@ entity alu is
 		output           : out std_logic_vector(15 downto 0);
 		mem_data         : out std_logic_vector(15 downto 0);
 		write            : out std_logic;
-		flags_out        : out std_logic_vector(3 downto 0)
-	);
+		flags_out        : out std_logic_vector(3 downto 0);
+		SP_out           : out std_logic_vector(15 downto 0) );
 end alu;
 architecture behavior of alu is
 	signal s_output        : std_logic_vector(16 downto 0) := (others => '0');
@@ -102,16 +102,16 @@ begin
 						write <= '0';
 					when OPC_ST =>
 						write <= '0';
-					when OPC_JMP  => 
-						write  <= '0';
+					when OPC_JMP =>
+						write <= '0';
 					when others =>
 						write <= '1';
 				end case;
 				case alu_control is
-				when OPC_JMP  => 
-					s_should_branch <= get_should_branch(flags_in, condition);
-				when others  => 
-					s_should_branch  <= '0';
+					when OPC_JMP =>
+						s_should_branch <= get_should_branch(flags_in, condition);
+					when others =>
+						s_should_branch <= '0';
 				end case;
 				case alu_control is
 					when OPC_ADD =>
@@ -168,7 +168,7 @@ begin
 						else
 							s_output <= '0' & data1;
 						end if;
-						
+
 					when OPC_ST =>
 						if mem_displacement = '1' then
 							s_output(15 downto 0) <= std_logic_vector(unsigned(rS_data) + unsigned(immediate));
@@ -184,7 +184,16 @@ begin
 							s_output(15 downto 0) <= data2;
 						end if;
 					when OPC_SET =>
-						s_output(15 downto 0) <=X"000" & "000" & get_should_branch(flags_in,condition);
+						s_output(15 downto 0) <= X"000" & "000" & get_should_branch(flags_in, condition);
+					when OPC_PUSH =>
+						if en_imm = '1' then
+							s_mem_data <= immediate;
+						else
+							s_mem_data <= rD_data;
+						end if;
+						
+						s_output(15 downto 0) <= std_logic_vector(signed(rS_data) - 2);
+						SP_out <= std_logic_vector(signed(rS_data) - 2);
 					when others => s_output <= '0' & X"0000";
 				end case;
 
