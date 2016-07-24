@@ -48,6 +48,7 @@ stcp {yylval.op = op(strdup(yytext),STCP); return OPCODE;};
 adc {yylval.op = op(strdup(yytext), ADC); return OPCODE;};
 sbb {yylval.op = op(strdup(yytext), SBB); return OPCODE;};
 set {yylval.op = op(strdup(yytext), SET); return OPCODE;};
+kill {yylval.op = op(strdup(yytext), KILL); return OPCODE;};
 \.nv {yylval.ival = NV; return CONDITION_CODE;}
 \.eq {yylval.ival = EQ; return CONDITION_CODE;}
 \.ne {yylval.ival = NE; return CONDITION_CODE;}
@@ -69,7 +70,7 @@ set {yylval.op = op(strdup(yytext), SET); return OPCODE;};
 #0x[0-9a-fA-F]* {yylval.ival = (int)strtol(yytext+1,NULL,16); return IMMEDIATE;};
 -?[0-9]+ {yylval.ival = atoi(yytext); return NUMBER;}
 0x[0-9a-fA-F]+ {yylval.ival = (int)strtol(yytext,NULL,16); return NUMBER;};
-[a-zA-Z][a-zA-Z0-9]*\: {
+[a-zA-Z][a-zA-Z0-9_]*\: {
 	char* label = strdup(yytext);
 	char* colon = strchr(label,':');
 	*colon = '\0';
@@ -77,7 +78,7 @@ set {yylval.op = op(strdup(yytext), SET); return OPCODE;};
 	printf("label: %s\n",label);
 	return LABEL;
 }
-[a-zA-Z][a-zA-Z0-9]* {printf("Identifier %s\n",yytext);yylval.sval = strdup(yytext); return IDENTIFIER;};
+[a-zA-Z][a-zA-Z0-9_]* {printf("Identifier %s\n",yytext);yylval.sval = strdup(yytext); return IDENTIFIER;};
 
 . {return yytext[0];}
 

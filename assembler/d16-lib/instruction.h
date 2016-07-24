@@ -101,7 +101,8 @@ enum _Op_Type{
 	ROLI=0x9b,
 	RCLI=0x9c,
 	ADCI=0x9f,
-	SBBI=0xA0
+	SBBI=0xA0,
+	KILL=0xFF
 } ;
 struct _OP{
     char* str;
