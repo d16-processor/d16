@@ -11,7 +11,7 @@
 %option nounput
 
 %%
-\;.*\n ;
+\;.*\n {yyline++;return NEWLINE;} ;
 \n {yyline++;return NEWLINE;};
 [ \t]          ;
 , {return COMMA;}
