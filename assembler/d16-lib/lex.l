@@ -76,10 +76,9 @@ kill {yylval.op = op(strdup(yytext), KILL); return OPCODE;};
 	char* colon = strchr(label,':');
 	*colon = '\0';
 	yylval.sval = label;
-	printf("label: %s\n",label);
 	return LABEL;
 }
-[a-zA-Z][a-zA-Z0-9_]* {printf("Identifier %s\n",yytext);yylval.sval = strdup(yytext); return IDENTIFIER;};
+[a-zA-Z][a-zA-Z0-9_]* {yylval.sval = strdup(yytext); return IDENTIFIER;};
 
 . {return yytext[0];}
 
