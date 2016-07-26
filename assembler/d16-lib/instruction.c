@@ -196,6 +196,21 @@ uint8_t build_jmp_selector(Instruction* i){
 }
 
 int instruction_length(Instruction* i){
+	if(i->type == I_TYPE_DIRECTIVE){
+		if(i->dir_type == D_ASCIZ){
+			char* str = (char*) i->dir_data;
+			int len = (int) (strlen(str) + 1 + 1); //1 for ending NULL, 1 for rounding up
+            return len/2;
+
+		}else if(i->dir_type == D_ASCII){
+            char* str = (char*) i->dir_data;
+            int len = (int) (strlen(str) + 1); //1 for ending NULL
+            return len/2;
+        }
+        else{
+			return 1;
+		}
+	}
 	if(i->type == I_TYPE_LABEL){
 		return 0;
 	}

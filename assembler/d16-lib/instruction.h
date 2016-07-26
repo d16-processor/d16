@@ -35,6 +35,7 @@ typedef enum {
 enum _Dir_Type{
     D_WORD,
     D_ASCIZ,
+	D_ASCII
 };
 typedef enum _condition_code{
 	NV=0,

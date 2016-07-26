@@ -23,10 +23,10 @@
 
 %error-verbose
 
-%token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD BYTE_FLAG PLUS COLON
+%token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD BYTE_FLAG PLUS COLON DIRECTIVE_ASCIZ DIRECTIVE_ASCII
 %token <op> OPCODE
 %token <ival> CONDITION_CODE
-%token <sval> IDENTIFIER LABEL
+%token <sval> IDENTIFIER LABEL STRING
 %token <ival> REGISTER IMMEDIATE CP_REGISTER NUMBER
 %type <instr> instruction
 %type <list> program
@@ -79,7 +79,9 @@ instruction:
 	|   OPCODE address NEWLINE {$$=new_instruction_jmpi($1,$2,AL);} //jump
 	|   OPCODE CONDITION_CODE address NEWLINE {$$=new_instruction_jmpi($1,$3,$2);}
 	|   OPCODE CONDITION_CODE REGISTER NEWLINE {$$=new_instruction_jmp($1,$3,$2);}
-    |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);};
+    |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);}
+    |   DIRECTIVE_ASCIZ STRING NEWLINE {$$=new_instruction_directive(D_ASCIZ,$2);}
+    |   DIRECTIVE_ASCII STRING NEWLINE {$$=new_instruction_directive(D_ASCII,$2);}
 	|   LABEL {$$=new_instruction_label(strdup($1));}
 ;
 

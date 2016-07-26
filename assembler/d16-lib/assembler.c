@@ -122,9 +122,18 @@ void assemble_instruction(Instruction* i, uint16_t** data){
 			**data = i->address->immediate & 0xffff;
 			*data += 1;
 		}else if (i->type == I_TYPE_DIRECTIVE){
-			if(i->dir_type == D_WORD){
-				**data = *(int*)i->dir_data;
-				*data+=1;
+			switch(i->dir_type) {
+				case D_WORD:{
+					**data = *(int *) i->dir_data;
+					*data += 1;
+					break;
+				}
+				case D_ASCIZ:
+				case D_ASCII:{
+					char* str = i->dir_data;
+                    strcpy((char*)*data,str);
+                    *data +=  instruction_length(i);
+				}
 			}
 		}
 		else if (i->type == I_TYPE_JMPI|| i->type == I_TYPE_JMP){

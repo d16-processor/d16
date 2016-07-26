@@ -2,6 +2,7 @@
     #include <stdio.h>
     #include "parser.h"
     #include "instruction.h"
+    #include <glib.h>
     #define YY_NO_INPUT
     extern int yylex();
 	int yyline = 1;
@@ -20,6 +21,8 @@
 [cC][rR][0-9][1-9]? {yylval.ival = atoi(yytext+2); return CP_REGISTER;}
 [rR][0-7] {yylval.ival = yytext[1] - '0'; return REGISTER;}
 .dw {return DIRECTIVE_WORD;}
+.asciz {return DIRECTIVE_ASCIZ;}
+.ascii {return DIRECTIVE_ASCII;}
 \.b {return BYTE_FLAG;}
 \+ {return PLUS;}
 \: {return COLON;}
@@ -79,7 +82,16 @@ kill {yylval.op = op(strdup(yytext), KILL); return OPCODE;};
 	return LABEL;
 }
 [a-zA-Z][a-zA-Z0-9_]* {yylval.sval = strdup(yytext); return IDENTIFIER;};
+L?\"(\\.|[^\\"])*\" {
+    char* str = strdup(yytext+1);
+    char* end = str + (strlen(str)-1);
+    *end = '\0';
+    printf("String: %s\n", str);
+    yylval.sval = g_strcompress(str);
+    free(str);
+    return STRING;
 
+}
 . {return yytext[0];}
 
 %%
