@@ -123,6 +123,7 @@ flycheck_*.el
 
 ## Build generated
 build/
+test/
 DerivedData/
 
 ## Various settings

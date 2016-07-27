@@ -6,7 +6,7 @@
 #define D16_ASM_AOUT_H
 
 #include <stdint.h>
-enum a_type {A_TEXT,A_BSS,A_DATA};
+typedef enum {A_TEXT,A_BSS,A_DATA} a_type;
 typedef struct _aout_header {
     uint32_t a_magic;
     uint32_t a_text;
@@ -35,5 +35,7 @@ typedef struct _symbol_entry{
     uint32_t value;
 } a_symbol_entry;
 
-a_symbol_entry gen_symbol_entry(char* string, uint32_t address, enum a_type);
+char* aout_strings;
+uint32_t add_string(char* string);
+a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type);
 #endif //D16_ASM_AOUT_H

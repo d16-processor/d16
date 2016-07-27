@@ -39,7 +39,7 @@ void test_assemble_SHRI(void){
 	test_reset();
 	Instruction* i = new_instruction_ri(op("shr",SHR), 4, addr_from_immediate(3));
 	assemble_instruction(i, &ptr_copy);
-	uint16_t array_compare[] ={0x9a1c,0};
+	uint16_t array_compare[] ={0x9a04,0x0003,0};
 	TEST_ASSERT_EQUAL_HEX16_ARRAY(array_compare, data, 2);
 	free(i);
 }

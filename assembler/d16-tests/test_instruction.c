@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "unity.h"
 #include "instruction.h"
 #include "assembler.h"
@@ -107,7 +108,7 @@ void test_instruction_length(void){
 	TEST_ASSERT_EQUAL_INT_MESSAGE(1, instruction_length(rr), "Incorrect RR instruction length");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(ri), "Incorrect RI instruction length");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(memi), "Incorrect MemI instruction length");
-	TEST_ASSERT_EQUAL_INT_MESSAGE(1, instruction_length(shift), "Incorrect Shift instruction length");
+	TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(shift), "Incorrect Shift instruction length");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(1, instruction_length(mov_special), "Incorrect Special movi instruction length");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(mov_general), "Incorrect General movi instruction length");
 	TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(jmpi), "Incorrect JmpI instruction length");

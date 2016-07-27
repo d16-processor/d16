@@ -11,6 +11,7 @@ add_executable(testing_main
   test_instruction.c
   test_label.c
   test_main.c
+  test_aout.c
 )
  
 target_link_libraries(testing_main
