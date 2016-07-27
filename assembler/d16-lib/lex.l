@@ -52,6 +52,7 @@ stcp {yylval.op = op(strdup(yytext),STCP); return OPCODE;};
 adc {yylval.op = op(strdup(yytext), ADC); return OPCODE;};
 sbb {yylval.op = op(strdup(yytext), SBB); return OPCODE;};
 set {yylval.op = op(strdup(yytext), SET); return OPCODE;};
+test {yylval.op = op(strdup(yytext), TEST); return OPCODE;};
 kill {yylval.op = op(strdup(yytext), KILL); return OPCODE;};
 \.nv {yylval.ival = NV; return CONDITION_CODE;}
 \.eq {yylval.ival = EQ; return CONDITION_CODE;}
@@ -86,7 +87,6 @@ L?\"(\\.|[^\\"])*\" {
     char* str = strdup(yytext+1);
     char* end = str + (strlen(str)-1);
     *end = '\0';
-    printf("String: %s\n", str);
     yylval.sval = g_strcompress(str);
     free(str);
     return STRING;

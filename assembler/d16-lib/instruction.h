@@ -84,6 +84,7 @@ enum _Op_Type{
 	ADC,
 	SBB,
 	SET,
+	TEST,
 
 	ADDI=0x81,
 	SUBI=0x82,
@@ -103,6 +104,7 @@ enum _Op_Type{
 	RCLI=0x9c,
 	ADCI=0x9f,
 	SBBI=0xA0,
+	TESTI=0xA2,
 	KILL=0xFF
 } ;
 struct _OP{
