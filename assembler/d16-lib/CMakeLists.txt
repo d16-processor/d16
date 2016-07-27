@@ -27,7 +27,7 @@ ADD_FLEX_BISON_DEPENDENCY(scanner parser)
 add_library(d16-lib STATIC
   assembler.c instruction.c label.c
   ${BISON_parser_OUTPUTS}
-  ${FLEX_scanner_OUTPUTS})
+  ${FLEX_scanner_OUTPUTS} aout.c aout.h)
  
 target_include_directories(d16-lib PUBLIC
   ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}
