@@ -75,7 +75,7 @@ alu_tb.o: ../tests/alu_tb.vhd ../src/alu.vhd
 %.o: ../src/%.vhd
 	ghdl -a $< 
 mem.bin: test.s
-	d16 test.s mem.bin
+	d16 -o mem.bin test.s 
 
 clean:
 	-rm -f *.o

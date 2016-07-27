@@ -125,7 +125,7 @@ flycheck_*.el
 build/
 test/
 DerivedData/
-
+test/
 ## Various settings
 *.pbxuser
 !default.pbxuser

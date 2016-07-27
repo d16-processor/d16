@@ -12,26 +12,32 @@
 #include "assembler.h"
 #include <string.h>
 #include "instruction.h"
-
+#include <unistd.h>
 extern int yyparse (FILE* output_file);
 extern FILE* yyin;
 extern int yydebug;
-int main(int argc, const char * argv[]) {
-    
-    if(argc != 3){
-        fprintf(stderr, "Usage d16-asm [file] [output]\n");
+int main(int argc, char * const argv[]) {
+    FILE *f,*o;
+    opterr = 0;
+    int c;
+    while ((c=getopt(argc,argv,"o:")) != -1){
+        switch(c){
+            case 'o':
+                o = fopen(optarg,"wb");
+
+
+        }
+    }
+    if(optind<argc) f = fopen(argv[optind],"r");
+    else{
+        fprintf(stderr,"d16: No input files specified\n");
         exit(-1);
     }
-    FILE* f = fopen(argv[1], "r");
-    FILE* o = fopen(argv[2], "wb");
-    if(f == NULL){
-        fprintf(stderr, "Error opening file %s\n",argv[1]);
-        exit(-1);
+    if(o==NULL){
+        o=fopen("a.out","wb");
     }
-    if(o == NULL){
-        fprintf(stderr, "Error opening file %s for writing\n",argv[2]);
-        exit(2);
-    }
+
+
     yyin = f;
 
 	  init_hash_table();
