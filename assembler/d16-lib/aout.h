@@ -6,6 +6,7 @@
 #define D16_ASM_AOUT_H
 
 #include <stdint.h>
+enum a_type {A_TEXT,A_BSS,A_DATA};
 typedef struct _aout_header {
     uint32_t a_magic;
     uint32_t a_text;
@@ -18,12 +19,12 @@ typedef struct _aout_header {
 }aout_header;
 
 typedef struct _reloc_entry {
-    uint32_t address;
-    uint32_t index:24;
-    uint32_t pc_rel:1;
-    uint32_t length:2;
-    uint32_t extern:1;
-    uint32_t spare:4;
+    unsigned int address;
+    unsigned int index:24;
+    unsigned int pc_rel:1;
+    unsigned int length:2;
+    unsigned int extern_entry:1;
+    unsigned int spare:4;
 } a_reloc_entry;
 
 typedef struct _symbol_entry{
@@ -33,4 +34,6 @@ typedef struct _symbol_entry{
     uint16_t debug_info;
     uint32_t value;
 } a_symbol_entry;
+
+a_symbol_entry gen_symbol_entry(char* string, uint32_t address, enum a_type);
 #endif //D16_ASM_AOUT_H
