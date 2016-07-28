@@ -21,22 +21,30 @@ int main(int argc, char * const argv[]) {
     FILE *f,*o;
     opterr = 0;
     int c;
-    while ((c=getopt(argc,argv,"o:bh")) != -1){
-        switch(c){
-            case 'o':
-                o = fopen(optarg,"wb");
-                break;
-            case 'b':
-                binary_mode = true;
-                break;
-            case 'h':
-                puts("Usage: d16 [-bh] -o [outputfile] [input]\n");
-                exit(0);
-                break;
+    while(optind < argc) {
+        if((c = getopt(argc, argv, "o:bh")) != -1) {
+            switch(c) {
+                case 'o':
+                    o = fopen(optarg, "wb");
+                    break;
+                case 'b':
+                    binary_mode = true;
+                    break;
+                case 'h':
+                    puts("Usage: d16 [-bh] -o [outputfile] [input]\n");
+                    exit(0);
+                    break;
+            }
+        } else {
+            if(f == NULL) {
+                f = fopen(argv[optind], "r");
+
+            }
+            optind++;
         }
     }
-    if(optind<argc) f = fopen(argv[optind],"r");
-    else{
+    
+    if(f == NULL){
         fprintf(stderr,"d16: No input files specified\n");
         exit(-1);
     }
