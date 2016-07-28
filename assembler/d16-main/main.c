@@ -43,7 +43,7 @@ int main(int argc, char * const argv[]) {
             optind++;
         }
     }
-    
+
     if(f == NULL){
         fprintf(stderr,"d16: No input files specified\n");
         exit(-1);

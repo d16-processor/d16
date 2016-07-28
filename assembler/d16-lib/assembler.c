@@ -103,7 +103,7 @@ void sum_program_length(void* elem, void* data) {
 		}
 	}
 }
-void* data_start;
+int ip = 0;
 void assemble_instruction(Instruction* i, void* d){
 	uint16_t** data = (uint16_t **)d;
 	if(i->type != I_TYPE_LABEL){
@@ -118,7 +118,7 @@ void assemble_instruction(Instruction* i, void* d){
 				*data += 1;
 				if(i->address->type == ADDR_LABEL && ! binary_mode){
 					**data = 0;
-					gen_reloc_entry(i->address->lblname,d-data_start);
+					gen_reloc_entry(i->address->lblname,ip);
 				}else {
 					**data = i->address->immediate & 0xffff;
 				}
@@ -153,7 +153,7 @@ void assemble_instruction(Instruction* i, void* d){
 			if(i->type == I_TYPE_JMPI){
 				if(i->address->type == ADDR_LABEL && ! binary_mode){
 					**data = 0;
-					gen_reloc_entry(i->address->lblname,d-data_start);
+					gen_reloc_entry(i->address->lblname,ip);
 				}else {
 					**data = i->address->immediate & 0xffff;
 				}
@@ -168,7 +168,7 @@ void assemble_instruction(Instruction* i, void* d){
 		}
 	}
 	free(i->address);
-
+	ip+=instruction_length(i)*2;
 }
 void process_list(struct _GList* list, FILE* output_file){
     size_t output_size = 0;
@@ -179,7 +179,6 @@ void process_list(struct _GList* list, FILE* output_file){
 	if(binary_mode) {
 		uint16_t *buffer = malloc(output_size);
 		uint16_t *buf_save = buffer;
-		data_start = buffer;
 		g_list_foreach(list, (void (*)(void *, void *)) &assemble_instruction, &buffer);
 		fwrite(buf_save, sizeof(uint8_t), output_size, output_file);
 #ifdef DEBUG
