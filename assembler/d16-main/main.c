@@ -13,7 +13,7 @@
 #include <string.h>
 #include "instruction.h"
 #include <unistd.h>
-extern int yyparse (FILE* output_file);
+extern int yyparse (FILE*);
 extern FILE* yyin;
 extern int yydebug;
 bool binary_mode = false;

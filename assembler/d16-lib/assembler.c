@@ -12,7 +12,8 @@
 #include <string.h>
 #include <glib.h>
 #include "instruction.h"
-
+#include "aout.h"
+extern bool binary_mode;
 FILE* output_file;
 void print_elem(void* element, void* data){
     Instruction* i = (Instruction* ) element;
@@ -97,9 +98,14 @@ void sum_program_length(void* elem, void* data) {
     *sz += instruction_length(i);
 	if(i->type == I_TYPE_LABEL){
 		set_label_address(i->opcode, 2*(int)*sz);
+		if(!binary_mode ){
+			gen_symbol_entry(i->opcode,*sz*2,A_TEXT);
+		}
 	}
 }
-void assemble_instruction(Instruction* i, uint16_t** data){
+void* data_start;
+void assemble_instruction(Instruction* i, void* d){
+	uint16_t** data = (uint16_t **)d;
 	if(i->type != I_TYPE_LABEL){
 		resolve_address(i->address);
 		if(i->type == I_TYPE_RIMM){
@@ -110,7 +116,12 @@ void assemble_instruction(Instruction* i, uint16_t** data){
 			else{
 				**data = i->op_type<<8 | build_reg_selector(i);
 				*data += 1;
-				**data = i->address->immediate & 0xffff;
+				if(i->address->type == ADDR_LABEL && ! binary_mode){
+					**data = 0;
+					gen_reloc_entry(i->address->lblname,d-data_start);
+				}else {
+					**data = i->address->immediate & 0xffff;
+				}
 				*data += 1;
 			}
 		}else if(i->type == I_TYPE_MEM){
@@ -140,7 +151,13 @@ void assemble_instruction(Instruction* i, uint16_t** data){
 			**data = i->op_type <<8 | build_jmp_selector(i);
 			*data += 1;
 			if(i->type == I_TYPE_JMPI){
-				**data = i->address->immediate;
+				if(i->address->type == ADDR_LABEL && ! binary_mode){
+					**data = 0;
+					gen_reloc_entry(i->address->lblname,d-data_start);
+				}else {
+					**data = i->address->immediate & 0xffff;
+				}
+
 				*data += 1;
 			}
 
@@ -159,14 +176,19 @@ void process_list(struct _GList* list, FILE* output_file){
     g_list_foreach(list, &sum_program_length , &output_size);
     fprintf(stdout,"Program length: %zu bytes\n",output_size*2);
     output_size *= 2;
-    uint16_t* buffer = malloc(output_size);
-    uint16_t* buf_save = buffer;
-    g_list_foreach(list, (void(*)(void*,void*))&assemble_instruction, &buffer);
-    fwrite(buf_save, sizeof(uint8_t), output_size, output_file);
-    #ifdef DEBUG
-    for(int i=0;i<output_size/2;i++){
-        fprintf(stdout,"0x%04x\n",buf_save[i]);
-    }
-    #endif
+	if(binary_mode) {
+		uint16_t *buffer = malloc(output_size);
+		uint16_t *buf_save = buffer;
+		data_start = buffer;
+		g_list_foreach(list, (void (*)(void *, void *)) &assemble_instruction, &buffer);
+		fwrite(buf_save, sizeof(uint8_t), output_size, output_file);
+#ifdef DEBUG
+		for(int i = 0; i < output_size / 2; i++) {
+			fprintf(stdout, "0x%04x\n", buf_save[i]);
+		}
+#endif
+	}else{
+		aout_process_instructions(list,output_size,output_file);
+	}
     g_list_free_full(list, &free_elem);
 }

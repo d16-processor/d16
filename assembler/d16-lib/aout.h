@@ -4,8 +4,9 @@
 
 #ifndef D16_ASM_AOUT_H
 #define D16_ASM_AOUT_H
-
+#include <glib.h>
 #include <stdint.h>
+#include <stdio.h>
 typedef enum {A_TEXT,A_BSS,A_DATA} a_type;
 typedef struct _aout_header {
     uint32_t a_magic;
@@ -34,8 +35,11 @@ typedef struct _symbol_entry{
     uint16_t debug_info;
     uint32_t value;
 } a_symbol_entry;
-
+#define A_LENGTH_16_BITS 0b01
+#define A_MAGIC 0407
 char* aout_strings;
 uint32_t add_string(char* string);
 a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type);
+a_reloc_entry gen_reloc_entry(char* label,uint32_t address);
+void aout_process_instructions(GList* instructions, int size, FILE*);
 #endif //D16_ASM_AOUT_H
