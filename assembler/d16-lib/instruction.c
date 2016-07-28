@@ -53,6 +53,7 @@ Instruction* gen_instruction_internal(OP *op){
     i->op_type = op->type;
 	i->address = NULL;
     free(op);
+	op = NULL;
     return i;
 }
 Instruction* new_instruction(OP* op){

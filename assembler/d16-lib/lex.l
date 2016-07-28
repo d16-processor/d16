@@ -10,7 +10,7 @@
 %option header-file="lex.yy.h"
 %option noyywrap
 %option nounput
-
+%option batch
 %%
 \;.*\n {yyline++;return NEWLINE;} ;
 \n {yyline++;return NEWLINE;};

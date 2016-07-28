@@ -90,7 +90,9 @@ void print_elem(void* element, void* data){
 void free_elem(void* element){
     Instruction *i = (Instruction*)element;
     free(i->opcode);
+	i->opcode = NULL;
     free(i);
+	i = NULL;
 }
 void sum_program_length(void* elem, void* data) {
     size_t* sz = (size_t*) data;
@@ -118,7 +120,7 @@ void assemble_instruction(Instruction* i, void* d){
 				*data += 1;
 				if(i->address->type == ADDR_LABEL && ! binary_mode){
 					**data = 0;
-					gen_reloc_entry(i->address->lblname,ip);
+					gen_reloc_entry(strdup(i->address->lblname),ip);
 				}else {
 					**data = i->address->immediate & 0xffff;
 				}
@@ -130,7 +132,12 @@ void assemble_instruction(Instruction* i, void* d){
 		}else if(i->type == I_TYPE_MEMI){
 			**data = i->op_type<<8 | build_mem_selector(i);
 			*data += 1;
-			**data = i->address->immediate & 0xffff;
+			if(i->address->type == ADDR_LABEL && ! binary_mode){
+				**data = 0;
+				gen_reloc_entry(strdup(i->address->lblname),ip);
+			}else {
+				**data = i->address->immediate & 0xffff;
+			}
 			*data += 1;
 		}else if (i->type == I_TYPE_DIRECTIVE){
 			switch(i->dir_type) {
@@ -153,7 +160,7 @@ void assemble_instruction(Instruction* i, void* d){
 			if(i->type == I_TYPE_JMPI){
 				if(i->address->type == ADDR_LABEL && ! binary_mode){
 					**data = 0;
-					gen_reloc_entry(i->address->lblname,ip);
+					gen_reloc_entry(strdup(i->address->lblname),ip);
 				}else {
 					**data = i->address->immediate & 0xffff;
 				}
@@ -167,7 +174,9 @@ void assemble_instruction(Instruction* i, void* d){
 			*data += 1;
 		}
 	}
-	free(i->address);
+	//free(i->address);
+	//
+	// i->address = NULL;
 	ip+=instruction_length(i)*2;
 }
 void process_list(struct _GList* list, FILE* output_file){

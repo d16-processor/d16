@@ -18,7 +18,7 @@ extern FILE* yyin;
 extern int yydebug;
 bool binary_mode = false;
 int main(int argc, char * const argv[]) {
-    FILE *f,*o;
+    FILE *o;
     opterr = 0;
     int c;
     while(optind < argc) {
@@ -36,15 +36,15 @@ int main(int argc, char * const argv[]) {
                     break;
             }
         } else {
-            if(f == NULL) {
-                f = fopen(argv[optind], "r");
+            if(yyin == NULL) {
+                yyin = fopen(argv[optind], "r");
 
             }
             optind++;
         }
     }
 
-    if(f == NULL){
+    if(yyin == NULL){
         fprintf(stderr,"d16: No input files specified\n");
         exit(-1);
     }
@@ -53,13 +53,13 @@ int main(int argc, char * const argv[]) {
     }
 
 
-    yyin = f;
+
 
 	  init_hash_table();
     do {
         yyparse(o);
     } while (!feof(yyin));
-    fclose(f);
+    fclose(yyin);
     fclose(o);
     return 0;
 }
