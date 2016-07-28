@@ -7,11 +7,13 @@
 //
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "unity.h"
 #include "test_instruction.h"
 #include "test_main.h"
 #include "test_label.h"
 #include "test_aout.h"
+bool binary_mode;
 int main(void){
 	UNITY_BEGIN();
 	test_instruction_run_all_tests();
