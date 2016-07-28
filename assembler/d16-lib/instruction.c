@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 GHashTable* labels;
+extern bool binary_mode;
 void init_hash_table(void){
 	labels = g_hash_table_new(g_str_hash, g_str_equal);
 }
@@ -168,7 +169,7 @@ void resolve_address(Address* addr){
 			if(g_hash_table_contains(labels, addr->lblname)){
 				addr->immediate = GPOINTER_TO_INT(g_hash_table_lookup(labels, addr->lblname));
 
-			}else{
+			}else if(binary_mode){
 				fprintf(stderr, "No label named %s\n",addr->lblname);
 				exit(1);
 			}

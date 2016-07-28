@@ -41,8 +41,11 @@ a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type){
     entry.type = type;
     entry.value = address;
     entry.name_offset = add_string(string);
-    g_hash_table_insert(symbol_table,string,GINT_TO_POINTER(symbol_array->len));
+
     g_array_append_val(symbol_array,entry);
+    a_symbol_entry* entryptr = &g_array_index(symbol_array,a_symbol_entry,symbol_array->len - 1);
+
+    g_hash_table_insert(symbol_table,string,entryptr);
     return entry;
 }
 
@@ -53,7 +56,12 @@ a_reloc_entry gen_reloc_entry(char* label,uint32_t address){
     }
     a_reloc_entry entry;
     entry.address = address;
-    entry.index = GPOINTER_TO_INT(g_hash_table_lookup(symbol_table,label));
+    a_symbol_entry* symb  = g_hash_table_lookup(symbol_table,label);
+    if(symb != NULL) {
+        entry.index = symb->name_offset;
+    }else{
+        entry.index = add_string(label);
+    }
     entry.pc_rel = 0;
     entry.length = A_LENGTH_16_BITS;
     entry.extern_entry = 0;
