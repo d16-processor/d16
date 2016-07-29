@@ -85,6 +85,7 @@ enum _Op_Type{
 	SBB,
 	SET,
 	TEST,
+	PUSHLR,
 
 	ADDI=0x81,
 	SUBI=0x82,
