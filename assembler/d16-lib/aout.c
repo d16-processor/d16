@@ -32,25 +32,29 @@ uint32_t add_string(char* string){
 }
 
 a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type){
-    //printf("Generating a symbol entry for label: %s\n",string);
+#ifdef DEBUG
+    printf("Generating a symbol entry for label: %s\n",string);
+#endif
     if(symbol_array == NULL){
-        symbol_array = g_array_new(FALSE,FALSE, sizeof(a_symbol_entry));
+        symbol_array = g_array_new(FALSE,FALSE, sizeof(a_symbol_entry*));
         symbol_table = g_hash_table_new(g_str_hash,g_str_equal);
     }
-    a_symbol_entry entry;
-    entry.type = type;
-    entry.value = address;
-    entry.name_offset = add_string(string);
+    a_symbol_entry *entry = malloc(sizeof(a_symbol_entry));
+    entry->type = type;
+    entry->value = address;
+    entry->name_offset = add_string(string);
 
     g_array_append_val(symbol_array,entry);
-    a_symbol_entry* entryptr = &g_array_index(symbol_array,a_symbol_entry,symbol_array->len - 1);
 
-    g_hash_table_insert(symbol_table,string,entryptr);
-    return entry;
+
+    g_hash_table_insert(symbol_table,string,entry);
+    return *entry;
 }
 
 a_reloc_entry gen_reloc_entry(char* label,uint32_t address){
-    //printf("Generating a reloc entry for label: %s\n",label);
+#ifdef DEBUG
+    printf("Generating a reloc entry for label: %s\n",label);
+#endif
     if(reloc_array == NULL){
         reloc_array = g_array_new(FALSE,FALSE, sizeof(a_reloc_entry));
     }
@@ -95,7 +99,10 @@ void aout_process_instructions(GList* instructions, int size, FILE* file) {
     fwrite(&header, sizeof(aout_header),1,file);
     fwrite(buf_save,sizeof(uint16_t),size/2,file);
     if(symbol_array != NULL) {
-        fwrite(symbol_array->data, symbol_array->len, sizeof(a_symbol_entry), file);
+        for(int i=0;i<symbol_array->len;i++){
+            a_symbol_entry* entry = g_array_index(symbol_array,a_symbol_entry*,i);
+            fwrite(entry,sizeof(a_symbol_entry),1,file);
+        }
     }
     if(reloc_array != NULL) {
         fwrite(reloc_array->data, reloc_array->len, sizeof(a_reloc_entry), file);
