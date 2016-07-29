@@ -8,22 +8,22 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "parser.h"
-#include "assembler.h"
 #include <string.h>
-#include "instruction.h"
 #include <unistd.h>
-extern int yyparse (FILE*);
+#include "assembler.h"
+#include "instruction.h"
+#include "parser.h"
+extern int   yyparse(FILE*);
 extern FILE* yyin;
-extern int yydebug;
-bool binary_mode = false;
-int main(int argc, char * const argv[]) {
-    FILE *o;
+extern int   yydebug;
+bool         binary_mode = false;
+int main(int argc, char* const argv[]) {
+    FILE* o;
     opterr = 0;
     int c;
-    while(optind < argc) {
-        if((c = getopt(argc, argv, "o:bh")) != -1) {
-            switch(c) {
+    while (optind < argc) {
+        if ((c = getopt(argc, argv, "o:bh")) != -1) {
+            switch (c) {
                 case 'o':
                     o = fopen(optarg, "wb");
                     break;
@@ -36,26 +36,22 @@ int main(int argc, char * const argv[]) {
                     break;
             }
         } else {
-            if(yyin == NULL) {
+            if (yyin == NULL) {
                 yyin = fopen(argv[optind], "r");
-
             }
             optind++;
         }
     }
 
-    if(yyin == NULL){
-        fprintf(stderr,"d16: No input files specified\n");
+    if (yyin == NULL) {
+        fprintf(stderr, "d16: No input files specified\n");
         exit(-1);
     }
-    if(o==NULL){
-        o=fopen("a.out","wb");
+    if (o == NULL) {
+        o = fopen("a.out", "wb");
     }
 
-
-
-
-	  init_hash_table();
+    init_hash_table();
     do {
         yyparse(o);
     } while (!feof(yyin));

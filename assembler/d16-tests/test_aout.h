@@ -5,4 +5,4 @@
 #ifndef D16_ASM_TEST_AOUT_H
 #define D16_ASM_TEST_AOUT_H
 void test_aout_run_all_tests(void);
-#endif //D16_ASM_TEST_AOUT_H
+#endif // D16_ASM_TEST_AOUT_H

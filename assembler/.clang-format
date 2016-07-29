@@ -1,0 +1,18 @@
+BasedOnStyle: LLVM
+
+Language: Cpp
+
+AlignTrailingComments: true
+AlignConsecutiveDeclarations: true
+IncludeCategories:
+  - Regex:    '<(.*)>'
+    Priority: -1
+  - Regex:    '\"(.*)\"'
+    Priority: 2
+IndentCaseLabels: true
+IndentWidth: 4
+PointerAlignment: Left
+SortIncludes: true
+SpaceBeforeParens: true
+TabWidth: 4
+UseTab: Never
