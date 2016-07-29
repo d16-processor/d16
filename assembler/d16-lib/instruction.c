@@ -153,6 +153,9 @@ Instruction* new_instruction_directive(Dir_Type type, void* data){
         case D_WORD:
             i->opcode = strdup(".db");
             break;
+		case D_ASCII:
+			i-> opcode = strdup(".ascii");
+			break;
         case D_ASCIZ:
             i->opcode = strdup(".asciz");
             break;

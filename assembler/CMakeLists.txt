@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.0)
 project (d16-asm)
-
+set(CMAKE_C_FLAGS "-std=gnu99 -Wall -Werror")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(TARGET_GROUP production CACHE STRING "Group to build")
 

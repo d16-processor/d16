@@ -4,7 +4,7 @@ set (d16asm_VERSION_MAJOR 1)
 set (d16asm_VERSION_MINOR 0)
 
 set(CMAKE_C_FLAGS_DEBUG "-DDEBUG -g")
-set(CMAKE_C_FLAGS "-g")
+set(CMAKE_C_FLAGS "-g -std=gnu99")
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 find_package(Glib REQUIRED)
