@@ -1,0 +1,99 @@
+\documentclass{article}
+\usepackage{courier}
+\title{D16 Processor Reference Manual}
+\date{Aug 16, 2016}
+\author{Michael Nolan}
+\newcommand{\instrr}[2]{
+\subsection{#1}
+	\begin{tabular}{| c | c | c  | c | c |}
+	\hline
+	Immediate & opcode & Unused & source & dest \\ \hline
+	Imm & #2 & 00 & rS & rD \\
+	\hline
+	\end{tabular} \\ \\
+	\noindent
+	\texttt{#1 \textless rD\textgreater , \textless rS or immediate\textgreater \\ \\}
+}
+\newcommand{\instr}[2]{
+\subsection{#1}
+	\begin{tabular}{| c | c | c  | c | c |}
+	\hline
+	Immediate & opcode & Unused & source & dest \\ \hline
+	Imm & #2 & 00 & 000 & rD \\
+	\hline
+	\end{tabular} \\ \\
+	\noindent
+	\texttt{#1 \textless rD or immediate\textgreater \\ \\} 
+}
+
+\begin{document}
+	\pagenumbering{gobble}
+	\maketitle
+	\newpage
+	\tableofcontents
+	\newpage
+	\pagenumbering{arabic}
+	
+	\section{The Processor}
+	The D16 Processor is a very simple, RISC like 16 bit processor with variable length instructions. It has 8 general purpose registers, 32 special purpose registers, and support for up to 64K of memory.
+	\subsection{General Purpose Registers}
+	The D16 processor defines 8 general purpose registers, called r0 - r7. 2 of these, although they behave the same as the other registers, have special meaning to the processor and in the ABI, and they are as follows: \newline
+		\paragraph{r6:} This is generally used as the pointer to the start of a stack frame, but has no special meaning to the processor
+		\paragraph{r7:} This is the stack pointer, and is manipulated via the stack instructions (push and pop)
+	\subsection{Flags}
+		The processor also contains several flags in Special Register 0. \\ \\
+		\begin{tabular}{| l | r |}
+		\hline
+			Zero & set if the result of the last computation is 0 \\ \hline
+			Sign & set if the result is negative (bit 15 is set) \\ \hline
+			Carry & set if there was a carry or borrow in the past computation \\ \hline
+			oVerflow & set if there was a signed overflow in the last computation \\ \hline
+		\end{tabular}
+	\section{Instruction Set}
+	Most instructions come in 2 formats, register and immediate. The immediate versions of an instruction will have bit 7 set in the opcode field and the 16 bit immediate in the word following the instruction. In the subsequent definitions, op2 will refer to the immediate value if the instruction has an immediate, otherwise it refers to rS.
+	\instrr{ADD}{000001}{} 
+	rD = rD + op2\\
+	Updates flags
+	
+	\instrr{SUB}{000010}
+	rD = rD - op2\\
+	Updates flags
+	\instr{PUSH}{000011}\noindent
+	r7 = r7 - 2 \\
+	memory[r7] = rD \\
+	This instruction does not update the flags \\
+	\instr{POP}{000100}
+	rD = memory[r7] \\
+	r7 = r7 + 2 \\
+	Does not update flags
+	\subsection{MOV}
+	Mov has 2 different encodings depending whether the immediate (if any) fits into 1 byte. \\
+	Neither encoding updates the flags.  
+	\subsubsection{general MOV encoding}
+	\begin{tabular}{| c | c | c  | c | c |}
+	\hline
+	Immediate & opcode & Unused & source & dest \\ \hline
+	Imm & 001101 & 00 & rS & rD \\
+	\hline
+	\end{tabular} \\ \\
+	\noindent
+	\texttt{MOV \textless rD\textgreater , \textless rS or immediate\textgreater \\ \\}
+	rD = op2 \\
+	This encoding is used for register to register MOVs or when the immediate value will not fit in one byte. \\
+	\subsubsection{special byte MOV}
+	\begin{tabular}{| c | c | c |}
+	\hline
+	Unused & opcode & data \\ \hline
+	0 & 000101 + rD & byte immediate \\ \hline
+	\end{tabular} \\ \\
+	\texttt{MOV \textless rD\textgreater , \textless byte immediate\textgreater \\ \\}
+	rD = immediate \\
+	This encoding is only used when the immediate will fit in 1 byte
+	\instrr{AND}{001110}\noindent
+	
+	rD = rD AND op2  \\
+	This instruction updates the flags, and will reset the overflow and carry flags. \\
+	\instrr{OR}{001111}\noindent
+	rD = rD OR op2 \\
+	This instruction updates the flags, and will reset the overflow and carry flags. \\
+\end{document}
