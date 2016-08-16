@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{courier}
+\usepackage[margin=1in]{geometry}
 \title{D16 Processor Reference Manual}
 \date{Aug 16, 2016}
 \author{Michael Nolan}
@@ -12,9 +13,9 @@
 	\hline
 	\end{tabular} \\ \\
 	\noindent
-	\texttt{#1 \textless rD\textgreater , \textless rS or immediate\textgreater \\ \\}
+	\texttt{#1  rD, \textless rS or immediate\textgreater \\ \\}
 }
-\newcommand{\instr}[2]{
+\newcommand{\instr}[3]{
 \subsection{#1}
 	\begin{tabular}{| c | c | c  | c | c |}
 	\hline
@@ -23,7 +24,7 @@
 	\hline
 	\end{tabular} \\ \\
 	\noindent
-	\texttt{#1 \textless rD or immediate\textgreater \\ \\} 
+	\texttt{#1 \textless rD#3\textgreater \\ \\} 
 }
 
 \begin{document}
@@ -42,7 +43,7 @@
 		\paragraph{r7:} This is the stack pointer, and is manipulated via the stack instructions (push and pop)
 	\subsection{Flags}
 		The processor also contains several flags in Special Register 0. \\ \\
-		\begin{tabular}{| l | r |}
+		\begin{tabular}{| l | l |}
 		\hline
 			Zero & set if the result of the last computation is 0 \\ \hline
 			Sign & set if the result is negative (bit 15 is set) \\ \hline
@@ -58,11 +59,11 @@
 	\instrr{SUB}{000010}
 	rD = rD - op2\\
 	Updates flags
-	\instr{PUSH}{000011}\noindent
+	\instr{PUSH}{000011}{ or immediate}\noindent
 	r7 = r7 - 2 \\
 	memory[r7] = rD \\
 	This instruction does not update the flags \\
-	\instr{POP}{000100}
+	\instr{POP}{000100}{}
 	rD = memory[r7] \\
 	r7 = r7 + 2 \\
 	Does not update flags
@@ -77,7 +78,7 @@
 	\hline
 	\end{tabular} \\ \\
 	\noindent
-	\texttt{MOV \textless rD\textgreater , \textless rS or immediate\textgreater \\ \\}
+	\texttt{MOV rD, \textless rS or immediate\textgreater \\ \\}
 	rD = op2 \\
 	This encoding is used for register to register MOVs or when the immediate value will not fit in one byte. \\
 	\subsubsection{special byte MOV}
@@ -86,7 +87,7 @@
 	Unused & opcode & data \\ \hline
 	0 & 000101 + rD & byte immediate \\ \hline
 	\end{tabular} \\ \\
-	\texttt{MOV \textless rD\textgreater , \textless byte immediate\textgreater \\ \\}
+	\texttt{MOV rD, \textless byte immediate\textgreater \\ \\}
 	rD = immediate \\
 	This encoding is only used when the immediate will fit in 1 byte
 	\instrr{AND}{001110}\noindent
@@ -96,4 +97,31 @@
 	\instrr{OR}{001111}\noindent
 	rD = rD OR op2 \\
 	This instruction updates the flags, and will reset the overflow and carry flags. \\
+	\instrr{XOR}{010000}\noindent
+	rD = rD XOR op2 \\
+	This instruction updates the flags, and will reset the overflow and carry flags. \\
+	\instr{NOT}{010001}\noindent
+	rD = !rD (bitwise NOT) \\
+	This instruction updates the flags, and will reset the overflow and carry flags. \\
+	\instr{NEG}{010010}\noindent
+	rD = 0-rD (signed negation) \\
+	This instruction updates the flags. \\
+	\subsection{LD}
+	\begin{tabular}{|c | c | c | c | c | c | c |}
+	\hline
+	Immediate & opcode & byte & displacement & address & data \\ \hline
+	imm & 010011 & byte & disp & rS & rD \\ \hline
+	\end{tabular}\noindent \\ \\
+	\texttt{LD\{.b\} rD, [rS] \\ LD\{.b\} rD, [immediate] \\ LD\{.b\} rD, [rS+immediate]\\ \\}
+	The load instruction loads a word (or byte) of data from the address specified in the brackets into register rD. The byte flag in the instruction encoding is set when the ".b" suffix is present and indicates a byte load. The displacement flag is set when the third instruction form is used and indicates that rS must be added to the displacement when generating the address. The displacement flag should only be set if the immediate flag is also set. If the displacement flag is set and the immediate flag is not, the behavior is undefined. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
+	\subsection{ST}
+	\begin{tabular}{|c | c | c | c | c | c | c |}
+	\hline
+	Immediate & opcode & byte & displacement & address & data \\ \hline
+	imm & 010100 & byte & disp & rS & rD \\ \hline
+	\end{tabular}\noindent \\ \\
+	\texttt{ST\{.b\} [rS], rD\\ ST\{.b\} [immediate], rD \\ ST\{.b\} [rS+immediate], rD\\ \\}
+	The store instruction stores the contents of rD into the address specified inside the brackets. The byte flag in the instruction is set when the ".b" suffix is present, and so the processor will only store the least significant 8 bits into the specified address. Similarly to the LD instruction, the disp flag indicates that the processor should add rS and the following immediate value before using the result as the address. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
+	\instrr{CMP}{010101}\noindent
+	The instruction sets the flags exactly like the SUB instruction, however it does not store the result back to rD.
 \end{document}
