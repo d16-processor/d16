@@ -124,4 +124,25 @@
 	The store instruction stores the contents of rD into the address specified inside the brackets. The byte flag in the instruction is set when the ".b" suffix is present, and so the processor will only store the least significant 8 bits into the specified address. Similarly to the LD instruction, the disp flag indicates that the processor should add rS and the following immediate value before using the result as the address. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
 	\instrr{CMP}{010101}\noindent
 	The instruction sets the flags exactly like the SUB instruction, however it does not store the result back to rD.
+	\section{Condition Codes}
+	In the JUMP variety of instructions (Jmp, Call, Set), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
+	\begin{tabular}{| l | c | l | l |} \hline
+	Mnemonic & Encoding & Expression & Meaning \\ \hline
+	NV &0000& False & Never execute\\ \hline
+	EQ &0001& Z set & Equal\\ \hline
+	NE &0010& Z clear & Not equal \\ \hline
+	OS &0011& V set & Overflow \\ \hline
+	OC &0100& V clear & No overflow \\ \hline
+	HI &0101& C set and Z clear & Unsigned greater than \\ \hline
+	LS &0110& C clear and Z set & Unsigned less than or equal to \\ \hline
+	P  &0111& S clear & Positive \\ \hline
+	N  &1000& S set & Negative \\ \hline
+	CS &1001& C set & Carry set \\ \hline
+	CC &1010& C clear & Carry clear \\ \hline
+	GE &1011& S = V & Signed greater than or equal to\\ \hline
+	G  &1100& S = V and Z clear & Signed greater than \\ \hline
+	LE &1101& Z set or S $\neq$ V & Signed less than or equal to \\ \hline
+	L  &1110& S $\neq$ V & Signed less than \\ \hline
+	AL &1111& True & Always execute \\ \hline
+	\end{tabular}
 \end{document}
