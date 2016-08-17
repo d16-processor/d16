@@ -15,7 +15,7 @@
 	\noindent
 	\texttt{#1  rD, \textless rS or immediate\textgreater \\ \\}
 }
-\newcommand{\instj}[2]{
+\newcommand{\instj}[3]{
 \subsection{#1}
 	\begin{tabular}{| c | c | c | c | c |}
 	\hline
@@ -24,7 +24,7 @@
 	\hline
 	\end{tabular} \\ \\
 	\noindent
-	\texttt{#1.CC \textless rD or immediate\textgreater \\ \\}
+	\texttt{#1.CC \textless rD#3\textgreater \\ \\}
 }
 \newcommand{\instr}[3]{
 \subsection{#1}
@@ -43,7 +43,7 @@
 	\hline
 	Reserved & Opcode & Reserved \\ \hline
 	0 & #2 & 00000000 \\ \hline
-	\end{tabular}\\ \noindent
+	\end{tabular}\\ \\ \noindent
 	\texttt{#1 \\ \\}
 }
 
@@ -144,9 +144,9 @@
 	The store instruction stores the contents of rD into the address specified inside the brackets. The byte flag in the instruction is set when the ".b" suffix is present, and so the processor will only store the least significant 8 bits into the specified address. Similarly to the LD instruction, the disp flag indicates that the processor should add rS and the following immediate value before using the result as the address. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
 	\instrr{CMP}{010101}\noindent
 	The instruction sets the flags exactly like the SUB instruction, however it does not store the result back to rD.
-	\instj{JMP}{010110}\noindent
+	\instj{JMP}{010110}{ or immediate}\noindent
 	If the condition code evaluates to True, JMP sets the instruction pointer to the address specified. \textbf{Important: This address must be word aligned}
-	\instj{CALL}{010111}\noindent
+	\instj{CALL}{010111}{ or immediate}\noindent
 	If the condition evaluates to true, CALL saves the instruction pointer in the link register (LR), before setting it to the address specified. \textbf{Important: This address must be word aligned}
 	\inst{RET}{011000}
 	Sets the instruction pointer to the link register(LR).
@@ -156,6 +156,20 @@
 	\instrr{SHR}{011010}
 	Logical right shift rD by op2 and store the result in rD.\\
 	Update flags and clear V.
+	\instrr{ROL}{011011}
+	Rotates the bits in rD left by the specified number in op2.\\ Updates flags
+	and clears carry and overflow.
+	\instrr{RCL}{011100}
+	Rotates the bits in rD, plus the carry bit left by the value in op2. \\
+	Updates flags and clears overflow.
+	\instj{SET}{100001}
+	If the condition code evaluates to true, sets rD to 1 otherwise sets rD to 0.
+	\instrr{TEST}{100010}
+	Sets the flags upon the result of the bitwise and of rD and op2. Does not modify the value of rD.
+	\inst{PUSHLR}{100011}
+	Pushes the link register onto the stack. This instruction should be used at the beginning of a subroutine if the subroutine executes the \texttt{CALL} instruction anywhere in its body. To return after executing this instruction, execute \\
+	\texttt{POP r1\\JMP.AL r1\\}
+	\textbf{Note: r1 can be replaced by any GP register}
 	\section{Condition Codes}
 	In the JUMP variety of instructions (Jmp, Call, Set), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
 	\begin{tabular}{| l | c | l | l |} \hline
