@@ -63,7 +63,7 @@ endif
 
 %_tb: cpu_constants.o %.o %_tb.o
 	ghdl -e $@
-	./$@ --stop-time=150ns --vcd=dump.vcd
+	./$@ --stop-time=500ns --vcd=dump.vcd
 ifdef WAVE
 	gtkwave dump.vcd
 endif
