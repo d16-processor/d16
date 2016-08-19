@@ -37,5 +37,5 @@ begin
 	end process name;
 	clk_out <= s_baud_clock;
 end architecture RTL;
---current clk rate 1.843
+--current clk rate 1.834
 --goal 1.843 Mhz
