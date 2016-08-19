@@ -11,31 +11,31 @@ entity baud_clock is
 end entity baud_clock;
 architecture RTL of baud_clock is
 	signal s_baud_clock : std_logic;
-	signal s_baud_counter : unsigned(3 downto 0);
-	signal s_baud_error : unsigned(2 downto 0);
+	signal s_baud_counter : unsigned(4 downto 0);
+	signal s_baud_error : std_logic;
 begin
 	name : process(clk) is
 	begin
 		if rising_edge(clk) then
 			if en = '1' then
 				s_baud_counter  <= s_baud_counter + 1;
-				if (s_baud_counter = X"C" and s_baud_clock = '0' and s_baud_error /= 0) or (s_baud_counter = X"D" and s_baud_clock = '0') then
+				if (s_baud_counter = '1' & X"A" and s_baud_clock = '0' and s_baud_error = '1') or (s_baud_counter = '1' & X"B" and s_baud_clock = '0') then
 					s_baud_clock  <= '1';
-					s_baud_counter  <= X"0";
-					s_baud_error  <= s_baud_error + 1;
+					s_baud_counter  <= '0' & X"0";
+					s_baud_error  <= not s_baud_error ;
 				end if;
-				if s_baud_counter = X"D" and s_baud_clock = '1' then
+				if s_baud_counter = '1' & X"A" and s_baud_clock = '1' then
 					s_baud_clock  <= '0';
-					s_baud_counter  <= X"0";
+					s_baud_counter  <= '0'& X"0";
 				end if;
 			else
 				s_baud_clock <= '0';
-				s_baud_counter  <= "0000";
-				s_baud_error  <= "000";
+				s_baud_counter  <= "00000";
+				s_baud_error  <= '0';
 			end if;
 		end if;
 	end process name;
 	clk_out <= s_baud_clock;
 end architecture RTL;
---current clk rate 1.866 Mhz
+--current clk rate 1.843
 --goal 1.843 Mhz
