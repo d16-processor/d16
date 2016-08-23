@@ -11,12 +11,7 @@ autom4te.cache/
 config.h
 config.log
 config.status
-assembler/d16-asm/d16
-assembler/d16-asm/lex.c
-assembler/d16-asm/parser.c
-assembler/d16-asm/parser.h
-assembler/d16-asm/lex.yy.h
-assembler/d16-asm/stamp-h1
-assembler/d16-asm/Makefile
+/assembler/cmake/*
+!/assembler/cmake/*.cmake
 
 vhdl/build/reg_tb
