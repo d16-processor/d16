@@ -21,6 +21,7 @@ int main(int argc, char* const argv[]) {
     FILE* o;
     opterr = 0;
     int c;
+    setenv("POSIXLY_CORRECT", "1", 1);
     while (optind < argc) {
         if ((c = getopt(argc, argv, "o:bh")) != -1) {
             switch (c) {

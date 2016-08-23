@@ -171,7 +171,7 @@
 	\texttt{POP r1\\JMP.AL r1\\}
 	\textbf{Note: r1 can be replaced by any GP register}
 	\section{Condition Codes}
-	In the JUMP variety of instructions (Jmp, Call, Set), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
+	In the \texttt{JMP} variety of instructions (\texttt{JMP}, \texttt{CALL}, \texttt{SET}), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
 	\begin{tabular}{| l | c | l | l |} \hline
 	Mnemonic & Encoding & Expression & Meaning \\ \hline
 	NV &0000& False & Never execute\\ \hline
@@ -190,5 +190,43 @@
 	LE &1101& Z set or S $\neq$ V & Signed less than or equal to \\ \hline
 	L  &1110& S $\neq$ V & Signed less than \\ \hline
 	AL &1111& True & Always execute \\ \hline
+	\end{tabular}
+	\newpage
+	\section{Peripherals}
+	The D16 processor uses memory mapping to access its peripherals. Currently, the memory mapped region starts at address 0xFF00 and ends at address 0xFFFF. However in subsequent revisions, this may be expanded to the range 0xFC00-0xFFFF, so the programmer is encouraged not to make use of the top 1K of the address space.
+	All peripheral registers will specify their size, either 16 bit or 8 bit. \textbf{Important: All registers must be accessed at their stated size. It is illegal to access a 16 bit register as 2 8 bit parts or 2 8 bit registers as a 16 bit register.}
+	\subsection{UART}
+	The UART is set up as a pair of 8-entry FIFO queues that feed the Tx and Rx circuitry. \\
+	\begin{tabular}{|l|l|l| l|}
+	\hline
+	Name & Size & Address & Description \\ \hline
+	\verb|IO_UART_DATA| & 8 &0xFF02 & UART data \\ \hline
+	\verb|IO_UART_STATUS| & 8 & 0xFF03 & UART status \\ \hline
+	\verb|IO_UART_BAUD| & 16 & 0xFF04 & UART Baud rate divisor \\ \hline
+	
+	
+	\end{tabular}
+	\subsubsection{IO\_UART\_DATA}
+	\begin{tabular}{|l|l|l|}
+	\hline
+	Bits & Type & Description \\ \hline
+	0-7 & W & Data sent to UART Tx \\ \hline
+	0-7 & R & Data from UART Rx \\ \hline
+	\end{tabular}
+	\subsubsection{IO\_UART\_STATUS}
+	\begin{tabular}{|l|l|l|}
+	\hline
+	Bits & Type & Description \\ \hline
+	0 & R & Tx FIFO Space free \\ \hline
+	1 & R & Tx FIFO Empty \\ \hline
+	2 & R & Rx Data ready \\ \hline
+	3 & R & Rx FIFO Overrun \\ \hline
+	4-7 & X & Reserved \\ \hline
+\end{tabular}
+	\subsubsection{IO\_UART\_BAUD}
+	\begin{tabular}{|l|l|l|}
+	\hline
+	Bits & Type & Description \\ \hline
+	0-15 & R/W & Baud rate divisor \\ \hline
 	\end{tabular}
 \end{document}
