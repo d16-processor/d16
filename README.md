@@ -12,7 +12,7 @@ The included assembler is written in C, and uses bison and flex for parsing. It'
 It can be built by:
 
 ```
-cd d16/assembler/cmake
+cd d16/assembler/build
 cmake ..; make
 ./d16-main/d16 <file> <output>
 ```
@@ -20,7 +20,7 @@ cmake ..; make
 Tests can be run by
 
 ```
-cd d16/assembler/cmake
+cd d16/assembler/build
 cmake -DTARGET_GROUP=test ..; make
 ./d16-tests/testing_main
 ```
