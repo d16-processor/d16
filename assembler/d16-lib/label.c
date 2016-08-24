@@ -20,3 +20,10 @@ Address* addr_from_label(char* label) {      // foo
     a->type = ADDR_LABEL;
     return a;
 }
+Address* addr_from_reference(int ref, bool dir) {
+    Address* a = calloc(1, sizeof(Address));
+    a->direction = dir;
+    a->type = ADDR_LOC_LABEL;
+    a->immediate = ref;
+    return a;
+}

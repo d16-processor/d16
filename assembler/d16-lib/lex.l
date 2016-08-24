@@ -26,6 +26,9 @@
 \.b {return BYTE_FLAG;}
 \+ {return PLUS;}
 \: {return COLON;}
+[0-9]b {yylval.ival = *yytext; return BACK_REFERENCE;}
+[0-9]f {yylval.ival = *yytext; return FORWARD_REFERENCE;}
+[0-9]\: {yylval.ival = *yytext; return LOCAL_LABEL;}
 nop {yylval.op = op(strdup(yytext),NOP); return OPCODE;};
 add {yylval.op = op(strdup(yytext),ADD); return OPCODE;};
 sub {yylval.op = op(strdup(yytext),SUB); return OPCODE;};

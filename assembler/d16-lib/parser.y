@@ -27,7 +27,7 @@
 %token <op> OPCODE
 %token <ival> CONDITION_CODE
 %token <sval> IDENTIFIER LABEL STRING
-%token <ival> REGISTER IMMEDIATE CP_REGISTER NUMBER
+%token <ival> REGISTER IMMEDIATE CP_REGISTER NUMBER BACK_REFERENCE FORWARD_REFERENCE LOCAL_LABEL
 %type <instr> instruction
 %type <list> program
 %type <addr> address
@@ -45,6 +45,9 @@ address:
 		IMMEDIATE {$$=addr_from_immediate($1);}
 	|	IDENTIFIER {$$=addr_from_label($1);}
 	|	NUMBER	{$$=addr_from_immediate($1);}
+	|   BACK_REFERENCE {$$=addr_from_reference($1,0);}
+	|   FORWARD_REFERENCE {$$=addr_from_reference($1,1);}
+
 ;
 //Instruction* new_instrution_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
 instruction:
@@ -83,6 +86,8 @@ instruction:
     |   DIRECTIVE_ASCIZ STRING NEWLINE {$$=new_instruction_directive(D_ASCIZ,$2);}
     |   DIRECTIVE_ASCII STRING NEWLINE {$$=new_instruction_directive(D_ASCII,$2);}
 	|   LABEL {$$=new_instruction_label(strdup($1));}
+	|   LOCAL_LABEL {$$=new_instruction_local_label($1);}
+
 ;
 
 

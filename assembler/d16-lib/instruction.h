@@ -25,7 +25,8 @@ typedef enum {
     I_TYPE_MEMI,
     I_TYPE_JMP,
     I_TYPE_JMPI,
-    I_TYPE_LABEL
+    I_TYPE_LABEL,
+    I_TYPE_LOCAL_LABEL
 } Instruction_Type;
 typedef enum { M_NONE = 0, M_BYTE = 2, M_DISP = 1 } mem_flags;
 enum _Dir_Type { D_WORD, D_ASCIZ, D_ASCII };
@@ -134,6 +135,7 @@ Instruction* new_instruction_jmp(OP* op, int rD, condition_code cc);
 Instruction* new_instruction_jmpi(OP* op, Address* addr, condition_code cc);
 Instruction* new_instruction_directive(Dir_Type, void* data);
 Instruction* new_instruction_label(char* name);
+Instruction* new_instruction_local_label(int num);
 void set_label_address(const char* label_name, unsigned int address);
 void resolve_address(Address* addr);
 char* cc_to_str(condition_code cc);

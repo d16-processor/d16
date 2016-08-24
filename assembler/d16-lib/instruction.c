@@ -18,6 +18,8 @@ char* opcodes_str[] = {"nop", "add", "sub", "push", "pop",  "mov",
                        "and", "or",  "xor", "not",  "neg",  "ld",
                        "st",  "cmp", "jmp", "call", "spec", "shl",
                        "shr", "rol", "rcl", "ldcp", "stcp"};
+static char* local_label_strings[] = {"0", "1", "2", "3", "4",
+                                      "5", "6", "7", "8", "9"};
 struct _OP* op(char* str, enum _Op_Type op_type) {
     OP* op = calloc(1, sizeof(op));
     op->str = str;
@@ -123,7 +125,12 @@ Instruction* new_instruction_label(char* name) {
     g_hash_table_insert(labels, name, NULL);
     return i;
 }
-
+Instruction* new_instruction_local_label(int num) {
+    Instruction* i = calloc(1, sizeof(Instruction));
+    i->type = I_TYPE_LOCAL_LABEL;
+    i->opcode = strdup(local_label_strings[num]);
+    return i;
+}
 Instruction* new_instruction_directive(Dir_Type type, void* data) {
     Instruction* i = calloc(1, sizeof(Instruction));
     i->dir_type = type;
@@ -142,6 +149,7 @@ Instruction* new_instruction_directive(Dir_Type type, void* data) {
     i->dir_data = data;
     return i;
 }
+
 void set_label_address(const char* label, unsigned int address) {
     g_hash_table_insert(labels, (void*)label, GINT_TO_POINTER(address));
 }
@@ -193,7 +201,7 @@ int instruction_length(Instruction* i) {
             return 1;
         }
     }
-    if (i->type == I_TYPE_LABEL) {
+    if (i->type == I_TYPE_LABEL || i->type == I_TYPE_LOCAL_LABEL) {
         return 0;
     }
     if (i->type == I_TYPE_RIMM) {
