@@ -18,8 +18,7 @@ char* opcodes_str[] = {"nop", "add", "sub", "push", "pop",  "mov",
                        "and", "or",  "xor", "not",  "neg",  "ld",
                        "st",  "cmp", "jmp", "call", "spec", "shl",
                        "shr", "rol", "rcl", "ldcp", "stcp"};
-static char* local_label_strings[] = {"0", "1", "2", "3", "4",
-                                      "5", "6", "7", "8", "9"};
+static int  local_count_table[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 struct _OP* op(char* str, enum _Op_Type op_type) {
     OP* op = calloc(1, sizeof(op));
     op->str = str;
@@ -128,7 +127,10 @@ Instruction* new_instruction_label(char* name) {
 Instruction* new_instruction_local_label(int num) {
     Instruction* i = calloc(1, sizeof(Instruction));
     i->type = I_TYPE_LOCAL_LABEL;
-    i->opcode = strdup(local_label_strings[num]);
+    char* lblname = malloc(16);
+    sprintf(lblname, ".L%d\002%d", num, local_count_table[num]);
+    ++local_count_table[num];
+    i->opcode = lblname;
     return i;
 }
 Instruction* new_instruction_directive(Dir_Type type, void* data) {

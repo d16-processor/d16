@@ -13,8 +13,10 @@
 #include "aout.h"
 #include "instruction.h"
 #include "parser.h"
+#define DEBUG
 extern bool binary_mode;
 FILE*       output_file;
+static int  local_label_count[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 void print_elem(void* element, void* data) {
     Instruction* i = (Instruction*)element;
     char         addr_string[128];
@@ -86,6 +88,9 @@ void print_elem(void* element, void* data) {
         case I_TYPE_LABEL:
             fprintf(stdout, "%s:", i->opcode);
             break;
+        case I_TYPE_LOCAL_LABEL:
+            fprintf(stdout, "How did a local label get here?");
+            break;
     }
     fprintf(stdout, " length: %d\n", instruction_length(i));
 }
@@ -100,6 +105,30 @@ void sum_program_length(void* elem, void* data) {
     size_t*      sz = (size_t*)data;
     Instruction* i = (Instruction*)elem;
     *sz += instruction_length(i);
+    if (i->address != NULL && i->address->type == ADDR_LOC_LABEL) {
+        i->address->type = ADDR_LABEL;
+
+        i->address->lblname = malloc(16);
+        int lblindex = local_label_count[i->address->immediate];
+
+        if (i->address->direction == 0) {
+            if (lblindex == 0) {
+                fprintf(stderr, "Error: No backwards label for %d\n",
+                        i->address->immediate);
+                exit(1);
+            }
+            sprintf(i->address->lblname, ".L%d\002%d", i->address->immediate,
+                    lblindex - 1);
+        } else {
+            sprintf(i->address->lblname, ".L%d\002%d", i->address->immediate,
+                    lblindex);
+        }
+    }
+    if (i->type == I_TYPE_LOCAL_LABEL) {
+        i->type = I_TYPE_LABEL;
+        int lblnum = *(i->opcode + 3);
+        ++local_label_count[lblnum];
+    }
     if (i->type == I_TYPE_LABEL) {
         set_label_address(i->opcode, 2 * (int)*sz);
         if (!binary_mode) {
@@ -186,6 +215,9 @@ void process_list(struct _GList* list, FILE* output_file) {
     g_list_foreach(list, &sum_program_length, &output_size);
     fprintf(stdout, "Program length: %zu bytes\n", output_size * 2);
     output_size *= 2;
+#ifdef DEBUG
+    g_list_foreach(list, &print_elem, NULL);
+#endif
     if (binary_mode) {
         uint16_t* buffer = malloc(output_size);
         uint16_t* buf_save = buffer;
