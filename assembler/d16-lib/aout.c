@@ -21,6 +21,16 @@ size_t string_capacity = 0;
 GArray*     symbol_array = NULL;
 GHashTable* symbol_table = NULL;
 GArray*     reloc_array = NULL;
+void        create_tables() {
+    reloc_array = g_array_new(FALSE, FALSE, sizeof(a_reloc_entry));
+    symbol_array = g_array_new(FALSE, FALSE, sizeof(a_symbol_entry*));
+    symbol_table = g_hash_table_new(g_str_hash, g_str_equal);
+}
+void delete_tables() {
+    g_array_free(reloc_array, false);
+    g_array_free(symbol_array, true);
+    g_hash_table_destroy(symbol_table);
+}
 
 uint32_t add_string(char* string) {
     /**
@@ -86,9 +96,7 @@ a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
 void aout_process_instructions(GList* instructions, int size, FILE* file) {
     uint16_t* instruction_buffer = malloc(size);
     uint16_t* buf_save = instruction_buffer;
-    reloc_array = g_array_new(FALSE, FALSE, sizeof(a_reloc_entry));
-    symbol_array = g_array_new(FALSE, FALSE, sizeof(a_symbol_entry*));
-    symbol_table = g_hash_table_new(g_str_hash, g_str_equal);
+    create_tables();
     g_list_foreach(instructions,
                    (void (*)(void*, void*)) & assemble_instruction,
                    &instruction_buffer);
@@ -126,6 +134,7 @@ void aout_process_instructions(GList* instructions, int size, FILE* file) {
     fwrite(aout_strings, string_size, sizeof(char), file);
     fflush(file);
     free(buf_save);
+    delete_tables();
     buf_save = NULL;
     instruction_buffer = NULL;
 }

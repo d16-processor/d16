@@ -39,6 +39,8 @@ typedef struct _symbol_entry {
 #define A_MAGIC 0407
 char*    aout_strings;
 uint32_t add_string(char* string);
+void           delete_tables();
+void           create_tables();
 a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type);
 a_reloc_entry gen_reloc_entry(char* label, uint32_t address);
 void aout_process_instructions(GList* instructions, int size, FILE*);

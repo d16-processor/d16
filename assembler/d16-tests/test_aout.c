@@ -24,7 +24,9 @@ void test_gen_symbol_entry(void) {
 }
 
 void test_aout_run_all_tests(void) {
+    create_tables();
     printf("Run all tests for aout.c\n");
     RUN_TEST(test_string);
     RUN_TEST(test_gen_symbol_entry);
+    delete_tables();
 }
