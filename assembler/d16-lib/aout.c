@@ -35,10 +35,7 @@ a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type) {
 #ifdef DEBUG
     printf("Generating a symbol entry for label: %s\n", string);
 #endif
-    if (symbol_array == NULL) {
-        symbol_array = g_array_new(FALSE, FALSE, sizeof(a_symbol_entry*));
-        symbol_table = g_hash_table_new(g_str_hash, g_str_equal);
-    }
+
     a_symbol_entry* entry = malloc(sizeof(a_symbol_entry));
     entry->type = type;
     entry->value = address;
@@ -54,9 +51,6 @@ a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
 #ifdef DEBUG
     printf("Generating a reloc entry for label: %s\n", label);
 #endif
-    if (reloc_array == NULL) {
-        reloc_array = g_array_new(FALSE, FALSE, sizeof(a_reloc_entry));
-    }
     a_reloc_entry entry;
     entry.address = address;
     a_symbol_entry* symb = g_hash_table_lookup(symbol_table, label);
@@ -76,6 +70,9 @@ a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
 void aout_process_instructions(GList* instructions, int size, FILE* file) {
     uint16_t* instruction_buffer = malloc(size);
     uint16_t* buf_save = instruction_buffer;
+    reloc_array = g_array_new(FALSE, FALSE, sizeof(a_reloc_entry));
+    symbol_array = g_array_new(FALSE, FALSE, sizeof(a_symbol_entry*));
+    symbol_table = g_hash_table_new(g_str_hash, g_str_equal);
     g_list_foreach(instructions,
                    (void (*)(void*, void*)) & assemble_instruction,
                    &instruction_buffer);
