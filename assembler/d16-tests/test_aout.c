@@ -12,6 +12,8 @@ void test_string() {
     int loc2 = add_string("Another one!");
     TEST_ASSERT_EQUAL_INT(11, loc2);
     TEST_ASSERT_EQUAL_STRING("Another one!", aout_strings + loc2);
+    // make sure the orignial string still exists
+    TEST_ASSERT_EQUAL_STRING("Testing123", aout_strings);
 }
 
 void test_gen_symbol_entry(void) {

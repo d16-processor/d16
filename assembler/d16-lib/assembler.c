@@ -122,7 +122,7 @@ void assemble_instruction(Instruction* i, void* d) {
                 *data += 1;
                 if (i->address->type == ADDR_LABEL && !binary_mode) {
                     **data = 0;
-                    gen_reloc_entry(strdup(i->address->lblname), ip);
+                    gen_reloc_entry(i->address->lblname, ip);
                 } else {
                     **data = i->address->immediate & 0xffff;
                 }
@@ -136,7 +136,7 @@ void assemble_instruction(Instruction* i, void* d) {
             *data += 1;
             if (i->address->type == ADDR_LABEL && !binary_mode) {
                 **data = 0;
-                gen_reloc_entry(strdup(i->address->lblname), ip);
+                gen_reloc_entry(i->address->lblname, ip);
             } else {
                 **data = i->address->immediate & 0xffff;
             }
@@ -161,7 +161,7 @@ void assemble_instruction(Instruction* i, void* d) {
             if (i->type == I_TYPE_JMPI) {
                 if (i->address->type == ADDR_LABEL && !binary_mode) {
                     **data = 0;
-                    gen_reloc_entry(strdup(i->address->lblname), ip);
+                    gen_reloc_entry(i->address->lblname, ip);
                 } else {
                     **data = i->address->immediate & 0xffff;
                 }

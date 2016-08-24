@@ -2,20 +2,33 @@
 // Created by Michael Nolan on 7/27/16.
 //
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "aout.h"
 #include "assembler.h"
 #define INITIAL_CAPACITY 128
-char*       aout_strings = NULL;
-size_t      string_size = 0;
-size_t      string_capacity = 0;
+
+// TODO put this in a struct and pass it around
+// to avoid global variables
+
+// a.out string table
+char*  aout_strings = NULL;
+size_t string_size = 0;
+size_t string_capacity = 0;
+
 GArray*     symbol_array = NULL;
-GHashTable* symbol_table;
+GHashTable* symbol_table = NULL;
 GArray*     reloc_array = NULL;
 
 uint32_t add_string(char* string) {
+    /**
+     * Adds the string to the string table; returns the position of the string
+     * in the table. Handles resizing the string table as needed.
+     *
+     * ``string`` is copied and can be freed after call.
+     */
     if (aout_strings == NULL) {
         aout_strings = malloc(INITIAL_CAPACITY);
         string_capacity = INITIAL_CAPACITY;
@@ -31,23 +44,26 @@ uint32_t add_string(char* string) {
     return to_return;
 }
 
-a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type) {
+a_symbol_entry gen_symbol_entry(char* name, uint32_t address, a_type type) {
 #ifdef DEBUG
-    printf("Generating a symbol entry for label: %s\n", string);
+    printf("Generating a symbol entry for label: %s\n", name);
 #endif
 
     a_symbol_entry* entry = malloc(sizeof(a_symbol_entry));
     entry->type = type;
     entry->value = address;
-    entry->name_offset = add_string(string);
+    entry->name_offset = add_string(name);
 
     g_array_append_val(symbol_array, entry);
+    g_hash_table_insert(symbol_table, name, entry);
 
-    g_hash_table_insert(symbol_table, string, entry);
     return *entry;
 }
 
 a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
+/**
+ * ``label`` is copied and can be freed after call.
+ */
 #ifdef DEBUG
     printf("Generating a reloc entry for label: %s\n", label);
 #endif
@@ -62,8 +78,8 @@ a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
     entry.pc_rel = 0;
     entry.length = A_LENGTH_16_BITS;
     entry.extern_entry = 0;
+
     g_array_append_val(reloc_array, entry);
-    free(label);
     return entry;
 }
 
