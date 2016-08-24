@@ -4,7 +4,7 @@ The cpu is a load-store architecture, with variable length instructions (multipl
 The cpu is written in VHDL and is simulatable with GHDL.
 
 Current build health:
-[![CircleCI](https://circleci.com/gh/C-Elegans/d16.svg?style=svg)](https://circleci.com/gh/C-Elegans/d16)
+[![CircleCI](https://circleci.com/gh/d16-processor/d16.svg?style=svg)](https://circleci.com/gh/d16-processor/d16)
 ## D16 Assembler
 The included assembler is written in C, and uses bison and flex for parsing. It's not of the best quality, but it works.
 
