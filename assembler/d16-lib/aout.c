@@ -96,7 +96,7 @@ a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
 void aout_process_instructions(GList* instructions, int size, FILE* file) {
     uint16_t* instruction_buffer = malloc(size);
     uint16_t* buf_save = instruction_buffer;
-    create_tables();
+
     g_list_foreach(instructions,
                    (void (*)(void*, void*)) & assemble_instruction,
                    &instruction_buffer);

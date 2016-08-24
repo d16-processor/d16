@@ -181,6 +181,7 @@ void assemble_instruction(Instruction* i, void* d) {
 }
 void process_list(struct _GList* list, FILE* output_file) {
     size_t output_size = 0;
+    create_tables();
     // g_list_foreach(list, &print_elem, NULL);
     g_list_foreach(list, &sum_program_length, &output_size);
     fprintf(stdout, "Program length: %zu bytes\n", output_size * 2);

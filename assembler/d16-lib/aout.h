@@ -36,7 +36,7 @@ typedef struct _symbol_entry {
     uint32_t value;
 } a_symbol_entry;
 #define A_LENGTH_16_BITS 0b01
-#define A_MAGIC 0407
+#define A_MAGIC 0x0107ffff
 char*    aout_strings;
 uint32_t add_string(char* string);
 void           delete_tables();
