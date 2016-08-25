@@ -54,7 +54,8 @@ uint32_t add_string(char* string) {
     return to_return;
 }
 
-a_symbol_entry gen_symbol_entry(char* name, uint32_t address, a_type type) {
+a_symbol_entry gen_symbol_entry(char* name, uint32_t address, a_type type,
+                                bool ext) {
 #ifdef DEBUG
     printf("Generating a symbol entry for label: %s\n", name);
 #endif
@@ -63,13 +64,20 @@ a_symbol_entry gen_symbol_entry(char* name, uint32_t address, a_type type) {
     entry->type = type;
     entry->value = address;
     entry->name_offset = add_string(name);
-
-    g_array_append_val(symbol_array, entry);
+    entry->spare = ext ? A_SYM_GLOBAL : A_SYM_LOCAL;
+    if (ext) {
+        g_array_append_val(symbol_array, entry);
+    }
     g_hash_table_insert(symbol_table, name, entry);
 
     return *entry;
 }
+a_symbol_entry* lookup_symbol(char* string) {
+    a_symbol_entry* symb =
+        (a_symbol_entry*)g_hash_table_lookup(symbol_table, string);
 
+    return symb;
+}
 a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
 /**
  * ``label`` is copied and can be freed after call.
@@ -87,8 +95,18 @@ a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
     }
     entry.pc_rel = 0;
     entry.length = A_LENGTH_16_BITS;
-    entry.extern_entry = 0;
+    entry.extern_entry = 1;
 
+    g_array_append_val(reloc_array, entry);
+    return entry;
+}
+a_reloc_entry gen_anonymous_reloc_entry(uint32_t address) {
+    a_reloc_entry entry;
+    entry.address = address;
+    entry.pc_rel = 0;
+    entry.length = A_LENGTH_16_BITS;
+    entry.extern_entry = 0;
+    entry.index = 0xffffffff;
     g_array_append_val(reloc_array, entry);
     return entry;
 }

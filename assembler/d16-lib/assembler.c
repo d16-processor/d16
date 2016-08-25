@@ -13,10 +13,11 @@
 #include "aout.h"
 #include "instruction.h"
 #include "parser.h"
-#define DEBUG
+
 extern bool binary_mode;
 FILE*       output_file;
 static int  local_label_count[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 void print_elem(void* element, void* data) {
     Instruction* i = (Instruction*)element;
     char         addr_string[128];
@@ -94,6 +95,7 @@ void print_elem(void* element, void* data) {
     }
     fprintf(stdout, " length: %d\n", instruction_length(i));
 }
+
 void free_elem(void* element) {
     Instruction* i = (Instruction*)element;
     free(i->opcode);
@@ -101,6 +103,7 @@ void free_elem(void* element) {
     free(i);
     i = NULL;
 }
+
 void sum_program_length(void* elem, void* data) {
     size_t*      sz = (size_t*)data;
     Instruction* i = (Instruction*)elem;
@@ -126,17 +129,19 @@ void sum_program_length(void* elem, void* data) {
     }
     if (i->type == I_TYPE_LOCAL_LABEL) {
         i->type = I_TYPE_LABEL;
-        int lblnum = *(i->opcode + 3);
+        int lblnum = *(i->opcode + 2) - '0';
         ++local_label_count[lblnum];
     }
     if (i->type == I_TYPE_LABEL) {
         set_label_address(i->opcode, 2 * (int)*sz);
         if (!binary_mode) {
-            gen_symbol_entry(i->opcode, *sz * 2, A_TEXT);
+            gen_symbol_entry(i->opcode, *sz * 2, A_TEXT, i->flags == L_GLOBAL);
         }
     }
 }
-int  ip = 0;
+
+int ip = 0;
+
 void assemble_instruction(Instruction* i, void* d) {
     uint16_t** data = (uint16_t**)d;
     if (i->type != I_TYPE_LABEL) {
@@ -150,8 +155,14 @@ void assemble_instruction(Instruction* i, void* d) {
                 **data = i->op_type << 8 | build_reg_selector(i);
                 *data += 1;
                 if (i->address->type == ADDR_LABEL && !binary_mode) {
-                    **data = 0;
-                    gen_reloc_entry(i->address->lblname, ip);
+                    a_symbol_entry* symb = lookup_symbol(i->address->lblname);
+                    if (symb != NULL && symb->spare == A_SYM_LOCAL) {
+                        **data = symb->value & 0xffff;
+                        gen_anonymous_reloc_entry(ip);
+                    } else {
+                        **data = 0;
+                        gen_reloc_entry(i->address->lblname, ip);
+                    }
                 } else {
                     **data = i->address->immediate & 0xffff;
                 }
@@ -164,8 +175,14 @@ void assemble_instruction(Instruction* i, void* d) {
             **data = i->op_type << 8 | build_mem_selector(i);
             *data += 1;
             if (i->address->type == ADDR_LABEL && !binary_mode) {
-                **data = 0;
-                gen_reloc_entry(i->address->lblname, ip);
+                a_symbol_entry* symb = lookup_symbol(i->address->lblname);
+                if (symb != NULL && symb->spare == A_SYM_LOCAL) {
+                    **data = symb->value & 0xffff;
+                    gen_anonymous_reloc_entry(ip);
+                } else {
+                    **data = 0;
+                    gen_reloc_entry(i->address->lblname, ip);
+                }
             } else {
                 **data = i->address->immediate & 0xffff;
             }
@@ -189,8 +206,14 @@ void assemble_instruction(Instruction* i, void* d) {
             *data += 1;
             if (i->type == I_TYPE_JMPI) {
                 if (i->address->type == ADDR_LABEL && !binary_mode) {
-                    **data = 0;
-                    gen_reloc_entry(i->address->lblname, ip);
+                    a_symbol_entry* symb = lookup_symbol(i->address->lblname);
+                    if (symb != NULL && symb->spare == A_SYM_LOCAL) {
+                        **data = symb->value & 0xffff;
+                        gen_anonymous_reloc_entry(ip);
+                    } else {
+                        **data = 0;
+                        gen_reloc_entry(i->address->lblname, ip);
+                    }
                 } else {
                     **data = i->address->immediate & 0xffff;
                 }
@@ -208,6 +231,7 @@ void assemble_instruction(Instruction* i, void* d) {
     // i->address = NULL;
     ip += instruction_length(i) * 2;
 }
+
 void process_list(struct _GList* list, FILE* output_file) {
     size_t output_size = 0;
     create_tables();

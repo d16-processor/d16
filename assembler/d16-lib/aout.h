@@ -5,6 +5,7 @@
 #ifndef D16_ASM_AOUT_H
 #define D16_ASM_AOUT_H
 #include <glib.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 typedef enum { A_TEXT, A_BSS, A_DATA } a_type;
@@ -35,13 +36,18 @@ typedef struct _symbol_entry {
     uint16_t debug_info;
     uint32_t value;
 } a_symbol_entry;
+#define A_SYM_LOCAL 0
+#define A_SYM_GLOBAL 1
 #define A_LENGTH_16_BITS 0b01
 #define A_MAGIC 0x0107ffff
 char*    aout_strings;
 uint32_t add_string(char* string);
-void           delete_tables();
-void           create_tables();
-a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type);
+void            delete_tables();
+void            create_tables();
+a_symbol_entry* lookup_symbol(char* string);
+a_symbol_entry gen_symbol_entry(char* string, uint32_t address, a_type type,
+                                bool ext);
 a_reloc_entry gen_reloc_entry(char* label, uint32_t address);
+a_reloc_entry gen_anonymous_reloc_entry(uint32_t address);
 void aout_process_instructions(GList* instructions, int size, FILE*);
 #endif // D16_ASM_AOUT_H

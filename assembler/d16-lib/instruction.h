@@ -29,6 +29,7 @@ typedef enum {
     I_TYPE_LOCAL_LABEL
 } Instruction_Type;
 typedef enum { M_NONE = 0, M_BYTE = 2, M_DISP = 1 } mem_flags;
+typedef enum { L_GLOBAL, L_LOCAL } sym_flags;
 enum _Dir_Type { D_WORD, D_ASCIZ, D_ASCII };
 typedef enum _condition_code {
     NV = 0,
@@ -116,7 +117,7 @@ struct _Instruction {
     Op_Type          op_type;
     Instruction_Type type;
     Dir_Type         dir_type;
-    mem_flags        flags;
+    int              flags;
     void*            dir_data;
 };
 typedef struct _Instruction Instruction;

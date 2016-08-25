@@ -121,12 +121,14 @@ Instruction* new_instruction_label(char* name) {
     Instruction* i = calloc(1, sizeof(Instruction));
     i->type = I_TYPE_LABEL;
     i->opcode = name;
+    i->flags = L_GLOBAL;
     g_hash_table_insert(labels, name, NULL);
     return i;
 }
 Instruction* new_instruction_local_label(int num) {
     Instruction* i = calloc(1, sizeof(Instruction));
     i->type = I_TYPE_LOCAL_LABEL;
+    i->flags = L_LOCAL;
     char* lblname = malloc(16);
     sprintf(lblname, ".L%d\002%d", num, local_count_table[num]);
     ++local_count_table[num];
