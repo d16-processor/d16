@@ -24,6 +24,7 @@
 %error-verbose
 
 %token COMMA NEWLINE LBRACKET RBRACKET DIRECTIVE_WORD BYTE_FLAG PLUS COLON DIRECTIVE_ASCIZ DIRECTIVE_ASCII
+%token DIRECTIVE_GLOBAL
 %token <op> OPCODE
 %token <ival> CONDITION_CODE
 %token <sval> IDENTIFIER LABEL STRING
@@ -31,6 +32,7 @@
 %type <instr> instruction
 %type <list> program
 %type <addr> address
+%type <sval> global_label
 %parse-param {FILE* output_file}
 %start start
 
@@ -48,6 +50,10 @@ address:
 	|   BACK_REFERENCE {$$=addr_from_reference($1,0);}
 	|   FORWARD_REFERENCE {$$=addr_from_reference($1,1);}
 
+;
+global_label:
+    DIRECTIVE_GLOBAL LABEL {$$=$2;}
+    | DIRECTIVE_GLOBAL NEWLINE LABEL {$$=$3;}
 ;
 //Instruction* new_instrution_memi(OP* op, int rD, int rS, int immediate, bool byte, bool displacement);
 instruction:
@@ -85,8 +91,9 @@ instruction:
     |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);}
     |   DIRECTIVE_ASCIZ STRING NEWLINE {$$=new_instruction_directive(D_ASCIZ,$2);}
     |   DIRECTIVE_ASCII STRING NEWLINE {$$=new_instruction_directive(D_ASCII,$2);}
-	|   LABEL {$$=new_instruction_label(strdup($1));}
+	|   LABEL {$$=new_instruction_label(strdup($1),0);}
 	|   LOCAL_LABEL {$$=new_instruction_local_label($1);}
+	|   global_label {$$=new_instruction_label(strdup($1),1);}
 
 ;
 

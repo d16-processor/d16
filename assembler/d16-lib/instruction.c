@@ -117,11 +117,11 @@ Instruction* new_instruction_jmpi(OP* op, Address* addr, condition_code cc) {
 
     return i;
 }
-Instruction* new_instruction_label(char* name) {
+Instruction* new_instruction_label(char* name, bool global) {
     Instruction* i = calloc(1, sizeof(Instruction));
     i->type = I_TYPE_LABEL;
     i->opcode = name;
-    i->flags = L_GLOBAL;
+    i->flags = global ? L_GLOBAL : L_LOCAL;
     g_hash_table_insert(labels, name, NULL);
     return i;
 }

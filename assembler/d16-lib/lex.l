@@ -23,6 +23,7 @@
 .dw {return DIRECTIVE_WORD;}
 .asciz {return DIRECTIVE_ASCIZ;}
 .ascii {return DIRECTIVE_ASCII;}
+.global {return DIRECTIVE_GLOBAL;}
 \.b {return BYTE_FLAG;}
 \+ {return PLUS;}
 \: {return COLON;}

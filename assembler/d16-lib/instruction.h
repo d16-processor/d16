@@ -135,7 +135,7 @@ Instruction* new_instruction_mem(OP* op, int rD, int rS, bool byte);
 Instruction* new_instruction_jmp(OP* op, int rD, condition_code cc);
 Instruction* new_instruction_jmpi(OP* op, Address* addr, condition_code cc);
 Instruction* new_instruction_directive(Dir_Type, void* data);
-Instruction* new_instruction_label(char* name);
+Instruction* new_instruction_label(char* name, bool global);
 Instruction* new_instruction_local_label(int num);
 void set_label_address(const char* label_name, unsigned int address);
 void resolve_address(Address* addr);
