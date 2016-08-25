@@ -17,7 +17,7 @@ void test_string() {
 }
 
 void test_gen_symbol_entry(void) {
-    a_symbol_entry entry = gen_symbol_entry("main", 0x5252, A_TEXT);
+    a_symbol_entry entry = gen_symbol_entry("main", 0x5252, A_TEXT, 1);
     TEST_ASSERT_EQUAL_INT(0x5252, entry.value);
     TEST_ASSERT_EQUAL_INT(A_TEXT, entry.type);
     TEST_ASSERT_EQUAL_STRING("main", entry.name_offset + aout_strings);
