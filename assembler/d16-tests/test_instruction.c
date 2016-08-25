@@ -148,7 +148,7 @@ void test_instruction_length(void) {
 }
 void test_labels(void) {
     init_hash_table();
-    Instruction* i = new_instruction_label("test");
+    Instruction* i = new_instruction_label("test", 1);
     TEST_ASSERT_EQUAL_STRING("test", i->opcode);
     TEST_ASSERT(i->type = I_TYPE_LABEL);
     set_label_address("test", 34);
