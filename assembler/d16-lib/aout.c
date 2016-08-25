@@ -106,7 +106,7 @@ a_reloc_entry gen_anonymous_reloc_entry(uint32_t address) {
     entry.pc_rel = 0;
     entry.length = A_LENGTH_16_BITS;
     entry.extern_entry = 0;
-    entry.index = 0xffffffff;
+    entry.index = 0xffffff;
     g_array_append_val(reloc_array, entry);
     return entry;
 }
