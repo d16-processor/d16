@@ -80,6 +80,7 @@ enum _Op_Type {
     SET,
     TEST,
     PUSHLR,
+    SAR,
 
     ADDI = 0x81,
     SUBI = 0x82,
@@ -100,6 +101,7 @@ enum _Op_Type {
     ADCI = 0x9f,
     SBBI = 0xA0,
     TESTI = 0xA2,
+    SARI = 0xA4,
     KILL = 0xFF
 };
 struct _OP {

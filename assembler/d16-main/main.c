@@ -17,6 +17,7 @@ extern int   yyparse(FILE*);
 extern FILE* yyin;
 extern int   yydebug;
 bool         binary_mode = false;
+
 int main(int argc, char* const argv[]) {
     FILE* o;
     opterr = 0;

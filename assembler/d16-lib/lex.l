@@ -59,6 +59,7 @@ set {yylval.op = op(strdup(yytext), SET); return OPCODE;};
 test {yylval.op = op(strdup(yytext), TEST); return OPCODE;};
 kill {yylval.op = op(strdup(yytext), KILL); return OPCODE;};
 pushlr {yylval.op = op(strdup(yytext),PUSHLR); return OPCODE;};
+sar {yylval.op = op(strdup(yytext),SAR); return OPCODE;};
 \.nv {yylval.ival = NV; return CONDITION_CODE;}
 \.eq {yylval.ival = EQ; return CONDITION_CODE;}
 \.ne {yylval.ival = NE; return CONDITION_CODE;}
