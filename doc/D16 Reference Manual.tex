@@ -170,6 +170,8 @@
 	Pushes the link register onto the stack. This instruction should be used at the beginning of a subroutine if the subroutine executes the \texttt{CALL} instruction anywhere in its body. To return after executing this instruction, execute \\
 	\texttt{POP r1\\JMP.AL r1\\}
 	\textbf{Note: r1 can be replaced by any GP register}
+	\instrr{SAR}{100100}
+	Shifts the bits in \texttt{rD} left by op2 similarly to \texttt{SHR}, except the bits shifted in on the left are the sign bit (bit 15) of \texttt{rD}. Useful for signed division by powers of 2.
 	\section{Condition Codes}
 	In the \texttt{JMP} variety of instructions (\texttt{JMP}, \texttt{CALL}, \texttt{SET}), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
 	\begin{tabular}{| l | c | l | l |} \hline
