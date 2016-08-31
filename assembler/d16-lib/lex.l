@@ -81,14 +81,14 @@ sar {yylval.op = op(strdup(yytext),SAR); return OPCODE;};
 #0x[0-9a-fA-F]* {yylval.ival = (int)strtol(yytext+1,NULL,16); return IMMEDIATE;};
 -?[0-9]+ {yylval.ival = atoi(yytext); return NUMBER;}
 0x[0-9a-fA-F]+ {yylval.ival = (int)strtol(yytext,NULL,16); return NUMBER;};
-[a-zA-Z][a-zA-Z0-9_]*\: {
+[a-zA-Z_][a-zA-Z0-9_]*\: {
 	char* label = strdup(yytext);
 	char* colon = strchr(label,':');
 	*colon = '\0';
 	yylval.sval = label;
 	return LABEL;
 }
-[a-zA-Z][a-zA-Z0-9_]* {yylval.sval = strdup(yytext); return IDENTIFIER;};
+[a-zA-Z_][a-zA-Z0-9_]* {yylval.sval = strdup(yytext); return IDENTIFIER;};
 L?\"(\\.|[^\\"])*\" {
     char* str = strdup(yytext+1);
     char* end = str + (strlen(str)-1);
