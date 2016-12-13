@@ -30,7 +30,7 @@ typedef enum {
 } Instruction_Type;
 typedef enum { M_NONE = 0, M_BYTE = 2, M_DISP = 1 } mem_flags;
 typedef enum { L_GLOBAL, L_LOCAL } sym_flags;
-enum _Dir_Type { D_WORD, D_ASCIZ, D_ASCII };
+enum _Dir_Type { D_WORD, D_ASCIZ, D_ASCII, D_BYTE, D_DWORD, D_ALIGN };
 typedef enum _condition_code {
     NV = 0,
     EQ = 1,

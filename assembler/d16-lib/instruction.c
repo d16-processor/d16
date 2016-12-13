@@ -140,13 +140,22 @@ Instruction* new_instruction_directive(Dir_Type type, void* data) {
     i->dir_type = type;
     switch (type) {
         case D_WORD:
-            i->opcode = strdup(".db");
+            i->opcode = strdup(".dw");
             break;
         case D_ASCII:
             i->opcode = strdup(".ascii");
             break;
         case D_ASCIZ:
             i->opcode = strdup(".asciz");
+            break;
+        case D_BYTE:
+            i->opcode = strdup(".db");
+            break;
+        case D_ALIGN:
+            i->opcode = strdup(".align");
+            break;
+        case D_DWORD:
+            i->opcode = strdup(".dd");
             break;
     }
     i->type = I_TYPE_DIRECTIVE;
@@ -195,14 +204,20 @@ int instruction_length(Instruction* i) {
             char* str = (char*)i->dir_data;
             int   len = (int)(strlen(str) + 1 +
                             1); // 1 for ending NULL, 1 for rounding up
-            return len / 2;
+            return len & ~1;
 
         } else if (i->dir_type == D_ASCII) {
             char* str = (char*)i->dir_data;
-            int   len = (int)(strlen(str) + 1); // 1 for ending NULL
-            return len / 2;
-        } else {
+            int   len = (int)(strlen(str) + 1); // 1 for rounding up
+            return len & ~1;
+        } else if (i->dir_type == D_BYTE) {
             return 1;
+        } else if (i->dir_type == D_DWORD) {
+            return 1;
+        } else if (i->dir_type == D_ALIGN) {
+            return *(int*)i->dir_data;
+        } else {
+            return 2;
         }
     }
     if (i->type == I_TYPE_LABEL || i->type == I_TYPE_LOCAL_LABEL) {
@@ -212,20 +227,20 @@ int instruction_length(Instruction* i) {
         if (i->op_type == MOVI && i->address->type == ADDR_IMMEDIATE) {
             if (((unsigned)i->address->immediate) < 255) {
                 i->op_type = MOVB;
-                return 1;
+                return 2;
             }
         }
         if (i->op_type == MOVB) {
-            return 1;
+            return 2;
         }
-        return 2;
+        return 4;
     } else if (i->type == I_TYPE_MEMI) {
-        return 2;
+        return 4;
     } else if (i->type == I_TYPE_JMPI) {
-        return 2;
+        return 4;
     }
 
-    return 1;
+    return 2;
 }
 char* cc_strs[] = {"nv", "eq", "ne", "os", "oc", "hi", "ls", "p",
                    "n",  "cs", "cc", "ge", "g",  "le", "l",  "al"};

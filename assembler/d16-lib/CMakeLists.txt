@@ -24,11 +24,23 @@ include_directories(${Glib_INCLUDE_DIR} ${GlibConfig_INCLUDE_DIR})
 BISON_TARGET(parser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.c)
 FLEX_TARGET(scanner lex.l  ${CMAKE_CURRENT_BINARY_DIR}/lexer.c)
 ADD_FLEX_BISON_DEPENDENCY(scanner parser)
+set(SOURCE_FILES assembler.c instruction.c label.c aout.c)
+if(CLANG_TIDY)
+    add_custom_target(
+        clang-tidy-3.7
+        COMMAND /usr/local/bin/clang-tidy-3.7
+        ${SOURCE_FILES}
+        --config=''
+        --
+        --std=c99
+        ${Glib_INCLUDE_DIR} ${GlibConfig_INCLUDE_DIR}
+        )
 
+endif()
 add_library(d16-lib STATIC
-  assembler.c instruction.c label.c
+  ${SOURCE_FILES} 
   ${BISON_parser_OUTPUTS}
-  ${FLEX_scanner_OUTPUTS} aout.c aout.h)
+  ${FLEX_scanner_OUTPUTS} )
  
 target_include_directories(d16-lib PUBLIC
   ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}

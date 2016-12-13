@@ -108,6 +108,9 @@ void sum_program_length(void* elem, void* data) {
     size_t*      sz = (size_t*)data;
     Instruction* i = (Instruction*)elem;
     *sz += instruction_length(i);
+    if (!(i->type == I_TYPE_DIRECTIVE && i->dir_type == D_BYTE)) {
+        *sz = (*sz + 1) & ~1;
+    }
     if (i->address != NULL && i->address->type == ADDR_LOC_LABEL) {
         i->address->type = ADDR_LABEL;
 
@@ -133,9 +136,9 @@ void sum_program_length(void* elem, void* data) {
         ++local_label_count[lblnum];
     }
     if (i->type == I_TYPE_LABEL) {
-        set_label_address(i->opcode, 2 * (int)*sz);
+        set_label_address(i->opcode, (int)*sz);
         if (!binary_mode) {
-            gen_symbol_entry(i->opcode, *sz * 2, A_TEXT, i->flags == L_GLOBAL);
+            gen_symbol_entry(i->opcode, *sz, A_TEXT, i->flags == L_GLOBAL);
         }
     }
 }
@@ -144,6 +147,11 @@ int ip = 0;
 
 void assemble_instruction(Instruction* i, void* d) {
     uint16_t** data = (uint16_t**)d;
+    if (!(i->type == I_TYPE_DIRECTIVE && i->dir_type == D_BYTE)) {
+        uint8_t** udata = (uint8_t**)d;
+        *udata = (uint8_t*)(((size_t)*udata + 1L) & ~1L);
+        ip = (ip + 1) & ~1;
+    }
     if (i->type != I_TYPE_LABEL) {
         resolve_address(i->address);
         if (i->type == I_TYPE_RIMM) {
@@ -200,6 +208,27 @@ void assemble_instruction(Instruction* i, void* d) {
                     strcpy((char*)*data, str);
                     *data += instruction_length(i);
                 }
+                case D_BYTE: {
+                    uint8_t** udata = (uint8_t**)d;
+                    **udata = *(int*)i->dir_data;
+                    *udata += 1;
+                    break;
+                }
+                case D_ALIGN: {
+                    uint8_t** udata = (uint8_t**)d;
+                    int       alignval = *(int*)i->dir_data;
+                    *udata = (uint8_t*)(((size_t)*udata + (alignval - 1)) &
+                                        ~(alignval - 1));
+                    break;
+                }
+                case D_DWORD: {
+                    int dword = *(int*)i->dir_data;
+                    **data = dword & 0xffff;
+                    *data += 1;
+                    **data = (dword >> 16) & 0xffff;
+                    *data += 1;
+                    break;
+                }
             }
         } else if (i->type == I_TYPE_JMPI || i->type == I_TYPE_JMP) {
             **data = i->op_type << 8 | build_jmp_selector(i);
@@ -229,7 +258,7 @@ void assemble_instruction(Instruction* i, void* d) {
     // free(i->address);
     //
     // i->address = NULL;
-    ip += instruction_length(i) * 2;
+    ip += instruction_length(i);
 }
 
 void process_list(struct _GList* list, FILE* output_file) {
@@ -237,8 +266,7 @@ void process_list(struct _GList* list, FILE* output_file) {
     create_tables();
     // g_list_foreach(list, &print_elem, NULL);
     g_list_foreach(list, &sum_program_length, &output_size);
-    fprintf(stdout, "Program length: %zu bytes\n", output_size * 2);
-    output_size *= 2;
+    fprintf(stdout, "Program length: %zu bytes\n", output_size);
 #ifdef DEBUG
     g_list_foreach(list, &print_elem, NULL);
 #endif

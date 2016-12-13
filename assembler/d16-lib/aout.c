@@ -9,7 +9,6 @@
 #include "aout.h"
 #include "assembler.h"
 #define INITIAL_CAPACITY 128
-
 // TODO put this in a struct and pass it around
 // to avoid global variables
 
@@ -57,7 +56,7 @@ uint32_t add_string(char* string) {
 a_symbol_entry gen_symbol_entry(char* name, uint32_t address, a_type type,
                                 bool ext) {
 #ifdef DEBUG
-    printf("Generating a symbol entry for label: %s\n", name);
+    printf("Generating a symbol entry for label: %s addr: %x\n", name, address);
 #endif
 
     a_symbol_entry* entry = malloc(sizeof(a_symbol_entry));
@@ -83,7 +82,7 @@ a_reloc_entry gen_reloc_entry(char* label, uint32_t address) {
  * ``label`` is copied and can be freed after call.
  */
 #ifdef DEBUG
-    printf("Generating a reloc entry for label: %s\n", label);
+    printf("Generating a reloc entry for label: %s addr: %x\n", label, address);
 #endif
     a_reloc_entry entry;
     entry.address = address;
