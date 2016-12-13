@@ -61,8 +61,9 @@ a_symbol_entry gen_symbol_entry(char* name, uint32_t address, a_type type,
 
     a_symbol_entry* entry = malloc(sizeof(a_symbol_entry));
     entry->type = type;
-    entry->value = address;
+    entry->value = address&0xffff;
     entry->name_offset = add_string(name);
+    entry->debug_info = 0;
     entry->spare = ext ? A_SYM_GLOBAL : A_SYM_LOCAL;
     if (ext) {
         g_array_append_val(symbol_array, entry);
@@ -131,7 +132,7 @@ void aout_process_instructions(GList* instructions, int size, FILE* file) {
     if (reloc_array == NULL) {
         header.a_trsize = 0;
     } else {
-        header.a_trsize = reloc_array->len * sizeof(reloc_array);
+        header.a_trsize = reloc_array->len * sizeof(a_reloc_entry);
     }
     header.a_drsize = 0;
 
@@ -139,8 +140,12 @@ void aout_process_instructions(GList* instructions, int size, FILE* file) {
     fwrite(buf_save, sizeof(uint16_t), size / 2, file);
     if (symbol_array != NULL) {
         for (int i = 0; i < symbol_array->len; i++) {
+            
             a_symbol_entry* entry =
                 g_array_index(symbol_array, a_symbol_entry*, i);
+            printf("entry %s, addr: %d pos: %lx\n", aout_strings + entry->name_offset,
+                   entry->value,
+                   ftell(file));
             fwrite(entry, sizeof(a_symbol_entry), 1, file);
         }
     }
