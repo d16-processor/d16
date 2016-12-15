@@ -26,7 +26,7 @@ void print_elem(void* element, void* data) {
             snprintf(addr_string, sizeof(addr_string), "0x%04x",
                      i->address->immediate);
         } else {
-            if(i->address->lblname)
+            if (i->address->lblname)
                 strncpy(addr_string, i->address->lblname, sizeof(addr_string));
             else
                 addr_string[0] = '\0';
@@ -111,9 +111,8 @@ void sum_program_length(void* elem, void* data) {
     size_t*      sz = (size_t*)data;
     Instruction* i = (Instruction*)elem;
     *sz += instruction_length(i);
-    print_elem(i,NULL);
     if (!(i->type == I_TYPE_DIRECTIVE && i->dir_type == D_BYTE)) {
-        *sz = (*sz + 1) & ~1; //align to 2 bytes
+        *sz = (*sz + 1) & ~1; // align to 2 bytes
     }
     if (i->address != NULL && i->address->type == ADDR_LOC_LABEL) {
         i->address->type = ADDR_LABEL;
@@ -209,10 +208,10 @@ void assemble_instruction(Instruction* i, void* d) {
                 case D_ASCIZ:
                 case D_ASCII: {
                     char* str = i->dir_data;
-                    int len = instruction_length(i);
-                    memset(*data,0,len);
-                    strncpy((char*)*data,str,len);
-                    *data += instruction_length(i)/2;
+                    int   len = instruction_length(i);
+                    memset(*data, 0, len);
+                    strncpy((char*)*data, str, len);
+                    *data += instruction_length(i) / 2;
                     break;
                 }
                 case D_BYTE: {
