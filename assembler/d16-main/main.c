@@ -19,7 +19,7 @@ extern int   yydebug;
 bool         binary_mode = false;
 
 int main(int argc, char* const argv[]) {
-    FILE* o;
+    FILE* o = NULL;
     opterr = 0;
     int c;
     setenv("POSIXLY_CORRECT", "1", 1);
