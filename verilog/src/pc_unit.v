@@ -88,7 +88,7 @@ reg [15:0] pc = 16'h 0000;
         //assert(pc_op == op_prev);
     end
     always @(*) begin
-        if(en == 1) begin
+        assume(en == 1);
         if(op_prev == `PC_RESET)
             assert(pc == 0);
         if(op_prev == `PC_NOP)
@@ -97,7 +97,6 @@ reg [15:0] pc = 16'h 0000;
             assert(pc == (pc_prev + 16'h2));
         if(op_prev == `PC_SET)
             assert(pc == set_prev);
-    end
     end
 `endif
 
