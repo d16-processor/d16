@@ -32,6 +32,9 @@
 `define OPC_ADC 8'h1F
 `define OPC_SBB 8'h20
 `define OPC_SET 8'h21
+`define OPC_TEST 8'h22
+`define OPC_PUSHLR 8'h23
+`define OPC_SAR 8'h24
 
 `define OPC_ADDI 8'h81
 `define OPC_SUBI 8'h82
@@ -51,6 +54,8 @@
 `define OPC_RCLI 8'h9C
 `define OPC_ADCI 8'h9F
 `define OPC_SBBI 8'hA0
+`define OPC_TESTI 8'hA2
+`define OPC_SARI 8'hA4
 
 `define FLAG_BIT_ZERO 0
 `define FLAG_BIT_CARRY 1

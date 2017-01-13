@@ -123,6 +123,9 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
             `OPC_CMP : begin
                 write <= 1'b 0;
             end
+            `OPC_TEST: 
+                write <= 1'b0;
+
             `OPC_ST : begin
                 write <= 1'b 0;
             end
@@ -238,6 +241,10 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
             end
             `OPC_SET : begin
                 s_output[15:0] <= {15'b000,get_should_branch(flags_in,condition)};
+            end
+            `OPC_TEST: begin
+                s_output[15:0] <= data1 & data2;
+                s_output[16] <= 0;
             end
             `OPC_PUSH : begin
                 if(en_imm == 1'b 1) begin
@@ -357,6 +364,11 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
                 (data1_prev[15] == ~data2_prev[15]) && 
                 (s_output[15] != data1_prev[15])));
         end
+        if(opc_prev == `OPC_TEST) begin
+            assert(s_output[15:0] == (data1_prev & data2_prev) & 16'hffff);
+            assert(write == 0);
+            assert(flags_out[`FLAG_BIT_CARRY] == 0);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == 0);
         end
     end
 `endif
