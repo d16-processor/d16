@@ -52,43 +52,7 @@ reg s_data1_sign;
 reg s_data2_sign;
 wire [3:0] s_flags;
 reg ov_op;
-reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_vector(3 downto 0); code : std_logic_vector(3 downto 0)) return std_logic is
-//begin
-//case code is
-//when CONDITION_ALWAYS =>
-//return '1';
-//when CONDITION_EQ =>
-//return flags(FLAG_BIT_ZERO);
-//when CONDITION_NE =>
-//return not flags(FLAG_BIT_ZERO);
-//when CONDITION_OS =>
-//return flags(FLAG_BIT_OVERFLOW);
-//when CONDITION_OC =>
-//return not flags(FLAG_BIT_OVERFLOW);
-//when CONDITION_HI =>
-//return flags(FLAG_BIT_CARRY) and (not flags(FLAG_BIT_ZERO));
-//when CONDITION_LS =>
-//return (not flags(FLAG_BIT_CARRY)) and flags(FLAG_BIT_ZERO);
-//when CONDITION_P =>
-//return not flags(FLAG_BIT_SIGN);
-//when CONDITION_N =>
-//return flags(FLAG_BIT_SIGN);
-//when CONDITION_CS =>
-//return flags(FLAG_BIT_CARRY);
-//when CONDITION_CC =>
-//return not flags(FLAG_BIT_CARRY);
-//when CONDITION_G =>
-//return not (flags(FLAG_BIT_SIGN) xor flags(FLAG_BIT_OVERFLOW));
-//when CONDITION_GE =>
-//return (not (flags(FLAG_BIT_SIGN) xor flags(FLAG_BIT_OVERFLOW))) and (not flags(FLAG_BIT_ZERO));
-//when CONDITION_LE =>
-//return (flags(FLAG_BIT_SIGN) xor flags(FLAG_BIT_OVERFLOW)) and (flags(FLAG_BIT_ZERO));
-//when CONDITION_L =>
-//return flags(FLAG_BIT_SIGN) xor flags(FLAG_BIT_OVERFLOW);
-//when others =>
-//return '0';
-//end case;
-//end function get_should_branch;
+reg [15:0] s_mem_data;    
     assign data1 = rD_data;
     assign data2 = en_imm ? immediate : rS_data;
     assign out = s_output[15:0];
@@ -120,19 +84,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
             end
             endcase
             case(alu_control)
-            `OPC_CMP : begin
-                write <= 1'b 0;
-            end
-            `OPC_TEST: 
-                write <= 1'b0;
-
-            `OPC_ST : begin
-                write <= 1'b 0;
-            end
-            `OPC_JMP : begin
-                write <= 1'b 0;
-            end
-            `OPC_PUSH : begin
+            `OPC_CMP, `OPC_TEST, `OPC_ST, `OPC_JMP, `OPC_PUSH: begin
                 write <= 1'b 0;
             end
             default : begin
@@ -244,7 +196,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
                 end
             end
             `OPC_SET : begin
-                s_output[15:0] <= {15'b000,get_should_branch(flags_in,condition)};
+                s_output[16:0] <= {16'b000,get_should_branch(flags_in,condition)};
             end
             `OPC_TEST: begin
                 s_output[15:0] <= data1 & data2;
@@ -275,6 +227,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
     reg [15:0] data1_prev;
     reg [15:0] data2_prev;
     reg [3:0] flags_prev = 0;
+    reg [3:0] cond_prev = 0;
     always @* begin
         assert(data1 == rD_data);
         if(en_imm == 1) begin
@@ -287,7 +240,6 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
     always @(posedge clk) begin
         restrict(en == 1);
         restrict(en_imm == 0);
-        restrict(alu_control == `OPC_SAR);
         assert(flags_out[`FLAG_BIT_SIGN] == s_output[15]);
         assert(flags_out[`FLAG_BIT_ZERO] == (s_output[15:0] == 0));
         if(en == 1) begin
@@ -295,6 +247,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
             data1_prev <= data1;
             data2_prev <= data2;
             flags_prev <= flags_in;
+            cond_prev <= condition;
         end
         if(opc_prev == `OPC_ADD) begin
             assert(s_output[15:0] == (data1_prev+data2_prev) & 'hffff);
@@ -384,6 +337,16 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
                 assert(s_output[15:0] == {data1_prev[15],data1_prev[15:1]});
             if(data2_prev[3:0] == 2)
                 assert(s_output[15:0] == {data1_prev[15],data1_prev[15],data1_prev[15:2]});
+        end
+        if(opc_prev == `OPC_SET) begin
+            assert(s_output[0] == get_should_branch(flags_prev, cond_prev));
+            assert(s_output[16:1] == 0);
+            assert(flags_out[`FLAG_BIT_CARRY] == 0);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == 0);
+        end
+        if(opc_prev == `OPC_JMP) begin
+            assert(s_output == data1_prev);
+            assert(s_should_branch == get_should_branch(flags_prev,cond_prev));
         end
 
     end
