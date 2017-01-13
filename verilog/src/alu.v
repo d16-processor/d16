@@ -112,7 +112,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
             //end
             case(alu_control)
                         //overflow signals
-            `OPC_ADD,`OPC_SUB,`OPC_ADC,`OPC_SBB : begin
+            `OPC_ADD,`OPC_SUB,`OPC_ADC,`OPC_SBB,`OPC_CMP : begin
                 ov_op <= 1'b 1;
             end
             default : begin
@@ -186,7 +186,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
                 s_output[16] <= 1'b 0;
             end
             `OPC_NEG : begin
-                s_output[15:0] <= ( -((data1)));
+                s_output[15:0] <=  -data1;
                 s_output[16] <= 1'b 0;
             end
             `OPC_SHL : begin
@@ -207,7 +207,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
                 // rcl
             end
             `OPC_CMP : begin
-                s_output <= ({data1[15],data1} - {data2[15],data2});
+                s_output <= (data1 - data2);
                 s_data1_sign <= data1[15];
                 s_data2_sign <=    ~data2[15];
             end
@@ -263,6 +263,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
     reg [7:0] opc_prev = 0;
     reg [15:0] data1_prev;
     reg [15:0] data2_prev;
+    reg [3:0] flags_prev = 0;
     always @* begin
         assert(data1 == rD_data);
         if(en_imm == 1) begin
@@ -275,29 +276,35 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
     always @(posedge clk) begin
         restrict(en == 1);
         restrict(en_imm == 0);
-        //restrict(opc_prev == `OPC_SHR);
-        assume(en == 1);
         assert(flags_out[`FLAG_BIT_SIGN] == s_output[15]);
         assert(flags_out[`FLAG_BIT_ZERO] == (s_output[15:0] == 0));
         if(en == 1) begin
             opc_prev <= alu_control;
             data1_prev <= data1;
             data2_prev <= data2;
+            flags_prev <= flags_in;
         end
         if(opc_prev == `OPC_ADD) begin
             assert(s_output[15:0] == (data1_prev+data2_prev) & 'hffff);
             assert(flags_out[`FLAG_BIT_CARRY] == 
                 $unsigned({1'b0,data1_prev} + {1'b0,data2_prev}) > 17'hffff);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == ( 
+                (data1_prev[15] == data2_prev[15]) && 
+                (s_output[15] != data1_prev[15])));
         end
         if(opc_prev == `OPC_SUB) begin
             assert(s_output[15:0] == (data1_prev - data2_prev) & 'hffff);
             assert(flags_out[`FLAG_BIT_CARRY] == 
                 $unsigned({1'b0,data1_prev} - {1'b0,data2_prev}) > 17'hffff);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == ( 
+                (data1_prev[15] == ~data2_prev[15]) && 
+                (s_output[15] != data1_prev[15])));
         end
         if(opc_prev == `OPC_AND) begin
             assert(s_output[15:0] == (data1_prev[15:0] & data2_prev[15:0]) & 'hffff);
             assert(s_output[16] == 0);
             assert(flags_out[`FLAG_BIT_CARRY] == 0);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == 0);
         end
         if(opc_prev == `OPC_OR) begin
             assert(s_output[15:0] == (data1_prev[15:0] | data2_prev[15:0]) & 'hffff);
@@ -321,6 +328,35 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
         if(opc_prev == `OPC_SHR) begin
             assert(s_output[16:0] == {1'b0,data1_prev[15:0]} >> data2_prev);
             assert(flags_out[`FLAG_BIT_CARRY] == s_output[16]);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == 0);
+        end
+        if(opc_prev == `OPC_ADC) begin
+            assert(s_output[15:0] == (data1_prev+data2_prev + flags_prev[`FLAG_BIT_CARRY]) & 'hffff);
+            assert(flags_out[`FLAG_BIT_CARRY] == 
+                $unsigned({1'b0,data1_prev} + {1'b0,data2_prev} + 
+                    flags_prev[`FLAG_BIT_CARRY]) > 17'hffff);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == ( 
+                (data1_prev[15] == data2_prev[15]) && 
+                (s_output[15] != data1_prev[15])));
+        end
+        if(opc_prev == `OPC_SBB) begin
+            assert(s_output[15:0] == (data1_prev-data2_prev - flags_prev[`FLAG_BIT_CARRY]) & 'hffff);
+            assert(flags_out[`FLAG_BIT_CARRY] == 
+                $unsigned({1'b0,data1_prev} - {1'b0,data2_prev} - 
+                    flags_prev[`FLAG_BIT_CARRY]) > 17'hffff);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == ( 
+                (data1_prev[15] == ~data2_prev[15]) && 
+                (s_output[15] != data1_prev[15])));
+        end
+        if(opc_prev == `OPC_CMP) begin
+            assert(s_output[15:0] == (data1_prev - data2_prev) & 16'hffff);
+            assert(write == 0);
+            assert(flags_out[`FLAG_BIT_CARRY] == 
+                $unsigned({1'b0,data1_prev} - {1'b0,data2_prev}) > 17'hffff);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == ( 
+                (data1_prev[15] == ~data2_prev[15]) && 
+                (s_output[15] != data1_prev[15])));
+        end
         end
     end
 `endif
