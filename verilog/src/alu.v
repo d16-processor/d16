@@ -20,6 +20,7 @@
 // considered unchanged from the original VHDL.
 
 // no timescale needed
+`timescale 1ns/1ps
 `include "cpu_constants.vh"
 module alu(
 input wire clk,
