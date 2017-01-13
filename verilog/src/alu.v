@@ -200,6 +200,10 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
                 s_output <= {1'b0,data1} >> data2; 
                 //shift_right
             end
+            `OPC_SAR : begin
+                s_output[15:0] <= $signed(data1) >>> $unsigned(data2[3:0]); 
+                s_output[16] <= 0;
+            end
             `OPC_ROL : begin
                 s_output[15:0] <= 16'hbeef;
                 //rol
@@ -283,6 +287,7 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
     always @(posedge clk) begin
         restrict(en == 1);
         restrict(en_imm == 0);
+        restrict(alu_control == `OPC_SAR);
         assert(flags_out[`FLAG_BIT_SIGN] == s_output[15]);
         assert(flags_out[`FLAG_BIT_ZERO] == (s_output[15:0] == 0));
         if(en == 1) begin
@@ -370,6 +375,17 @@ reg [15:0] s_mem_data;    //pure function get_should_branch(flags : std_logic_ve
             assert(flags_out[`FLAG_BIT_CARRY] == 0);
             assert(flags_out[`FLAG_BIT_OVERFLOW] == 0);
         end
+        if(opc_prev == `OPC_SAR) begin
+            assume(data2_prev[15:4] == 0);
+            assert($signed(s_output[15:0]) == $signed(($signed(data1_prev) >>> data2_prev[3:0])));
+            assert(flags_out[`FLAG_BIT_CARRY] == 0);
+            assert(flags_out[`FLAG_BIT_OVERFLOW] == 0);
+            if(data2_prev[3:0] == 1)
+                assert(s_output[15:0] == {data1_prev[15],data1_prev[15:1]});
+            if(data2_prev[3:0] == 2)
+                assert(s_output[15:0] == {data1_prev[15],data1_prev[15],data1_prev[15:2]});
+        end
+
     end
 `endif
     function get_should_branch;
