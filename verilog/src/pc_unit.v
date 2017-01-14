@@ -31,8 +31,13 @@ pc_out
 
 input clk;
 input en;
+`ifdef FORMAL
+input [15:0] pc_in = 0;
+input [1:0] pc_op = 0;
+`else
 input [15:0] pc_in;
 input [1:0] pc_op;
+`endif
 output [15:0] pc_out;
 
 wire clk;
@@ -67,37 +72,24 @@ reg [15:0] pc = 16'h 0000;
   end
   //Formally verified
 `ifdef FORMAL
-    reg [1:0] op_prev = 0;
-    reg [15:0] pc_prev = 0;
-    reg [15:0] set_prev = 0;
-    always @(posedge clk) begin
-        if(en == 1) begin
-            pc_prev <= pc;
-            op_prev <= pc_op;
-            set_prev <= pc_in;
-        end
-    end
-    initial begin 
-        assume(pc_op == `PC_NOP);
-        assume(op_prev == pc_op);
+    initial begin
+        assume(pc_op == `PC_RESET);
         assume(pc_in == 0);
         assume(pc == 0);
-        assume(pc_prev == pc);
-        assume(set_prev == 0);
         assume(clk == 0);
-        //assert(pc_op == op_prev);
     end
-    always @(*) begin
+    always @(posedge clk) begin
         assume(en == 1);
-        if(op_prev == `PC_RESET)
+        if($past(pc_op) == `PC_RESET)
             assert(pc == 0);
-        if(op_prev == `PC_NOP)
-            assert(pc == pc_prev);
-        if(op_prev == `PC_INC)
-            assert(pc == (pc_prev + 16'h2));
-        if(op_prev == `PC_SET)
-            assert(pc == set_prev);
+        if($past(pc_op) == `PC_NOP)
+            assert($past(pc) == pc);
+        if($past(pc_op) == `PC_SET)
+            assert(pc == $past(pc_in));
+        if($past(pc_op) == `PC_INC)
+            assert(pc == ($past(pc) + 16'h2));
     end
+
 `endif
 
 endmodule
