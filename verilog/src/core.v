@@ -1,7 +1,7 @@
 //deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
-module core(input clk,input rst, output [4:0] LED);
+module core(input clk,input rst_n, output [4:0] LED);
 /*AUTOWIRE*/
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [15:0]             SP_out;                 // From alu of alu.v
@@ -36,6 +36,7 @@ wire [15:0]             data_in;
 wire mem_enable, write_enable, byte_enable, byte_select;
 wire reg_write_enable, rS_wr_en;
 wire en;
+wire rst;
 
 reg [1:0]              pc_op;
 reg [3:0]              flags_in;
@@ -138,7 +139,8 @@ mem mem(
     assign rS_data_in = SP_out;
     assign rS_wr_en = 0; //TODO: add select for PUSH and POP
     assign data_in = mem_data;
-    assign en = 1;
+    assign en = rst_n; //! rst
+	 assign rst = ~rst_n;
     assign LED[4:0] = alu_output[4:0];
     always @(posedge clk) begin
         if (rst == 1)
