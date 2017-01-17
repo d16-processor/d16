@@ -1,5 +1,5 @@
 //deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v
-`timescale 1ps/1ns
+`timescale 1ns/1ps
 `include "cpu_constants.vh"
 module core(input clk,input rst, output [4:0] LED);
 /*AUTOWIRE*/
@@ -26,10 +26,7 @@ wire                    alu_wr_en;                  // From alu of alu.v
 wire                    en_immediate;
 wire [15:0]             rD_data;
 wire [15:0]             rS_data;
-wire [3:0]              flags_in;
-wire [15:0]             instruction;
 wire [15:0]             pc_in;
-wire [1:0]              pc_op;
 wire [15:0]             dec_immediate;
 wire en_alu, en_pc, en_decoder, en_register;
 wire [15:0]             addr;
@@ -39,6 +36,10 @@ wire [15:0]             data_in;
 wire mem_enable, write_enable, byte_enable, byte_select;
 wire reg_write_enable, rS_wr_en;
 wire en;
+
+reg [1:0]              pc_op;
+reg [3:0]              flags_in;
+reg [15:0]             instruction;
 // End of automatics
 alu alu(
         // Outputs
