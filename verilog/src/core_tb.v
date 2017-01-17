@@ -4,7 +4,7 @@ module core_tb;
 /*AUTOREGINPUT*/
 // Beginning of automatic reg inputs (for undeclared instantiated-module inputs)
 reg                     clk;                    // To core of core.v
-reg                     rst;                    // To core of core.v
+reg                     rst_n;                  // To core of core.v
 // End of automatics
 /*AUTOWIRE*/
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
@@ -15,18 +15,20 @@ core core(/*AUTOINST*/
           .LED                          (LED[4:0]),
           // Inputs
           .clk                          (clk),
-          .rst                          (rst));
+          .rst_n                        (rst_n));
 initial begin
     clk <= 0;
-    rst <= 1;
+    rst_n <= 0;
 
     $dumpfile("dump.vcd");
     $dumpvars;
 end
 always #5 clk <= ~clk;
 initial begin
-    #20 rst <= 0;
+    #20 rst_n <= 1;
 
+    #300 rst_n <= 0;
+    #20 rst_n <= 1;
     #500 $finish;
 end
 endmodule

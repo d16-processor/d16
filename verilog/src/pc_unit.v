@@ -24,6 +24,7 @@
 module pc_unit(
 clk,
 en,
+rst,
 pc_in,
 pc_op,
 pc_out
@@ -31,6 +32,7 @@ pc_out
 
 input clk;
 input en;
+input rst;
 `ifdef FORMAL
 input [15:0] pc_in;
 input [1:0] pc_op;
@@ -51,7 +53,9 @@ reg [15:0] pc = 16'h 0000;
 
   assign pc_out = pc;
   always @(posedge clk) begin
-    if(en == 1'b 1) begin
+    if(rst == 1) 
+        pc <= 0;
+    else if(en == 1'b 1) begin
       case(pc_op)
       `PC_NOP : begin
         pc <= pc;
@@ -83,7 +87,7 @@ reg [15:0] pc = 16'h 0000;
             assume($past(pc_op) == `PC_NOP);
             assume($past(pc) == 0);
         end
-        assume(en == 1);
+        assume(en == 1 && rst == 0);
         if($past(pc_op) == `PC_RESET)
             assert(pc == 0);
         if($past(pc_op) == `PC_NOP)

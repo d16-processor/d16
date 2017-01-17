@@ -24,7 +24,7 @@ always @(posedge clk) begin
         s_addr <= 0;
         /*AUTORESET*/
     end
-    if(en == 1)begin
+    else if(en == 1)begin
         if(addr < 64) begin
             if(write_enable == 1) begin
                 if(byte_enable == 1) begin

@@ -93,6 +93,7 @@ pc_unit pc_unit(
                 // Inputs
                 .clk                    (clk),
                 .en                     (en_pc),
+                .rst                    (rst),
                 .pc_in                  (pc_in[15:0]),
                 .pc_op                  (pc_op[1:0]));
 register_unit reg_unit(
@@ -102,6 +103,7 @@ register_unit reg_unit(
                        // Inputs
                        .clk             (clk),
                        .en              (en_register),
+                       .rst             (rst),
                        .wr_en           (reg_write_enable),
                        .rS_wr_en        (rS_wr_en),
                        .rD_sel          (rD_sel[2:0]),
