@@ -8,11 +8,11 @@ reg                     rst_n;                  // To core of core.v
 // End of automatics
 /*AUTOWIRE*/
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
-wire [4:0]              LED;                    // From core of core.v
+wire [7:0]              LED;                    // From core of core.v
 // End of automatics
 core core(/*AUTOINST*/
           // Outputs
-          .LED                          (LED[4:0]),
+          .LED                          (LED[7:0]),
           // Inputs
           .clk                          (clk),
           .rst_n                        (rst_n));
@@ -27,8 +27,6 @@ always #5 clk <= ~clk;
 initial begin
     #20 rst_n <= 1;
 
-    #300 rst_n <= 0;
-    #20 rst_n <= 1;
-    #500 $finish;
+    #1000 $finish;
 end
 endmodule
