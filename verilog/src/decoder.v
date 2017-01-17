@@ -46,7 +46,8 @@ reg [2:0] s_rS_sel;
 reg [15:0] s_immediate;
 reg s_en_imm;
 reg s_next_word;
-
+wire [7:0] opcode;
+assign opcode = instruction[15:8];
 assign alu_control = s_alu_control;
 assign rD_sel = s_rD_sel;
 assign rS_sel = s_rS_sel;
@@ -54,10 +55,8 @@ assign immediate = s_immediate;
 assign en_immediate = s_en_imm;
 assign next_word = s_next_word;
 always @(posedge clk) begin : P1
-    reg [7:0] opcode;
 
     if(en == 1'b 1) begin
-        opcode = instruction[15:8];
         if((((opcode)) <= ((`OPC_MOVB_R7)) && ((opcode)) >= ((`OPC_MOVB_R0)))) begin
             s_en_imm <= 1'b 1;
             s_alu_control <= `OPC_MOV;
@@ -139,12 +138,11 @@ initial begin
     assume(s_en_imm == 0);
     assume(s_immediate == 0);
     assume(opcode_prev == 0);
-    assume(s_en_mem == 0);
     assume(s_next_word == 0);
 end
 always @(posedge clk) begin
         instr_prev <= instruction;
-        opcode_prev <= instruction[15:8];
+        opcode_prev <= opcode;
     if(opcode_prev == `OPC_ADD) begin
         assert(s_en_imm == 0);
         assert(s_alu_control == `OPC_ADD);
@@ -163,6 +161,39 @@ always @(posedge clk) begin
     end
     
 end
+`endif
+`ifdef FORMAL
+    initial begin
+        assume(instruction == 0);
+        assume(s_rD_sel == 0);
+        assume(s_rS_sel == 0);
+    end
+    always @(posedge clk) begin
+        if($initstate) begin
+            assume($past(instruction) == 0);
+            assume($past(opcode) == 0);
+        end
+        if($past(opcode) & 8'h80)
+            assert(s_next_word == 1);
+        else
+            assert(s_next_word == 0);
+        if($past(opcode) >= `OPC_MOVB_R0 && opcode_prev <= `OPC_MOVB_R7) begin
+            assert(s_next_word == 0);
+            assert(s_en_imm == 1);
+            assert(s_rD_sel == ($past(opcode) - `OPC_MOVB_R0 & 3'b110));
+            assert(s_immediate == ($past(instruction) & 8'hff));
+        end
+        else begin
+            assert(s_alu_control == ($past(opcode) & 8'h7f));
+            assert(s_rD_sel == ($past(instruction) & 3'b111));
+            if($past(opcode) != `OPC_PUSH && $past(opcode) != `OPC_POP &&
+                $past(opcode) != `OPC_PUSHI)
+                assert(s_rS_sel == (($past(instruction) & 6'b111000) >> 3));
+            else
+                assert(s_rS_sel == 3'b111);
+        end
+        
+    end
 `endif
 
 

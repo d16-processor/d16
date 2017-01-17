@@ -32,8 +32,8 @@ pc_out
 input clk;
 input en;
 `ifdef FORMAL
-input [15:0] pc_in = 0;
-input [1:0] pc_op = 0;
+input [15:0] pc_in;
+input [1:0] pc_op;
 `else
 input [15:0] pc_in;
 input [1:0] pc_op;
@@ -79,6 +79,10 @@ reg [15:0] pc = 16'h 0000;
         assume(clk == 0);
     end
     always @(posedge clk) begin
+        if($initstate == 1) begin
+            assume($past(pc_op) == `PC_NOP);
+            assume($past(pc) == 0);
+        end
         assume(en == 1);
         if($past(pc_op) == `PC_RESET)
             assert(pc == 0);

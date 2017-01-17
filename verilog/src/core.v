@@ -1,20 +1,67 @@
-//deps: alu.v control.v mem.v pc_unit.v register_unit.v
+//deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v
 `timescale 1ps/1ns
 `include "cpu_constants.vh"
-module core(input clk,input rst);
+module core(input clk,input rst, output [4:0] LED);
 /*AUTOWIRE*/
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [15:0]             SP_out;                 // From alu of alu.v
-wire [`CONTROL_BIT_MAX:0] control_o;            // From control of control.v
+wire [7:0]              alu_control;            // From decoder of decoder.v
+wire [3:0]              condition;              // From decoder of decoder.v
+wire [`CONTROL_BIT_MAX:0] control_state;            // From control of control.v
+wire [15:0]             data_out;               // From mem of mem.v
+wire                    en_mem;                 // From decoder of decoder.v
 wire [3:0]              flags_out;              // From alu of alu.v
+wire [15:0]             immediate;              // From decoder of decoder.v
+wire                    mem_byte;               // From decoder of decoder.v
 wire [15:0]             mem_data;               // From alu of alu.v
-wire [15:0]             out;                    // From alu of alu.v
+wire                    mem_displacement;       // From decoder of decoder.v
+wire                    mem_wait;               // From mem of mem.v
+wire                    next_word;              // From decoder of decoder.v
+wire [15:0]             alu_output;                    // From alu of alu.v
+wire [15:0]             pc_out;                 // From pc_unit of pc_unit.v
+wire [2:0]              rD_sel;                 // From decoder of decoder.v
+wire [2:0]              rS_sel;                 // From decoder of decoder.v
 wire                    should_branch;          // From alu of alu.v
-wire                    write;                  // From alu of alu.v
+wire                    alu_wr_en;                  // From alu of alu.v
+wire                    en_immediate;
+wire [15:0]             rD_data;
+wire [15:0]             rS_data;
+wire [3:0]              flags_in;
+wire [15:0]             instruction;
+wire [15:0]             pc_in;
+wire [1:0]              pc_op;
+wire [15:0]             dec_immediate;
+wire en_alu, en_pc, en_decoder, en_register;
+wire [15:0]             addr;
+wire [15:0]             mem_addr_out;
+wire [15:0]             rS_data_in, rD_data_in;
+wire [15:0]             data_in;
+wire mem_enable, write_enable, byte_enable, byte_select;
+wire reg_write_enable, rS_wr_en;
+wire en;
 // End of automatics
-control control(/*AUTOINST*/
+alu alu(
+        // Outputs
+        .should_branch                  (should_branch),
+        .out                            (alu_output[15:0]),
+        .mem_data                       (mem_data[15:0]),
+        .write                          (alu_wr_en),
+        .flags_out                      (flags_out[3:0]),
+        .SP_out                         (SP_out[15:0]),
+        // Inputs
+        .clk                            (clk),
+        .en                             (en_alu),
+        .alu_control                    (alu_control[7:0]),
+        .en_imm                         (en_immediate),
+        .rD_data                        (rD_data[15:0]),
+        .rS_data                        (rS_data[15:0]),
+        .immediate                      (immediate[15:0]),
+        .condition                      (condition[3:0]),
+        .flags_in                       (flags_in[3:0]),
+        .mem_displacement               (mem_displacement));
+control control(
                 // Outputs
-                .control_o              (control_o[`CONTROL_BIT_MAX:0]),
+                .control_o              (control_state[`CONTROL_BIT_MAX:0]),
                 // Inputs
                 .clk                    (clk),
                 .en                     (en),
@@ -22,24 +69,98 @@ control control(/*AUTOINST*/
                 .en_mem                 (en_mem),
                 .mem_wait               (mem_wait),
                 .should_branch          (should_branch));
-alu alu(/*AUTOINST*/
+decoder decoder(
+                // Outputs
+                .alu_control            (alu_control[7:0]),
+                .rD_sel                 (rD_sel[2:0]),
+                .rS_sel                 (rS_sel[2:0]),
+                .immediate              (dec_immediate[15:0]),
+                .en_immediate           (en_immediate),
+                .next_word              (next_word),
+                .en_mem                 (en_mem),
+                .mem_displacement       (mem_displacement),
+                .mem_byte               (mem_byte),
+                .condition              (condition[3:0]),
+                // Inputs
+                .clk                    (clk),
+                .en                     (en_decoder),
+                .instruction            (instruction[15:0]));
+pc_unit pc_unit(
+                // Outputs
+                .pc_out                 (pc_out[15:0]),
+                // Inputs
+                .clk                    (clk),
+                .en                     (en_pc),
+                .pc_in                  (pc_in[15:0]),
+                .pc_op                  (pc_op[1:0]));
+register_unit reg_unit(
+                       // Outputs
+                       .rD_data_out     (rD_data[15:0]),
+                       .rS_data_out     (rS_data[15:0]),
+                       // Inputs
+                       .clk             (clk),
+                       .en              (en_register),
+                       .wr_en           (reg_write_enable),
+                       .rS_wr_en        (rS_wr_en),
+                       .rD_sel          (rD_sel[2:0]),
+                       .rS_sel          (rS_sel[2:0]),
+                       .rD_data_in      (rD_data_in[15:0]),
+                       .rS_data_in      (rS_data_in[15:0]));
+mem mem(
         // Outputs
-        .should_branch                  (should_branch),
-        .out                            (out[15:0]),
-        .mem_data                       (mem_data[15:0]),
-        .write                          (write),
-        .flags_out                      (flags_out[3:0]),
-        .SP_out                         (SP_out[15:0]),
+        .data_out                       (data_out[15:0]),
+        .mem_wait                       (mem_wait),
         // Inputs
         .clk                            (clk),
-        .en                             (en),
-        .alu_control                    (alu_control[7:0]),
-        .en_imm                         (en_imm),
-        .rD_data                        (rD_data[15:0]),
-        .rS_data                        (rS_data[15:0]),
-        .immediate                      (immediate[15:0]),
-        .condition                      (condition[3:0]),
-        .flags_in                       (flags_in[3:0]),
-        .mem_displacement               (mem_displacement));
-decoder decoder(/*AUTOINST*/);
+        .rst                            (rst),
+        .en                             (mem_enable),
+        .write_enable                   (write_enable),
+        .byte_select                    (byte_select),
+        .byte_enable                    (byte_enable),
+        .addr                           (addr[15:0]),
+        .data_in                        (data_in[15:0]));
+
+    assign en_alu = control_state == `STATE_ALU;
+    assign en_decoder = control_state == `STATE_DECODE;
+    assign en_pc = control_state == `STATE_FETCH || control_state == `STATE_REG_READ || control_state == `STATE_PC_DELAY;
+    assign en_register = control_state == `STATE_REG_READ || control_state == `STATE_REG_WR;
+    assign mem_enable = 1;
+    assign write_enable = control_state == `STATE_MEM && {1'b0,instruction[14:8]} == `OPC_ST || {1'b0,instruction[14:8]} == `OPC_PUSH;
+    assign reg_write_enable = control_state == `STATE_REG_WR ? alu_wr_en : 0;
+    assign immediate = next_word ? data_out : dec_immediate;
+    assign rD_data_in = en_mem ? data_out : alu_output;
+    assign pc_in = alu_output;
+    assign mem_addr_out = control_state == `STATE_MEM ? alu_output : pc_out;
+    assign byte_select = addr[0];
+    assign byte_enable = control_state == `STATE_MEM ? mem_byte : 0;
+    assign addr = {1'b0,mem_addr_out[15:1]};
+    assign rS_data_in = SP_out;
+    assign rS_wr_en = 0; //TODO: add select for PUSH and POP
+    assign data_in = mem_data;
+    assign en = 1;
+    assign LED[4:0] = alu_output[4:0];
+    always @(posedge clk) begin
+        if (rst == 1)
+            flags_in <= 0;
+        else
+            case (control_state)
+                `STATE_FETCH:
+                    instruction <= data_out;
+                `STATE_REG_WR:
+                    if(should_branch == 1)
+                        pc_op <= `PC_SET;
+                    else
+                        pc_op <= `PC_INC;
+                `STATE_PC_DELAY:
+                    pc_op <= `PC_INC;
+                `STATE_DECODE: begin
+                    flags_in <= flags_out;
+                    if (data_out[15] == 1 )
+                        pc_op <= `PC_INC;
+                    else
+                        pc_op <= `PC_NOP;
+                end
+
+            endcase
+        end
 endmodule
