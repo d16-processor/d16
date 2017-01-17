@@ -8,22 +8,24 @@ module mem(
     input byte_enable,
     input [15:0] addr,
     input [15:0] data_in,
-    output reg [15:0] data_out,
+    output [15:0] data_out,
     output mem_wait);
 
 reg [15:0] mem_storage [0:63];
+reg [15:0] s_addr = 0;
+
 initial begin
     $readmemh("mem.hex",mem_storage);
 end
 assign mem_wait = 0;
+assign data_out = mem_storage[s_addr];
 always @(posedge clk) begin
     if (rst == 1) begin
-        data_out <= 0;
+        s_addr <= 0;
         /*AUTORESET*/
     end
     if(en == 1)begin
         if(addr < 64) begin
-            data_out <= mem_storage[addr[5:0]];
             if(write_enable == 1) begin
                 if(byte_enable == 1) begin
                     if(byte_select == 1)
@@ -35,6 +37,8 @@ always @(posedge clk) begin
                     mem_storage[addr[5:0]] <= data_in;
             end
         end
+		  s_addr <= addr;
+		  
     end
 end
 endmodule

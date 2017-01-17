@@ -354,6 +354,7 @@ reg [15:0] s_mem_data;
     function get_should_branch;
     input [3:0] flags;
     input [3:0] code;
+    begin
     case (code)
         `CONDITION_ALWAYS: get_should_branch = 1;
         `CONDITION_EQ: get_should_branch = flags[`FLAG_BIT_ZERO];
@@ -376,7 +377,8 @@ reg [15:0] s_mem_data;
             flags[`FLAG_BIT_SIGN] ^ flags[`FLAG_BIT_OVERFLOW];
         default:       get_should_branch = 0;
 
-    endcase;
+    endcase
+    end
     endfunction
 
 endmodule
