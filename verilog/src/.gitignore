@@ -3,3 +3,7 @@
 *.swp
 *~
 *.smt2
+*.bin
+*.s
+*.hex
+*.blif

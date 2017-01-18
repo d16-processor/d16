@@ -350,6 +350,31 @@ reg [15:0] s_mem_data;
         end
 
     end
+    reg [3:0] tflags;
+    // bit 3210
+    // fl  VNCZ
+    assert property(get_should_branch(tflags, `CONDITION_ALWAYS) == 1);
+    assert property(get_should_branch(tflags, `CONDITION_NEVER) == 0);
+    assert property(get_should_branch(tflags, `CONDITION_EQ) == tflags[`FLAG_BIT_ZERO]);
+    assert property(get_should_branch(tflags, `CONDITION_NE) == !tflags[`FLAG_BIT_ZERO]);
+    assert property(get_should_branch(tflags, `CONDITION_CS) == tflags[`FLAG_BIT_CARRY]);
+    assert property(get_should_branch(tflags, `CONDITION_CC) == !tflags[`FLAG_BIT_CARRY]);
+    assert property(get_should_branch(tflags, `CONDITION_OS) == tflags[`FLAG_BIT_OVERFLOW]);
+    assert property(get_should_branch(tflags, `CONDITION_OC) == !tflags[`FLAG_BIT_OVERFLOW]);
+    assert property(get_should_branch(tflags, `CONDITION_P) == !tflags[`FLAG_BIT_SIGN]);
+    assert property(get_should_branch(tflags, `CONDITION_N) == tflags[`FLAG_BIT_SIGN]);
+    assert property(get_should_branch(tflags, `CONDITION_HI) == 
+        ((tflags[`FLAG_BIT_CARRY] == 1) && (tflags[`FLAG_BIT_ZERO] == 0)));
+    assert property(get_should_branch(tflags, `CONDITION_LS) == 
+        ((tflags[`FLAG_BIT_CARRY] == 0) || (tflags[`FLAG_BIT_ZERO] == 1)));
+    assert property(get_should_branch(tflags, `CONDITION_GE) ==
+        (tflags[`FLAG_BIT_SIGN] == tflags[`FLAG_BIT_OVERFLOW]));
+    assert property(get_should_branch(tflags, `CONDITION_L) ==
+        (tflags[`FLAG_BIT_SIGN] != tflags[`FLAG_BIT_OVERFLOW]));
+    assert property(get_should_branch(tflags, `CONDITION_G) ==
+        (tflags[`FLAG_BIT_ZERO] == 0 && (tflags[`FLAG_BIT_SIGN] == tflags[`FLAG_BIT_OVERFLOW])));
+    assert property(get_should_branch(tflags, `CONDITION_LE) ==
+        (tflags[`FLAG_BIT_ZERO] == 1 || (tflags[`FLAG_BIT_SIGN] != tflags[`FLAG_BIT_OVERFLOW])));
 `endif
     function get_should_branch;
     input [3:0] flags;
@@ -362,17 +387,17 @@ reg [15:0] s_mem_data;
         `CONDITION_OS: get_should_branch = flags[`FLAG_BIT_OVERFLOW];
         `CONDITION_OC: get_should_branch = ~flags[`FLAG_BIT_OVERFLOW];
         `CONDITION_HI: get_should_branch = flags[`FLAG_BIT_CARRY] & ~flags[`FLAG_BIT_ZERO];
-        `CONDITION_LS: get_should_branch = ~flags[`FLAG_BIT_CARRY] & flags[`FLAG_BIT_ZERO];
+        `CONDITION_LS: get_should_branch = ~flags[`FLAG_BIT_CARRY] | flags[`FLAG_BIT_ZERO];
         `CONDITION_P:  get_should_branch = ~flags[`FLAG_BIT_SIGN];
         `CONDITION_N:  get_should_branch = flags[`FLAG_BIT_SIGN];
         `CONDITION_CS: get_should_branch = flags[`FLAG_BIT_CARRY];
         `CONDITION_CC: get_should_branch = ~flags[`FLAG_BIT_CARRY];
-        `CONDITION_G:  get_should_branch = 
+        `CONDITION_GE:  get_should_branch = 
             ~flags[`FLAG_BIT_SIGN] ^ flags[`FLAG_BIT_OVERFLOW];
-        `CONDITION_GE: get_should_branch = 
+        `CONDITION_G: get_should_branch = 
             (~flags[`FLAG_BIT_SIGN] ^ flags[`FLAG_BIT_OVERFLOW]) & ~flags[`FLAG_BIT_ZERO];
         `CONDITION_LE: get_should_branch =
-            (flags[`FLAG_BIT_SIGN] ^ flags[`FLAG_BIT_OVERFLOW]) & flags[`FLAG_BIT_ZERO];
+            (flags[`FLAG_BIT_SIGN] ^ flags[`FLAG_BIT_OVERFLOW]) | flags[`FLAG_BIT_ZERO];
         `CONDITION_L:  get_should_branch =
             flags[`FLAG_BIT_SIGN] ^ flags[`FLAG_BIT_OVERFLOW];
         default:       get_should_branch = 0;
