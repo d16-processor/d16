@@ -45,6 +45,7 @@ output reg [15:0] SP_out
 //nonblocking "variable" registers
 wire [15:0] data1;
 wire [15:0] data2;
+wire [32:0] data1_double;
 
 reg [16:0] s_output = 0;
 reg s_should_branch = 1'b 0;
@@ -157,7 +158,7 @@ reg [15:0] s_mem_data;
                 s_output[16] <= 0;
             end
             `OPC_ROL : begin
-                s_output[15:0] <= 16'hbeef;
+                s_output[15:0] <= {data1,data1} >> (16-data2[3:0]);
                 //rol
                 s_output[16] <= 1'b 0;
             end
