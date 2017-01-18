@@ -353,6 +353,9 @@ reg [15:0] s_mem_data;
     reg [3:0] tflags;
     // bit 3210
     // fl  VNCZ
+    // taken directly from https://www.community.arm.com/processors/b/blog/posts/condition-codes-1-condition-flags-and-codes
+    // And I forgot that ARM's carry is cleared when there is a subtraction
+    // with borrow. Whoops
     assert property(get_should_branch(tflags, `CONDITION_ALWAYS) == 1);
     assert property(get_should_branch(tflags, `CONDITION_NEVER) == 0);
     assert property(get_should_branch(tflags, `CONDITION_EQ) == tflags[`FLAG_BIT_ZERO]);
@@ -364,9 +367,9 @@ reg [15:0] s_mem_data;
     assert property(get_should_branch(tflags, `CONDITION_P) == !tflags[`FLAG_BIT_SIGN]);
     assert property(get_should_branch(tflags, `CONDITION_N) == tflags[`FLAG_BIT_SIGN]);
     assert property(get_should_branch(tflags, `CONDITION_HI) == 
-        ((tflags[`FLAG_BIT_CARRY] == 1) && (tflags[`FLAG_BIT_ZERO] == 0)));
+        ((tflags[`FLAG_BIT_CARRY] == 0) && (tflags[`FLAG_BIT_ZERO] == 0)));
     assert property(get_should_branch(tflags, `CONDITION_LS) == 
-        ((tflags[`FLAG_BIT_CARRY] == 0) || (tflags[`FLAG_BIT_ZERO] == 1)));
+        ((tflags[`FLAG_BIT_CARRY] == 1) || (tflags[`FLAG_BIT_ZERO] == 1)));
     assert property(get_should_branch(tflags, `CONDITION_GE) ==
         (tflags[`FLAG_BIT_SIGN] == tflags[`FLAG_BIT_OVERFLOW]));
     assert property(get_should_branch(tflags, `CONDITION_L) ==
@@ -386,8 +389,8 @@ reg [15:0] s_mem_data;
         `CONDITION_NE: get_should_branch = ~flags[`FLAG_BIT_ZERO];
         `CONDITION_OS: get_should_branch = flags[`FLAG_BIT_OVERFLOW];
         `CONDITION_OC: get_should_branch = ~flags[`FLAG_BIT_OVERFLOW];
-        `CONDITION_HI: get_should_branch = flags[`FLAG_BIT_CARRY] & ~flags[`FLAG_BIT_ZERO];
-        `CONDITION_LS: get_should_branch = ~flags[`FLAG_BIT_CARRY] | flags[`FLAG_BIT_ZERO];
+        `CONDITION_HI: get_should_branch = ~flags[`FLAG_BIT_CARRY] & ~flags[`FLAG_BIT_ZERO];
+        `CONDITION_LS: get_should_branch = flags[`FLAG_BIT_CARRY] | flags[`FLAG_BIT_ZERO];
         `CONDITION_P:  get_should_branch = ~flags[`FLAG_BIT_SIGN];
         `CONDITION_N:  get_should_branch = flags[`FLAG_BIT_SIGN];
         `CONDITION_CS: get_should_branch = flags[`FLAG_BIT_CARRY];
