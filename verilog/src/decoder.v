@@ -181,7 +181,7 @@ end
         if($past(opcode) >= `OPC_MOVB_R0 && opcode_prev <= `OPC_MOVB_R7) begin
             assert(s_next_word == 0);
             assert(s_en_imm == 1);
-            assert(s_rD_sel == ($past(opcode) - `OPC_MOVB_R0 & 3'b110));
+            assert(s_rD_sel == ($past(opcode) - `OPC_MOVB_R0 & 3'b111));
             assert(s_immediate == ($past(instruction) & 8'hff));
         end
         else begin
