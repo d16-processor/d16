@@ -180,7 +180,7 @@ reg [15:0] s_mem_data;
             end
             `OPC_ST : begin
                 if(mem_displacement == 1'b 1) begin
-                    s_output[15:0] <= (((rS_data)) + ((immediate)));
+                    s_output[15:0] <= rS_data + immediate;
                 end
                 else begin
                     s_output[15:0] <= data2;
@@ -188,12 +188,10 @@ reg [15:0] s_mem_data;
                 s_mem_data <= data1;
             end
             `OPC_LD : begin
-                if(mem_displacement == 1'b 1) begin
-                    s_output[15:0] <= (((rS_data)) + ((immediate)));
-                end
-                else begin
+                if(mem_displacement == 1'b 1) 
+                    s_output[15:0] <= rS_data + immediate;
+                else 
                     s_output[15:0] <= data2;
-                end
             end
             `OPC_SET : begin
                 s_output[16:0] <= {16'b000,get_should_branch(flags_in,condition)};
@@ -226,8 +224,12 @@ reg [15:0] s_mem_data;
     reg [7:0] opc_prev = 0;
     reg [15:0] data1_prev;
     reg [15:0] data2_prev;
+    reg [15:0] rS_data_prev = 0;
     reg [3:0] flags_prev = 0;
     reg [3:0] cond_prev = 0;
+    reg mem_disp_prev = 0;
+    reg en_imm_prev = 0;
+    restrict property(en == 1);
     always @* begin
         assert(data1 == rD_data);
         if(en_imm == 1) begin
@@ -238,16 +240,17 @@ reg [15:0] s_mem_data;
         end
     end
     always @(posedge clk) begin
-        restrict(en == 1);
-        restrict(en_imm == 0);
         assert(flags_out[`FLAG_BIT_SIGN] == s_output[15]);
         assert(flags_out[`FLAG_BIT_ZERO] == (s_output[15:0] == 0));
         if(en == 1) begin
             opc_prev <= alu_control;
             data1_prev <= data1;
             data2_prev <= data2;
+            rS_data_prev <= rS_data;
             flags_prev <= flags_in;
             cond_prev <= condition;
+            mem_disp_prev <= mem_displacement;
+            en_imm_prev <= en_imm;
         end
         if(opc_prev == `OPC_ADD) begin
             assert(s_output[15:0] == (data1_prev+data2_prev) & 'hffff);
@@ -345,8 +348,30 @@ reg [15:0] s_mem_data;
             assert(flags_out[`FLAG_BIT_OVERFLOW] == 0);
         end
         if(opc_prev == `OPC_JMP) begin
-            assert(s_output == data1_prev);
+            if(en_imm_prev == 0)
+                assert(s_output == data1_prev);
+            else
+                assert(s_output == data2_prev);
             assert(s_should_branch == get_should_branch(flags_prev,cond_prev));
+            assert(write == 0);
+        end
+        if(opc_prev == `OPC_LD) begin
+            if(mem_disp_prev == 1) begin
+                assume(en_imm_prev == 1);
+                assert(s_output[15:0] == (data2_prev + rS_data_prev) & 16'hffff);
+            end
+            else
+                assert(s_output[15:0] == data2_prev[15:0]);
+        end
+        if(opc_prev == `OPC_ST) begin
+            if(mem_disp_prev == 1) begin
+                assume(en_imm_prev == 1);
+                assert(s_output[15:0] == (data2_prev + rS_data_prev) & 16'hffff);
+            end
+            else
+                assert(s_output[15:0] == data2_prev[15:0]);
+            assert(s_mem_data == data1_prev);
+            assert(write == 0);
         end
 
     end
