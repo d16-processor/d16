@@ -21,6 +21,7 @@
 
 // no timescale needed
 `include "cpu_constants.vh"
+`timescale 1ns/1ps
 module decoder(
 input wire clk,
 input wire en,
