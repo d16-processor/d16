@@ -35,6 +35,7 @@ output wire next_word,
 output reg en_mem,
 output reg mem_displacement,
 output reg mem_byte,
+output reg lr_is_input,
 output reg [3:0] condition
 );
 
@@ -122,7 +123,13 @@ always @(posedge clk) begin : P1
         else begin
             mem_displacement <= 1'b 0;
         end
-        if(opcode == `OPC_JMP || opcode == `OPC_JMPI || opcode == `OPC_SET) begin
+        if(opcode == `OPC_SPEC)
+            lr_is_input <= 1;
+        else
+            lr_is_input <= 0;
+        if(opcode == `OPC_JMP || opcode == `OPC_JMPI ||
+           opcode == `OPC_SET || opcode == `OPC_CALL ||
+           opcode == `OPC_CALLI ) begin
             condition <= instruction[6:3];
         end
         else begin

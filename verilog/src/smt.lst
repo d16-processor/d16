@@ -2,3 +2,4 @@ alu.v
 pc_unit.v
 control.v
 decoder.v
+lr.v

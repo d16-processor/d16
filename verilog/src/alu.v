@@ -38,19 +38,20 @@ output wire [15:0] out,
 output wire [15:0] mem_data,
 output reg write,
 output wire [3:0] flags_out,
-output reg [15:0] SP_out
+output reg [15:0] SP_out,
+output wire lr_wr_en
 );
 
 
 //nonblocking "variable" registers
 wire [15:0] data1;
 wire [15:0] data2;
-wire [32:0] data1_double;
 
 reg [16:0] s_output = 0;
 reg s_should_branch = 1'b 0;
 reg s_data1_sign;
 reg s_data2_sign;
+reg s_lr_wr_en = 0;
 wire [3:0] s_flags;
 reg ov_op;
 reg [15:0] s_mem_data;    
@@ -64,6 +65,7 @@ reg [15:0] s_mem_data;
     assign s_flags[`FLAG_BIT_OVERFLOW] = ov_op == 1'b 1 && s_data1_sign == s_data2_sign && s_data1_sign != s_output[15] ? 1'b 1 : 1'b 0;
     assign flags_out = s_flags;
     assign mem_data = s_mem_data;
+    assign lr_wr_en = s_lr_wr_en;
     always @(posedge clk) begin
             //variable data1 : std_logic_vector(15 downto 0);
         //variable data2 : std_logic_vector(15 downto 0);
@@ -85,7 +87,7 @@ reg [15:0] s_mem_data;
             end
             endcase
             case(alu_control)
-            `OPC_CMP, `OPC_TEST, `OPC_ST, `OPC_JMP, `OPC_PUSH: begin
+            `OPC_CMP, `OPC_TEST, `OPC_ST, `OPC_JMP, `OPC_PUSH, `OPC_CALL: begin
                 write <= 1'b 0;
             end
             default : begin
@@ -96,8 +98,22 @@ reg [15:0] s_mem_data;
             `OPC_JMP : begin
                 s_should_branch <= get_should_branch(flags_in,condition);
             end
+            `OPC_CALL : begin
+                if(get_should_branch(flags_in, condition) == 1) begin
+                    s_should_branch <= 1;
+                    s_lr_wr_en <= 1;
+                end
+                else begin
+                    s_should_branch <= 0;
+                    s_lr_wr_en <= 0;
+                end
+            end
+            `OPC_SPEC: begin
+                s_should_branch <= 1;
+            end
             default : begin
                 s_should_branch <= 1'b 0;
+                s_lr_wr_en <= 0;
             end
             endcase
             case(alu_control)
@@ -178,6 +194,15 @@ reg [15:0] s_mem_data;
                 else begin
                     s_output <= {1'b 0,data1};
                 end
+            end
+            `OPC_CALL : begin
+                if(en_imm == 1'b1) 
+                    s_output <= {1'b0, immediate};
+                else
+                    s_output <= {1'b0, data1};
+            end
+            `OPC_SPEC: begin
+                s_output <= {1'b0,immediate}; // immediate is link register
             end
             `OPC_ST : begin
                 if(mem_displacement == 1'b 1) begin
@@ -354,6 +379,15 @@ reg [15:0] s_mem_data;
             else
                 assert(s_output == data2_prev);
             assert(s_should_branch == get_should_branch(flags_prev,cond_prev));
+            assert(write == 0);
+        end
+        if(opc_prev == `OPC_CALL) begin
+            if(en_imm_prev == 0)
+                assert(s_output == data1_prev);
+            else
+                assert(s_output == data2_prev);
+            assert(s_should_branch == get_should_branch(flags_prev,cond_prev));
+            assert(s_lr_wr_en == get_should_branch(flags_prev,cond_prev));
             assert(write == 0);
         end
         if(opc_prev == `OPC_LD) begin

@@ -1,8 +1,7 @@
-//deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v, leds.v
+//deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v, leds.v, lr.v
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
 module core(input clk,input rst_n, output [7:0] LED);
-/*AUTOWIRE*/
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [15:0]             SP_out;                 // From alu of alu.v
 wire [7:0]              alu_control;            // From decoder of decoder.v
@@ -37,6 +36,9 @@ wire mem_enable, write_enable, byte_enable, byte_select;
 wire reg_write_enable, rS_wr_en;
 wire en;
 wire rst;
+wire [15:0] lr_in, lr_out;
+wire lr_wr_en, alu_lr_wr_en;
+wire lr_is_input;
 
 reg [1:0]              pc_op;
 reg [3:0]              flags_in;
@@ -60,7 +62,8 @@ alu alu(
         .immediate                      (immediate[15:0]),
         .condition                      (condition[3:0]),
         .flags_in                       (flags_in[3:0]),
-        .mem_displacement               (mem_displacement));
+        .mem_displacement               (mem_displacement),
+        .lr_wr_en                       (alu_lr_wr_en));
 control control(
                 // Outputs
                 .control_o              (control_state[`CONTROL_BIT_MAX:0]),
@@ -83,6 +86,7 @@ decoder decoder(
                 .mem_displacement       (mem_displacement),
                 .mem_byte               (mem_byte),
                 .condition              (condition[3:0]),
+                .lr_is_input            (lr_is_input),
                 // Inputs
                 .clk                    (clk),
                 .en                     (en_decoder),
@@ -131,6 +135,14 @@ leds leds(
     .data                               (data_in[15:0]),
     .addr                               (addr[15:0]),
     .led_out                            (LED));
+lr lr(/*AUTOINST*/
+      // Outputs
+      .lr_out                           (lr_out[15:0]),
+      // Inputs
+      .clk                              (clk),
+      .rst                              (rst),
+      .wr_en                            (lr_wr_en),
+      .lr_in                            (lr_in[15:0]));
     
 
     assign en_alu = control_state == `STATE_ALU;
@@ -140,7 +152,7 @@ leds leds(
     assign mem_enable = 1;
     assign write_enable = control_state == `STATE_MEM && ({1'b0,instruction[14:8]} == `OPC_ST || {1'b0,instruction[14:8]} == `OPC_PUSH);
     assign reg_write_enable = control_state == `STATE_REG_WR ? alu_wr_en : 0;
-    assign immediate = next_word ? data_out : dec_immediate;
+    assign immediate = lr_is_input ? lr_out : (next_word ? data_out : dec_immediate);
     assign rD_data_in = en_mem ? data_out : alu_output;
     assign pc_in = alu_output;
     assign mem_addr_out = control_state == `STATE_MEM ? alu_output : pc_out;
@@ -152,7 +164,9 @@ leds leds(
                         && control_state == `STATE_REG_WR ? 1 : 0;
     assign data_in = mem_data;
     assign en = rst_n; //! rst
-	assign rst = ~rst_n;
+    assign rst = ~rst_n;
+    assign lr_in = pc_out;
+    assign lr_wr_en = control_state == `STATE_REG_WR ? alu_lr_wr_en : 0;
     always @(posedge clk) begin
         if (rst_n == 0)
             flags_in <= 0;
