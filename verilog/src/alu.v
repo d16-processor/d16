@@ -87,7 +87,7 @@ reg [15:0] s_mem_data;
             end
             endcase
             case(alu_control)
-            `OPC_CMP, `OPC_TEST, `OPC_ST, `OPC_JMP, `OPC_PUSH, `OPC_CALL, `OPC_SPEC: begin
+            `OPC_CMP, `OPC_TEST, `OPC_ST, `OPC_JMP, `OPC_PUSH, `OPC_PUSHLR, `OPC_CALL, `OPC_SPEC: begin
                 write <= 1'b 0;
             end
             default : begin
@@ -235,6 +235,11 @@ reg [15:0] s_mem_data;
                 end
                 s_output[15:0] <= (((rS_data)) - 2);
                 SP_out <= (((rS_data)) - 2);
+            end
+            `OPC_PUSHLR: begin
+                s_mem_data <= immediate; // link register
+                s_output <= rS_data - 16'h2;
+                SP_out <= rS_data - 16'h2;
             end
             `OPC_POP : begin
                 s_output[15:0] <= rS_data;

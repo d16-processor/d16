@@ -150,7 +150,10 @@ lr lr(/*AUTOINST*/
     assign en_pc = control_state == `STATE_FETCH || control_state == `STATE_REG_READ || control_state == `STATE_PC_DELAY;
     assign en_register = control_state == `STATE_REG_READ || control_state == `STATE_REG_WR;
     assign mem_enable = 1;
-    assign write_enable = control_state == `STATE_MEM && ({1'b0,instruction[14:8]} == `OPC_ST || {1'b0,instruction[14:8]} == `OPC_PUSH);
+    assign write_enable = control_state == `STATE_MEM && 
+        ({1'b0,instruction[14:8]} == `OPC_ST ||
+         {1'b0,instruction[14:8]} == `OPC_PUSH ||
+         {1'b0,instruction[14:8]} == `OPC_PUSHLR);
     assign reg_write_enable = control_state == `STATE_REG_WR ? alu_wr_en : 0;
     assign immediate = lr_is_input ? lr_out : (next_word ? data_out : dec_immediate);
     assign rD_data_in = en_mem ? data_out : alu_output;
@@ -160,7 +163,9 @@ lr lr(/*AUTOINST*/
     assign byte_enable = control_state == `STATE_MEM ? mem_byte : 0;
     assign addr = {1'b0,mem_addr_out[15:1]};
     assign rS_data_in = SP_out;
-    assign rS_wr_en = (instruction[14:8] == `OPC_PUSH || instruction[14:8] == `OPC_POP) 
+    assign rS_wr_en = (instruction[14:8] == `OPC_PUSH ||
+                       instruction[14:8] == `OPC_POP ||
+                       instruction[14:8] == `OPC_PUSHLR)
                         && control_state == `STATE_REG_WR ? 1 : 0;
     assign data_in = mem_data;
     assign en = rst_n; //! rst

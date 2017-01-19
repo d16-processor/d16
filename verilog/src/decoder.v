@@ -99,7 +99,8 @@ always @(posedge clk) begin : P1
             s_next_word <= instruction[15];
             s_rD_sel <= instruction[2:0];
             s_immediate <= 16'h 0000;
-            if(opcode == `OPC_PUSH || opcode == `OPC_POP || opcode == `OPC_PUSHI) begin
+            if(opcode == `OPC_PUSH || opcode == `OPC_POP ||
+               opcode == `OPC_PUSHI || opcode == `OPC_PUSHLR) begin
                 s_rS_sel <= 3'b 111;
                 //Stack pointer
             end
@@ -109,9 +110,11 @@ always @(posedge clk) begin : P1
         end
         if(opcode == `OPC_ST || opcode == `OPC_LD || opcode == `OPC_LDI ||
            opcode == `OPC_STI || opcode == `OPC_PUSH || opcode == `OPC_PUSHI ||
-           opcode == `OPC_POP) begin
+           opcode == `OPC_POP || opcode == `OPC_PUSHLR) begin
             en_mem <= 1'b 1;
-            mem_byte <= instruction[7];
+            if(opcode == `OPC_ST || opcode == `OPC_LD ||
+               opcode == `OPC_LDI || opcode == `OPC_STI) 
+                mem_byte <= instruction[7];
         end
         else begin
             mem_byte <= 1'b 0;
@@ -123,7 +126,7 @@ always @(posedge clk) begin : P1
         else begin
             mem_displacement <= 1'b 0;
         end
-        if(opcode == `OPC_SPEC)
+        if(opcode == `OPC_SPEC || opcode == `OPC_PUSHLR)
             lr_is_input <= 1;
         else
             lr_is_input <= 0;
