@@ -38,7 +38,7 @@ wire en;
 wire rst;
 wire [15:0] lr_in, lr_out;
 wire lr_wr_en, alu_lr_wr_en;
-wire lr_is_input;
+wire lr_is_input, dec_lr_is_input;
 
 reg [1:0]              pc_op;
 reg [3:0]              flags_in;
@@ -86,7 +86,7 @@ decoder decoder(
                 .mem_displacement       (mem_displacement),
                 .mem_byte               (mem_byte),
                 .condition              (condition[3:0]),
-                .lr_is_input            (lr_is_input),
+                .lr_is_input            (dec_lr_is_input),
                 // Inputs
                 .clk                    (clk),
                 .en                     (en_decoder),
@@ -167,6 +167,7 @@ lr lr(/*AUTOINST*/
     assign rst = ~rst_n;
     assign lr_in = pc_out;
     assign lr_wr_en = control_state == `STATE_REG_WR ? alu_lr_wr_en : 0;
+    assign lr_is_input = dec_lr_is_input && control_state == `STATE_ALU;
     always @(posedge clk) begin
         if (rst_n == 0)
             flags_in <= 0;

@@ -87,7 +87,7 @@ reg [15:0] s_mem_data;
             end
             endcase
             case(alu_control)
-            `OPC_CMP, `OPC_TEST, `OPC_ST, `OPC_JMP, `OPC_PUSH, `OPC_CALL: begin
+            `OPC_CMP, `OPC_TEST, `OPC_ST, `OPC_JMP, `OPC_PUSH, `OPC_CALL, `OPC_SPEC: begin
                 write <= 1'b 0;
             end
             default : begin
@@ -251,6 +251,7 @@ reg [15:0] s_mem_data;
     reg [15:0] data1_prev;
     reg [15:0] data2_prev;
     reg [15:0] rS_data_prev = 0;
+    reg [15:0] immediate_prev = 0;
     reg [3:0] flags_prev = 0;
     reg [3:0] cond_prev = 0;
     reg mem_disp_prev = 0;
@@ -277,6 +278,7 @@ reg [15:0] s_mem_data;
             cond_prev <= condition;
             mem_disp_prev <= mem_displacement;
             en_imm_prev <= en_imm;
+            immediate_prev <= immediate;
         end
         if(opc_prev == `OPC_ADD) begin
             assert(s_output[15:0] == (data1_prev+data2_prev) & 'hffff);
@@ -389,6 +391,10 @@ reg [15:0] s_mem_data;
             assert(s_should_branch == get_should_branch(flags_prev,cond_prev));
             assert(s_lr_wr_en == get_should_branch(flags_prev,cond_prev));
             assert(write == 0);
+        end
+        if(opc_prev == `OPC_SPEC) begin
+            assert(s_should_branch == 1);
+            assert(s_output[15:0] == immediate_prev);
         end
         if(opc_prev == `OPC_LD) begin
             if(mem_disp_prev == 1) begin

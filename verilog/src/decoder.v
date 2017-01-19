@@ -200,6 +200,9 @@ end
             else
                 assert(s_rS_sel == 3'b111);
         end
+        if($past(opcode) == `OPC_SPEC) begin
+            assert (lr_is_input == 1);
+        end
         
     end
 `endif
