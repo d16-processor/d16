@@ -115,6 +115,8 @@ always @(posedge clk) begin : P1
             if(opcode == `OPC_ST || opcode == `OPC_LD ||
                opcode == `OPC_LDI || opcode == `OPC_STI) 
                 mem_byte <= instruction[7];
+            else
+                mem_byte <= 0;
         end
         else begin
             mem_byte <= 1'b 0;

@@ -114,7 +114,9 @@ register_unit reg_unit(
                        .rS_sel          (rS_sel[2:0]),
                        .rD_data_in      (rD_data_in[15:0]),
                        .rS_data_in      (rS_data_in[15:0]));
-mem mem(
+mem#(
+    .MEM_BYTES(256)    
+) mem(
         // Outputs
         .data_out                       (data_out[15:0]),
         .mem_wait                       (mem_wait),
