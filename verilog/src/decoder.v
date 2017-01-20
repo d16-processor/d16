@@ -198,7 +198,7 @@ end
             assert(s_alu_control == ($past(opcode) & 8'h7f));
             assert(s_rD_sel == ($past(instruction) & 3'b111));
             if($past(opcode) != `OPC_PUSH && $past(opcode) != `OPC_POP &&
-                $past(opcode) != `OPC_PUSHI)
+                $past(opcode) != `OPC_PUSHI && $past(opcode) != `OPC_PUSHLR)
                 assert(s_rS_sel == (($past(instruction) & 6'b111000) >> 3));
             else
                 assert(s_rS_sel == 3'b111);

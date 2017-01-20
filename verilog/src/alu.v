@@ -256,6 +256,7 @@ reg [15:0] s_mem_data;
     reg [15:0] data1_prev;
     reg [15:0] data2_prev;
     reg [15:0] rS_data_prev = 0;
+    reg [15:0] rD_data_prev = 0;
     reg [15:0] immediate_prev = 0;
     reg [3:0] flags_prev = 0;
     reg [3:0] cond_prev = 0;
@@ -279,6 +280,7 @@ reg [15:0] s_mem_data;
             data1_prev <= data1;
             data2_prev <= data2;
             rS_data_prev <= rS_data;
+            rD_data_prev <= rD_data;
             flags_prev <= flags_in;
             cond_prev <= condition;
             mem_disp_prev <= mem_displacement;
@@ -418,6 +420,23 @@ reg [15:0] s_mem_data;
                 assert(s_output[15:0] == data2_prev[15:0]);
             assert(s_mem_data == data1_prev);
             assert(write == 0);
+        end
+        if(opc_prev == `OPC_PUSH) begin
+            assert(SP_out == rS_data_prev - 16'h2);
+            assert(s_output[15:0] == rS_data_prev - 16'h2);
+            if(en_imm_prev == 1)
+                assert(s_mem_data == immediate_prev);
+            else
+                assert(s_mem_data == rD_data_prev);
+        end
+        if(opc_prev == `OPC_PUSHLR) begin
+            assert(SP_out == rS_data_prev - 16'h2);
+            assert(s_output[15:0] == rS_data_prev - 16'h2);
+            assert(s_mem_data == immediate_prev);
+        end
+        if(opc_prev == `OPC_POP) begin
+            assert(s_output[15:0] == rS_data_prev);
+            assert(SP_out == rS_data_prev + 16'h2);
         end
 
     end
