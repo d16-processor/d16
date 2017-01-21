@@ -5,15 +5,13 @@ module leds(
     input rst,
     input wr_en,
     input [15:0] data,
-    input [15:0] addr,
     output reg [7:0] led_out);
 
     always @(posedge clk) begin
         if(rst == 1)
             led_out <= 0;
-        else if(en == 1) 
-            if({addr[14:0],1'b0} == 16'hff00 && wr_en == 1)
-                led_out <= data[7:0];
+        else if(en == 1 && wr_en == 1) 
+            led_out <= data[7:0];
     end
 `ifdef FORMAL
     always @(posedge clk) begin
@@ -27,7 +25,7 @@ module leds(
         else if($past(rst) == 1)
             assert(led_out == 0);
         else if($past(en) == 1) begin
-            if($past(wr_en) == 1 && $past(addr) == 15'h7f80)
+            if($past(wr_en) == 1)
                 assert(led_out == $past(data[7:0]));
 
         end

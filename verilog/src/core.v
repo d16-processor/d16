@@ -1,4 +1,4 @@
-//deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v, leds.v, lr.v
+//deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v, mmio.v, lr.v
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
 module core(input clk,input rst_n, output [7:0] LED);
@@ -39,6 +39,7 @@ wire rst;
 wire [15:0] lr_in, lr_out;
 wire lr_wr_en, alu_lr_wr_en;
 wire lr_is_input, dec_lr_is_input;
+wire [15:0] mmio_data_out;
 
 reg [1:0]              pc_op;
 reg [3:0]              flags_in;
@@ -129,15 +130,28 @@ mem#(
         .byte_enable                    (byte_enable),
         .addr                           (addr[15:0]),
         .data_in                        (data_in[15:0]));
-leds leds(
-    .clk                                (clk),
-    .en                                 (en),
-    .rst                                (rst),
-    .wr_en                              (write_enable),
-    .data                               (data_in[15:0]),
-    .addr                               (addr[15:0]),
-    .led_out                            (LED));
-lr lr(/*AUTOINST*/
+//leds leds(
+    //.clk                                (clk),
+    //.en                                 (en),
+    //.rst                                (rst),
+    //.wr_en                              (write_enable),
+    //.data                               (data_in[15:0]),
+    //.addr                               (addr[15:0]),
+    //.led_out                            (LED));
+mmio mmio(
+          // Outputs
+          .data_out                     (mmio_data_out[15:0]),
+          .led_out                      (LED),
+          // Inputs
+          .clk                          (clk),
+          .rst                          (rst),
+          .en                           (mem_enable),
+          .write_enable                 (write_enable),
+          .byte_select                  (byte_select),
+          .byte_enable                  (byte_enable),
+          .addr                         (addr[15:0]),
+          .data_in                      (data_in[15:0]));
+lr lr(
       // Outputs
       .lr_out                           (lr_out[15:0]),
       // Inputs

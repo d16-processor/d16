@@ -94,3 +94,5 @@
 `define PC_INC 2'b01
 `define PC_SET 2'b10
 `define PC_RESET 2'b11
+
+`define LED_WR_ADDR 16'hff00
