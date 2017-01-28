@@ -104,3 +104,6 @@ L?\"(\\.|[^\\"])*\" {
 . {return yytext[0];}
 
 %%
+struct yy_buffer_state* read_string(char* string){
+    return yy_scan_string(string);
+}

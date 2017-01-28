@@ -12,14 +12,18 @@
 #include <unistd.h>
 #include "assembler.h"
 #include "instruction.h"
+#include "macro.h"
 #include "parser.h"
-extern int   yyparse(FILE*);
-extern FILE* yyin;
-extern int   yydebug;
-bool         binary_mode = false;
+extern struct yy_buffer_state* read_string(char*);
+extern void                    yy_delete_buffer(struct yy_buffer_state*);
+extern int                     yyparse(FILE*);
+extern FILE*                   yyin;
+extern int                     yydebug;
+bool                           binary_mode = false;
 
 int main(int argc, char* const argv[]) {
     FILE* o = NULL;
+    FILE* in = NULL;
     opterr = 0;
     int c;
     setenv("POSIXLY_CORRECT", "1", 1);
@@ -38,26 +42,26 @@ int main(int argc, char* const argv[]) {
                     break;
             }
         } else {
-            if (yyin == NULL) {
-                yyin = fopen(argv[optind], "r");
+            if (in == NULL) {
+                in = fopen(argv[optind], "r");
             }
             optind++;
         }
     }
 
-    if (yyin == NULL) {
+    if (in == NULL) {
         fprintf(stderr, "d16: No input files specified\n");
         exit(-1);
     }
     if (o == NULL) {
         o = fopen("a.out", "wb");
     }
-
+    GString*                input = read_replace_macros(in);
+    struct yy_buffer_state* yystate = read_string(input->str);
     init_hash_table();
-    do {
-        yyparse(o);
-    } while (!feof(yyin));
-    fclose(yyin);
+    yyparse(o);
+    yy_delete_buffer(yystate);
+    g_string_free(input, true);
     fclose(o);
     return 0;
 }
