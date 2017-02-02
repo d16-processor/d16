@@ -120,7 +120,7 @@ void aout_process_instructions(GList* instructions, int size, FILE* file) {
                    &instruction_buffer);
     aout_header header;
     header.a_magic = A_MAGIC;
-    header.a_text = size;
+    header.a_text = (size / 2) * 2;
     header.a_data = 0;
     header.a_bss = 0;
     if (symbol_array == NULL) {
