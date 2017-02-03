@@ -102,6 +102,7 @@ enum _Op_Type {
     SBBI = 0xA0,
     TESTI = 0xA2,
     SARI = 0xA4,
+    FLUSH = 0xFE,
     KILL = 0xFF
 };
 struct _OP {

@@ -56,7 +56,7 @@ int main(int argc, char* const argv[]) {
     if (o == NULL) {
         o = fopen("a.out", "wb");
     }
-    GString*                input = read_replace_macros(in);
+    GString* input = read_replace_macros(in);
     struct yy_buffer_state* yystate = read_string(input->str);
     init_hash_table();
     yyparse(o);

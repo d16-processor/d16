@@ -177,6 +177,6 @@ GString* read_replace_macros(FILE* input) {
     build_macro_table(string);
     replace_macros(string);
     g_string_append(string,"\n");
-    puts(string->str);
+    /*puts(string->str);*/
     return string;
 }
