@@ -19,10 +19,12 @@ always @(posedge clk) begin
         assume(wr_en == 0);
         assume($past(wr_en) == 0);
     end
-    if($past(rst) == 1)
-        assert(link_register == 0);
-    if($past(wr_en) == 1 && $past(rst) != 1)
-        assert(link_register == $past(lr_in));
+    else begin
+        if($past(rst) == 1)
+            assert(link_register == 0);
+        if($past(wr_en) == 1 && $past(rst) != 1)
+            assert(link_register == $past(lr_in));
+    end
 end
 `endif
 endmodule

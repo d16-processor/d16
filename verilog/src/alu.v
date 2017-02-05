@@ -22,6 +22,11 @@
 // no timescale needed
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
+`ifdef FORMAL
+    `define COVER cover;
+`else
+    `define COVER
+`endif
 module alu(
 input wire clk,
 input wire en,
@@ -118,130 +123,164 @@ reg [15:0] s_mem_data;
             endcase
             case(alu_control)
             `OPC_ADD : begin
+                `COVER
                 s_output <= (data1 + data2);
                 s_data1_sign <= data1[15];
                 s_data2_sign <= data2[15];
             end
             `OPC_SUB : begin
+                `COVER
                 s_output <= (data1 - data2);
                 s_data1_sign <= data1[15];
                 s_data2_sign <=    ~data2[15];
             end
             `OPC_ADC : begin
+                `COVER
                 s_output <= (data1 + data2 + {15'b 0,flags_in[`FLAG_BIT_CARRY]});
                 s_data1_sign <= data1[15];
                 s_data2_sign <= data2[15];
             end
             `OPC_SBB : begin
+                `COVER
                 s_output <= (data1 - data2 - {15'b 0,flags_in[`FLAG_BIT_CARRY]});
                 s_data1_sign <= data1[15];
                 s_data2_sign <=    ~data2[15];
             end
             `OPC_MOV : begin
+                `COVER
                 s_output[15:0] <= data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_AND : begin
+                `COVER
                 s_output[15:0] <= data1 & data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_OR : begin
+                `COVER
                 s_output[15:0] <= data1 | data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_XOR : begin
+                `COVER
                 s_output[15:0] <= data1 ^ data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_NOT : begin
+                `COVER
                 s_output[15:0] <=    ~data1;
                 s_output[16] <= 1'b 0;
             end
             `OPC_NEG : begin
+                `COVER
                 s_output[15:0] <=  -data1;
                 s_output[16] <= 1'b 0;
             end
             `OPC_SHL : begin
+                `COVER
                 s_output <= {1'b0,data1} << data2; 
                 //shift_left
             end
             `OPC_SHR : begin
+                `COVER
                 s_output <= {1'b0,data1} >> data2; 
                 //shift_right
             end
             `OPC_SAR : begin
+                `COVER
                 s_output[15:0] <= $signed(data1) >>> $unsigned(data2[3:0]); 
                 s_output[16] <= 0;
             end
             `OPC_ROL : begin
+                `COVER
                 s_output[15:0] <= {data1,data1} >> (16-data2[3:0]);
                 //rol
                 s_output[16] <= 1'b 0;
             end
             `OPC_RCL : begin
+                `COVER
                 s_output <= {1'b0,16'hbeef};
                 // rcl
             end
             `OPC_CMP : begin
+                `COVER
                 s_output <= (data1 - data2);
                 s_data1_sign <= data1[15];
                 s_data2_sign <=    ~data2[15];
             end
             `OPC_JMP : begin
                 if(en_imm == 1'b 1) begin
+                    `COVER
                     s_output <= {1'b 0,immediate};
                 end
                 else begin
+                    `COVER
                     s_output <= {1'b 0,data1};
                 end
             end
             `OPC_CALL : begin
-                if(en_imm == 1'b1) 
+                if(en_imm == 1'b1) begin
+                    `COVER
                     s_output <= {1'b0, immediate};
-                else
+                end
+                else begin
                     s_output <= {1'b0, data1};
+                end
             end
             `OPC_SPEC: begin
+                `COVER
                 s_output <= {1'b0,immediate}; // immediate is link register
             end
             `OPC_ST : begin
                 if(mem_displacement == 1'b 1) begin
+                    `COVER
                     s_output[15:0] <= rS_data + immediate;
                 end
                 else begin
+                    `COVER
                     s_output[15:0] <= data2;
                 end
                 s_mem_data <= data1;
             end
             `OPC_LD : begin
-                if(mem_displacement == 1'b 1) 
+                if(mem_displacement == 1'b 1) begin
+                    `COVER
                     s_output[15:0] <= rS_data + immediate;
-                else 
+                end
+                else begin
+                    `COVER
                     s_output[15:0] <= data2;
+                end
             end
             `OPC_SET : begin
+                `COVER
                 s_output[16:0] <= {16'b000,get_should_branch(flags_in,condition)};
             end
             `OPC_TEST: begin
+                `COVER
                 s_output[15:0] <= data1 & data2;
                 s_output[16] <= 0;
             end
             `OPC_PUSH : begin
                 if(en_imm == 1'b 1) begin
+                    `COVER
                     s_mem_data <= immediate;
                 end
                 else begin
+                    `COVER
                     s_mem_data <= rD_data;
                 end
                 s_output[15:0] <= (((rS_data)) - 2);
                 SP_out <= (((rS_data)) - 2);
             end
             `OPC_PUSHLR: begin
+                `COVER
                 s_mem_data <= immediate; // link register
                 s_output <= rS_data - 16'h2;
                 SP_out <= rS_data - 16'h2;
             end
             `OPC_POP : begin
+                `COVER
                 s_output[15:0] <= rS_data;
                 SP_out <= (((rS_data)) + 2);
             end
@@ -288,6 +327,7 @@ reg [15:0] s_mem_data;
             immediate_prev <= immediate;
         end
         if(opc_prev == `OPC_ADD) begin
+            cover;
             assert(s_output[15:0] == (data1_prev+data2_prev) & 'hffff);
             assert(flags_out[`FLAG_BIT_CARRY] == 
                 $unsigned({1'b0,data1_prev} + {1'b0,data2_prev}) > 17'hffff);

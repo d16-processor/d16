@@ -186,6 +186,7 @@ end
             assume($past(instruction) == 0);
             assume($past(opcode) == 0);
         end
+        else begin
         if($past(opcode) & 8'h80)
             assert(s_next_word == 1);
         else
@@ -208,7 +209,7 @@ end
         if($past(opcode) == `OPC_SPEC) begin
             assert (lr_is_input == 1);
         end
-        
+        end        
     end
 `endif
 

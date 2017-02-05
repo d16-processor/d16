@@ -88,15 +88,25 @@ reg [15:0] pc = 16'h 0000;
             assume($past(pc_op) == `PC_NOP);
             assume($past(pc) == 0);
         end
-        assume(en == 1 && rst == 0);
-        if($past(pc_op) == `PC_RESET)
-            assert(pc == 0);
-        if($past(pc_op) == `PC_NOP)
-            assert($past(pc) == pc);
-        if($past(pc_op) == `PC_SET)
-            assert(pc == $past(pc_in));
-        if($past(pc_op) == `PC_INC)
-            assert(pc == ($past(pc) + 16'h2));
+        else begin
+            assume(en == 1 && rst == 0);
+            if($past(pc_op) == `PC_RESET) begin
+                cover;
+                assert(pc == 0);
+            end
+            if($past(pc_op) == `PC_NOP) begin
+                cover;
+                assert($past(pc) == pc);
+            end
+            if($past(pc_op) == `PC_SET) begin
+                cover;
+                assert(pc == $past(pc_in));
+            end
+            if($past(pc_op) == `PC_INC) begin
+                cover;
+                assert(pc == ($past(pc) + 16'h2));
+            end
+        end
     end
 
 `endif
