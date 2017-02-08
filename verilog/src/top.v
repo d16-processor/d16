@@ -1,4 +1,4 @@
-module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED);
+module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED, output Tx, input Rx);
 /*AUTOWIRE*/
 wire clk;
 wire rst_n;
@@ -8,9 +8,11 @@ reg [23:0] counter = 0;
 core core(/*AUTOINST*/
           // Outputs
           .LED                          (LED),
+          .tx                           (Tx),
           // Inputs
           .clk                          (clk),
-          .rst_n                        (rst_n));
+          .rst_n                        (rst_n),
+          .rx                           (Rx));
 assign clk = counter[21];
 assign rst_n = rst_sync[2];
 always @(posedge CLOCK_50) begin
