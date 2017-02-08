@@ -181,7 +181,7 @@ lr lr(
     assign rD_data_in = en_mem ? (mmio_serviced_read ? mmio_data_out : data_out) : alu_output;
     assign pc_in = alu_output;
     assign mem_addr_out = control_state == `STATE_MEM ? alu_output : pc_out;
-    assign byte_select = addr[0];
+    assign byte_select = mem_addr_out[0];
     assign byte_enable = control_state == `STATE_MEM ? mem_byte : 0;
     assign addr = {1'b0,mem_addr_out[15:1]};
     assign rS_data_in = SP_out;
