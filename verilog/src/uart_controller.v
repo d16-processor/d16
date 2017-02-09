@@ -8,7 +8,7 @@ module uart_controller(
     input wr_en,
     input [15:0] data,
     output [7:0] data_out,
-    output reg [7:0] status_out,
+    output reg [7:0] status_out = 0,
     output tx);
     parameter FIFO_WIDTH = 8;
     parameter CLOCK_FREQUENCY = 50_000_000;

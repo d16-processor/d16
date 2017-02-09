@@ -12,11 +12,11 @@ module mmio(
     input [15:0] data_in,
     output reg [15:0] data_out,
     output [7:0] led_out,
-    output reg serviced_read,
+    output reg serviced_read = 0,
     input rx,
     output tx);
     wire [15:0] real_addr;
-    assign real_addr = {addr[14:0],byte_enable ? byte_select : 1'b0};
+    assign real_addr = {addr[14:0],byte_select};
     wire led_wr_en;
     wire [7:0] uart_data_out;
     wire [7:0] uart_status_out;
