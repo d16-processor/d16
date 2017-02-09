@@ -98,3 +98,12 @@
 `define LED_WR_ADDR 16'hff00
 `define UART_STATUS_ADDR 16'hff03
 `define UART_DATA_ADDR 16'hff02
+
+
+
+`ifdef FORMAL
+`define COVER(x) cover(x);
+`else
+`define COVER(x)
+`define COVER
+`endif

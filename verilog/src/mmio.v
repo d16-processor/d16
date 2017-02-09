@@ -30,7 +30,7 @@ leds leds(
           .rst                          (rst),
           .wr_en                        (led_wr_en),
           .data                         (data_in[15:0]));
-uart_controller uart(/*AUTOINST*/
+uart_controller uart(
                      // Outputs
                      .data_out          (uart_data_out[7:0]),
                      .status_out        (uart_status_out[7:0]),
@@ -45,8 +45,16 @@ uart_controller uart(/*AUTOINST*/
     assign led_wr_en = (real_addr == `LED_WR_ADDR) & write_enable;
     assign uart_wr_en = (real_addr == `UART_DATA_ADDR) & write_enable;
     always @(posedge clk)
-        serviced_read <= en && !write_enable && real_addr >= 16'hff00;
+        if(rst)
+            serviced_read <= 0;
+        else begin
+            `COVER(real_addr < 16'hff00)
+            serviced_read <= en & ~write_enable & real_addr >= 16'hff00;
+        end
     always @(posedge clk) begin
+        if(rst)
+            data_out <= 0;
+        else
         case(real_addr)
             16'hff00:
                 data_out <= led_out;
@@ -59,5 +67,26 @@ uart_controller uart(/*AUTOINST*/
 
         endcase
     end
+`ifdef FORMAL
+    always @(posedge clk) 
+        if($initstate) begin
+            assume($past(rst) == 0);
+            assume($past(en) == 1);
+            assume($past(real_addr) == 0);
+            assume($past(write_enable) == 0);
+            assume($past(data_in[7:0]) == 0);
+            assume(data_in[7:0] == 0);
+            assume(led_out == 0);
+            assume(en == 1);
+            assume(write_enable == 0);
+            assume(real_addr == 0);
+        end
+        else begin
+            assume($past(en) == 1 && $past(rst) == 0);
+            if($past(real_addr) == 16'hff00 && $past(write_enable) == 1) begin
+                assert(led_out == $past(data_in[7:0]));
+            end
+        end
+`endif
 
 endmodule
