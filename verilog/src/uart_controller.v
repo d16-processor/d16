@@ -18,10 +18,10 @@ module uart_controller(
     wire                full;                   // From tx_fifo of fifo.v, ...
     wire [FIFO_WIDTH-1:0] output_data;          // From tx_fifo of fifo.v, ...
     wire [7:0] rx_input;
-    reg [7:0] tx_input;
+    reg [7:0] tx_input = 0;
     wire [7:0] tx_output;
     wire [7:0] rx_output;
-    reg tx_rd,tx_wr,rx_rd,rx_wr,transmit;
+    reg tx_rd = 0,tx_wr = 0,rx_rd = 0,rx_wr = 0,transmit = 0;
     wire tx_empty, tx_full, rx_empty, rx_full;
     wire received, is_receiving, recv_error, is_transmitting;
     fifo tx_fifo(
