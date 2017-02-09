@@ -9,7 +9,8 @@ module uart_controller(
     input [15:0] data,
     output [7:0] data_out,
     output reg [7:0] status_out = 0,
-    output tx);
+    output tx,
+    output reg uart_wait = 0);
     parameter FIFO_WIDTH = 8;
     parameter CLOCK_FREQUENCY = 50_000_000;
     parameter BAUD_RATE = 19200;
@@ -68,6 +69,7 @@ module uart_controller(
             // Beginning of autoreset for uninitialized flops
             tx_input <= 8'h0;
             tx_wr <= 1'h0;
+            uart_wait <= 0;
             // End of automatics
         end
         else begin
@@ -76,8 +78,13 @@ module uart_controller(
             status_out[2] <= !rx_empty;
             status_out[3] <= 0;
             if(wr_en == 1) begin
-                tx_input <= data[7:0];
-                tx_wr <= 1;
+                if(!tx_full) begin
+                    tx_input <= data[7:0];
+                    tx_wr <= 1;
+                    uart_wait <= 0;
+                end
+                else
+                    uart_wait <= 1;
             end
             if(tx_wr == 1)
                 tx_wr <= 0;

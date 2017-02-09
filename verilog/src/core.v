@@ -42,6 +42,8 @@ wire lr_wr_en, alu_lr_wr_en;
 wire lr_is_input, dec_lr_is_input;
 wire [15:0] mmio_data_out;
 wire mmio_serviced_read;
+wire mmio_mem_wait;
+wire mem_mem_wait;
 
 reg [1:0]              pc_op;
 reg [3:0]              flags_in;
@@ -122,7 +124,7 @@ mem#(
 ) mem(
         // Outputs
         .data_out                       (data_out[15:0]),
-        .mem_wait                       (mem_wait),
+        .mem_wait                       (mem_mem_wait),
         // Inputs
         .clk                            (clk),
         .rst                            (rst),
@@ -146,6 +148,7 @@ mmio mmio(
           .led_out                      (LED),
           .serviced_read                (mmio_serviced_read),
           .tx                           (tx),
+          .mem_wait                     (mmio_mem_wait),
           // Inputs
           .clk                          (clk),
           .rst                          (rst),
@@ -195,6 +198,7 @@ lr lr(
     assign lr_in = pc_out;
     assign lr_wr_en = control_state == `STATE_REG_WR ? alu_lr_wr_en : 0;
     assign lr_is_input = dec_lr_is_input && control_state == `STATE_ALU;
+    assign mem_wait = mem_mem_wait | mmio_mem_wait;
     always @(posedge clk) begin
         if (rst_n == 0)
             flags_in <= 0;

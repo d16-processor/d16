@@ -32,6 +32,6 @@ always #5 clk <= ~clk;
 initial begin
     #20 rst_n <= 1;
 
-    #2000 $finish;
+    #10000 $finish;
 end
 endmodule

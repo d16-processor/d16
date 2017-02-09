@@ -14,13 +14,16 @@ module mmio(
     output [7:0] led_out,
     output reg serviced_read = 0,
     input rx,
-    output tx);
+    output tx,
+    output mem_wait);
+
+
     wire [15:0] real_addr;
     assign real_addr = {addr[14:0],byte_select};
     wire led_wr_en;
     wire [7:0] uart_data_out;
     wire [7:0] uart_status_out;
-    wire uart_wr_en;
+    wire uart_wr_en, uart_wait;
 leds leds(
           // Outputs
           .led_out                      (led_out[7:0]),
@@ -35,6 +38,7 @@ uart_controller uart(
                      .data_out          (uart_data_out[7:0]),
                      .status_out        (uart_status_out[7:0]),
                      .tx                (tx),
+                     .uart_wait         (uart_wait),
                      // Inputs
                      .rx                (rx),
                      .clk               (clk),
@@ -44,6 +48,7 @@ uart_controller uart(
                      .data              (data_in[15:0]));
     assign led_wr_en = (real_addr == `LED_WR_ADDR) & write_enable;
     assign uart_wr_en = (real_addr == `UART_DATA_ADDR) & write_enable;
+    assign mem_wait = uart_wait;
     always @(posedge clk)
         if(rst)
             serviced_read <= 0;
