@@ -23,7 +23,7 @@ module mmio(
     wire led_wr_en;
     wire [7:0] uart_data_out;
     wire [7:0] uart_status_out;
-    wire uart_wr_en, uart_wait;
+    wire uart_wr_en, uart_wait, uart_read;
 leds leds(
           // Outputs
           .led_out                      (led_out[7:0]),
@@ -45,9 +45,11 @@ uart_controller uart(
                      .en                (en),
                      .rst               (rst),
                      .wr_en             (uart_wr_en),
+                     .read              (uart_read),
                      .data              (data_in[15:0]));
     assign led_wr_en = (real_addr == `LED_WR_ADDR) & write_enable;
     assign uart_wr_en = (real_addr == `UART_DATA_ADDR) & write_enable;
+    assign uart_read = (real_addr == `UART_DATA_ADDR) & en & ~write_enable;
     assign mem_wait = uart_wait;
     always @(posedge clk)
         if(rst)
