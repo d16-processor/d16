@@ -1,7 +1,7 @@
 module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED, output Tx, input Rx);
 /*AUTOWIRE*/
 wire clk;
-reg [2:0] rst_n;
+reg [2:0] rst_n = 3'b000;
 reg [23:0] counter = 0;
 
 core core(/*AUTOINST*/
