@@ -123,104 +123,104 @@ reg [15:0] s_mem_data;
             endcase
             case(alu_control)
             `OPC_ADD : begin
-                `COVER()
+                `COVER
                 s_output <= (data1 + data2);
                 s_data1_sign <= data1[15];
                 s_data2_sign <= data2[15];
             end
             `OPC_SUB : begin
-                `COVER()
+                `COVER
                 s_output <= (data1 - data2);
                 s_data1_sign <= data1[15];
                 s_data2_sign <=    ~data2[15];
             end
             `OPC_ADC : begin
-                `COVER()
+                `COVER
                 s_output <= (data1 + data2 + {15'b 0,flags_in[`FLAG_BIT_CARRY]});
                 s_data1_sign <= data1[15];
                 s_data2_sign <= data2[15];
             end
             `OPC_SBB : begin
-                `COVER()
+                `COVER
                 s_output <= (data1 - data2 - {15'b 0,flags_in[`FLAG_BIT_CARRY]});
                 s_data1_sign <= data1[15];
                 s_data2_sign <=    ~data2[15];
             end
             `OPC_MOV : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_AND : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= data1 & data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_OR : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= data1 | data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_XOR : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= data1 ^ data2;
                 s_output[16] <= 1'b 0;
             end
             `OPC_NOT : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <=    ~data1;
                 s_output[16] <= 1'b 0;
             end
             `OPC_NEG : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <=  -data1;
                 s_output[16] <= 1'b 0;
             end
             `OPC_SHL : begin
-                `COVER()
+                `COVER
                 s_output <= {1'b0,data1} << data2; 
                 //shift_left
             end
             `OPC_SHR : begin
-                `COVER()
+                `COVER
                 s_output <= {1'b0,data1} >> data2; 
                 //shift_right
             end
             `OPC_SAR : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= $signed(data1) >>> $unsigned(data2[3:0]); 
                 s_output[16] <= 0;
             end
             `OPC_ROL : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= {data1,data1} >> (16-data2[3:0]);
                 //rol
                 s_output[16] <= 1'b 0;
             end
             `OPC_RCL : begin
-                `COVER()
+                `COVER
                 s_output <= {1'b0,16'hbeef};
                 // rcl
             end
             `OPC_CMP : begin
-                `COVER()
+                `COVER
                 s_output <= (data1 - data2);
                 s_data1_sign <= data1[15];
                 s_data2_sign <=    ~data2[15];
             end
             `OPC_JMP : begin
                 if(en_imm == 1'b 1) begin
-                    `COVER()
+                    `COVER
                     s_output <= {1'b 0,immediate};
                 end
                 else begin
-                    `COVER()
+                    `COVER
                     s_output <= {1'b 0,data1};
                 end
             end
             `OPC_CALL : begin
                 if(en_imm == 1'b1) begin
-                    `COVER()
+                    `COVER
                     s_output <= {1'b0, immediate};
                 end
                 else begin
@@ -228,59 +228,59 @@ reg [15:0] s_mem_data;
                 end
             end
             `OPC_SPEC: begin
-                `COVER()
+                `COVER
                 s_output <= {1'b0,immediate}; // immediate is link register
             end
             `OPC_ST : begin
                 if(mem_displacement == 1'b 1) begin
-                    `COVER()
+                    `COVER
                     s_output[15:0] <= rS_data + immediate;
                 end
                 else begin
-                    `COVER()
+                    `COVER
                     s_output[15:0] <= data2;
                 end
                 s_mem_data <= data1;
             end
             `OPC_LD : begin
                 if(mem_displacement == 1'b 1) begin
-                    `COVER()
+                    `COVER
                     s_output[15:0] <= rS_data + immediate;
                 end
                 else begin
-                    `COVER()
+                    `COVER
                     s_output[15:0] <= data2;
                 end
             end
             `OPC_SET : begin
-                `COVER()
+                `COVER
                 s_output[16:0] <= {16'b000,get_should_branch(flags_in,condition)};
             end
             `OPC_TEST: begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= data1 & data2;
                 s_output[16] <= 0;
             end
             `OPC_PUSH : begin
                 if(en_imm == 1'b 1) begin
-                    `COVER()
+                    `COVER
                     s_mem_data <= immediate;
                 end
                 else begin
-                    `COVER()
+                    `COVER
                     s_mem_data <= rD_data;
                 end
                 s_output[15:0] <= (((rS_data)) - 2);
                 SP_out <= (((rS_data)) - 2);
             end
             `OPC_PUSHLR: begin
-                `COVER()
+                `COVER
                 s_mem_data <= immediate; // link register
                 s_output <= rS_data - 16'h2;
                 SP_out <= rS_data - 16'h2;
             end
             `OPC_POP : begin
-                `COVER()
+                `COVER
                 s_output[15:0] <= rS_data;
                 SP_out <= (((rS_data)) + 2);
             end

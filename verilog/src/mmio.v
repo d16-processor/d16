@@ -48,7 +48,7 @@ uart_controller uart(
         if(rst)
             serviced_read <= 0;
         else begin
-            `COVER(real_addr < 16'hff00)
+            `COVER
             serviced_read <= en & ~write_enable & real_addr >= 16'hff00;
         end
     always @(posedge clk) begin
