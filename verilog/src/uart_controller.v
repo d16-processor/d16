@@ -13,7 +13,7 @@ module uart_controller(
     output reg uart_wait = 0);
     parameter FIFO_WIDTH = 8;
     parameter CLOCK_FREQUENCY = 50_000_000;
-    parameter BAUD_RATE = 19200;
+    parameter BAUD_RATE = 115_200;
     /*AUTOWIRE*/
     wire                empty;                  // From tx_fifo of fifo.v, ...
     wire                full;                   // From tx_fifo of fifo.v, ...
@@ -36,6 +36,7 @@ module uart_controller(
                  .rd                    (tx_rd),
                  .wr                    (tx_wr),
                  .input_data            (tx_input[FIFO_WIDTH-1:0]));
+    
     fifo rx_fifo(
                  // Outputs
                  .output_data           (data_out[FIFO_WIDTH-1:0]),
@@ -88,14 +89,16 @@ module uart_controller(
             end
             if(tx_wr == 1)
                 tx_wr <= 0;
-            if(tx_empty == 0 && is_transmitting == 0)
+            if(tx_empty == 0 && is_transmitting == 0) begin
                 tx_rd <= 1;
-            if(tx_rd == 1) begin
-                tx_rd <= 0;
                 transmit <= 1;
             end
-            if(transmit == 1)
+            if(tx_rd == 1) begin
+                tx_rd <= 0;
                 transmit <= 0;
+            end
+            //if(transmit == 1)
+                //transmit <= 0;
             if(received) 
                 rx_wr <= 1;
             if(rx_wr)
