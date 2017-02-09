@@ -12,7 +12,7 @@ core core(/*AUTOINST*/
           .clk                          (clk),
           .rst_n                        (rst_n[2]),
           .rx                           (Rx));
-assign clk = counter[17];
+assign clk = CLOCK_50;
 //assign LED[7] = Tx;
 
 always @(posedge CLOCK_50)begin
