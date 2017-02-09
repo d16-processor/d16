@@ -42,8 +42,8 @@ uart_controller uart(/*AUTOINST*/
                      .rst               (rst),
                      .wr_en             (uart_wr_en),
                      .data              (data_in[15:0]));
-    assign led_wr_en = real_addr == `LED_WR_ADDR && write_enable == 1;
-    assign uart_wr_en = real_addr == `UART_DATA_ADDR && write_enable == 1;
+    assign led_wr_en = (real_addr == `LED_WR_ADDR) & write_enable;
+    assign uart_wr_en = (real_addr == `UART_DATA_ADDR) & write_enable;
     always @(posedge clk)
         serviced_read <= en && !write_enable && real_addr >= 16'hff00;
     always @(posedge clk) begin

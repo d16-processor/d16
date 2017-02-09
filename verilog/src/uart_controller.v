@@ -12,7 +12,7 @@ module uart_controller(
     output tx);
     parameter FIFO_WIDTH = 8;
     parameter CLOCK_FREQUENCY = 50_000_000;
-    parameter BAUD_RATE = 9600;
+    parameter BAUD_RATE = 19200;
     /*AUTOWIRE*/
     wire                empty;                  // From tx_fifo of fifo.v, ...
     wire                full;                   // From tx_fifo of fifo.v, ...
@@ -60,7 +60,7 @@ module uart_controller(
               .rst                      (rst),
               .rx                       (rx),
               .transmit                 (transmit),
-              .tx_byte                  (tx_output[7:0]));
+              .tx_byte                  (tx_output));
     always @(posedge clk) begin
         if(rst == 1) begin
             status_out <= 0;

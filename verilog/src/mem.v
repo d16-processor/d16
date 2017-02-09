@@ -11,11 +11,11 @@ module mem(
     output [15:0] data_out,
     output mem_wait);
 
-reg [15:0] mem_storage [0:MEM_WORDS-1];
-reg [15:0] s_addr = 0;
+
 parameter MEM_BYTES = 128;
 parameter MEM_WORDS = MEM_BYTES / 2;
-
+reg [15:0] mem_storage [0:MEM_WORDS-1];
+reg [15:0] s_addr = 0;
 initial begin
     $readmemh("mem.hex",mem_storage);
 end
