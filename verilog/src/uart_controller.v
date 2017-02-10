@@ -47,7 +47,7 @@ module uart_controller(
                  .clk                   (clk),
                  .rst                   (rst),
                  .rd                    (rx_rd),
-                 .wr                    (rx_wr),
+                 .wr                    (received),
                  .input_data            (rx_input[FIFO_WIDTH-1:0]));
     uart #(
         .CLOCK_DIVIDE(CLOCK_FREQUENCY/(BAUD_RATE*4))) uart(
@@ -78,7 +78,7 @@ module uart_controller(
             status_out[0] <= !tx_full;
             status_out[1] <= tx_empty;
             status_out[2] <= !rx_empty;
-            status_out[3] <= 0;
+            status_out[3] <= rx_full;
             //CPU side
             //TX 
             if(wr_en == 1) begin
@@ -92,10 +92,14 @@ module uart_controller(
             end
             if(tx_wr == 1)
                 tx_wr <= 0;
-            if(read)
+            if(read) begin
                 rx_rd <= 1;
-            if(rx_rd == 1)
+                uart_wait <= 1;
+            end
+            if(rx_rd == 1) begin
                 rx_rd <= 0;
+                uart_wait <= 0;
+            end
             //UART side
             //TX 
             if(tx_empty == 0 && is_transmitting == 0) begin
@@ -106,11 +110,6 @@ module uart_controller(
                 tx_rd <= 0;
                 transmit <= 0;
             end
-            if(received) 
-                rx_wr <= 1;
-            if(rx_wr)
-                rx_wr <= 0;
-            
 
         end
     end
