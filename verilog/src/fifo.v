@@ -18,6 +18,7 @@ reg [POINTER_BITS:0] wr_ptr = 0;
 assign empty = rd_ptr == wr_ptr;
 assign full = (rd_ptr[POINTER_BITS-1:0] == wr_ptr[POINTER_BITS-1:0]) & (rd_ptr[POINTER_BITS] ^ wr_ptr[POINTER_BITS]);
 always @(posedge clk)begin
+    output_data <= memory[rd_ptr[POINTER_BITS-1:0]];
     if(rst == 1) begin
         rd_ptr <= 0;
         wr_ptr <= 0;
@@ -25,7 +26,6 @@ always @(posedge clk)begin
     end
     else begin
         if(rd == 1) begin
-            output_data <= memory[rd_ptr[POINTER_BITS-1:0]];
             rd_ptr <= rd_ptr + 1;
         end
         if(wr == 1) begin
