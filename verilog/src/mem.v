@@ -13,6 +13,7 @@ module mem(
 
 reg [15:0] mem_storage [0:MEM_WORDS-1];
 reg [15:0] s_addr = 0;
+reg s_byte_select, s_byte_enable;
 wire [15:0] mem_data;
 parameter MEM_BYTES = 128;
 parameter MEM_WORDS = MEM_BYTES / 2;
@@ -23,8 +24,8 @@ end
 assign mem_wait = 0;
 assign mem_data = mem_storage[s_addr];
 always @* begin
-    if(byte_enable == 1)
-        if(byte_select == 1)
+    if(s_byte_enable == 1)
+        if(s_byte_select == 1)
             data_out <= {8'b0,mem_data[15:8]};
         else
             data_out <= {8'b0,mem_data[7:0]};
@@ -32,6 +33,8 @@ always @* begin
         data_out <= mem_data;
 end
 always @(posedge clk) begin
+    s_byte_enable <= byte_enable;
+    s_byte_select <= byte_select;
     if (rst == 1) begin
         s_addr <= 0;
         /*AUTORESET*/

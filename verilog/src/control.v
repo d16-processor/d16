@@ -40,7 +40,7 @@ reg [`CONTROL_BIT_MAX:0] s_control = `STATE_FETCH;
   assign control_o = s_control;
   always @(posedge clk) begin
     if(rst == 1'b 1) begin
-      s_control <= `STATE_FETCH;
+      s_control <= 0;
     end
     else begin
       if(en == 1'b 1) begin
