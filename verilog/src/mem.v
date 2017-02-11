@@ -43,10 +43,14 @@ always @(posedge clk) begin
         if(addr < MEM_WORDS) begin
             if(write_enable == 1) begin
                 if(byte_enable == 1) begin
-                    if(byte_select == 1)
+                    if(byte_select == 1) begin
                         mem_storage[addr][15:8] <= data_in[7:0];
-                    else
+                        mem_storage[addr][7:0] <= mem_storage[addr][7:0];
+                    end
+                    else begin
                         mem_storage[addr][7:0] <= data_in[7:0];
+                        mem_storage[addr][15:8] <= mem_storage[addr][15:8];
+                    end
                 end
                 else
                     mem_storage[addr] <= data_in;

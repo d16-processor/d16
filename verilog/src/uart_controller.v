@@ -109,6 +109,7 @@ module uart_controller(
             if(tx_rd == 1) begin
                 tx_rd <= 0;
                 transmit <= 0;
+                $display("Wrote char: %c\n",tx_output);
             end
 
         end

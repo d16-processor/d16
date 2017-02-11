@@ -120,7 +120,7 @@ register_unit reg_unit(
                        .rD_data_in      (rD_data_in[15:0]),
                        .rS_data_in      (rS_data_in[15:0]));
 mem#(
-    .MEM_BYTES(256)    
+    .MEM_BYTES(16384)    
 ) mem(
         // Outputs
         .data_out                       (data_out[15:0]),
