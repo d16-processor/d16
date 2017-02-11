@@ -8,11 +8,12 @@ module mem(
     input byte_enable,
     input [15:0] addr,
     input [15:0] data_in,
-    output [15:0] data_out,
+    output reg [15:0] data_out,
     output mem_wait);
 
 reg [15:0] mem_storage [0:MEM_WORDS-1];
 reg [15:0] s_addr = 0;
+wire [15:0] mem_data;
 parameter MEM_BYTES = 128;
 parameter MEM_WORDS = MEM_BYTES / 2;
 
@@ -20,7 +21,16 @@ initial begin
     $readmemh("mem.hex",mem_storage);
 end
 assign mem_wait = 0;
-assign data_out = mem_storage[s_addr];
+assign mem_data = mem_storage[s_addr];
+always @* begin
+    if(byte_enable == 1)
+        if(byte_select == 1)
+            data_out <= {8'b0,mem_data[15:8]};
+        else
+            data_out <= {8'b0,mem_data[7:0]};
+    else
+        data_out <= mem_data;
+end
 always @(posedge clk) begin
     if (rst == 1) begin
         s_addr <= 0;
