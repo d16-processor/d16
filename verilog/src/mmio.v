@@ -23,6 +23,8 @@ module mmio(
     wire led_wr_en;
     wire [7:0] uart_data_out;
     wire [7:0] uart_status_out;
+    wire [15:0] timer_data_out;
+    wire timer_wr_en;
     wire uart_wr_en, uart_wait, uart_read;
 leds leds(
           // Outputs
@@ -47,9 +49,19 @@ uart_controller uart(
                      .wr_en             (uart_wr_en),
                      .read              (uart_read),
                      .data              (data_in[15:0]));
+    timer timer (
+                 // Outputs
+                 .data_out              (timer_data_out[15:0]),
+                 // Inputs
+                 .clk                   (clk),
+                 .en                    (en),
+                 .wr_en                 (timer_wr_en),
+                 .rst                   (rst),
+                 .data_in               (data_in[15:0]));
     assign led_wr_en = (real_addr == `LED_WR_ADDR) & write_enable;
     assign uart_wr_en = (real_addr == `UART_DATA_ADDR) & write_enable;
     assign uart_read = (real_addr == `UART_DATA_ADDR) & en & ~write_enable;
+    assign timer_wr_en = (real_addr == `TIMER_DATA_ADDR) & write_enable;
     assign mem_wait = uart_wait;
     always @(posedge clk)
         if(rst)
@@ -64,11 +76,13 @@ uart_controller uart(
         else
         case(real_addr)
             16'hff00:
-                data_out <= led_out;
+                data_out <= {8'b0,led_out};
             16'hff03:
-                data_out <= uart_status_out;
+                data_out <= {8'b0,uart_status_out};
             16'hff02:
-                data_out <= uart_data_out;
+                data_out <= {8'b0,uart_data_out};
+            `TIMER_DATA_ADDR:
+                data_out <= timer_data_out;
             default:
                 data_out <= 0;
 
