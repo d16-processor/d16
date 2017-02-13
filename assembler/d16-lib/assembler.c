@@ -111,7 +111,9 @@ void sum_program_length(void* elem, void* data) {
     size_t*      sz = (size_t*)data;
     Instruction* i = (Instruction*)elem;
     *sz += instruction_length(i);
-    if (!(i->type == I_TYPE_DIRECTIVE && i->dir_type == D_BYTE)) {
+    if (!(i->type == I_TYPE_DIRECTIVE &&
+          (i->dir_type == D_BYTE || i->dir_type == D_ASCII ||
+           i->dir_type == D_ASCIZ))) {
         *sz = (*sz + 1) & ~1; // align to 2 bytes
     }
     if (i->address != NULL && i->address->type == ADDR_LOC_LABEL) {
@@ -150,7 +152,9 @@ int ip = 0;
 
 void assemble_instruction(Instruction* i, void* d) {
     uint16_t** data = (uint16_t**)d;
-    if (!(i->type == I_TYPE_DIRECTIVE && i->dir_type == D_BYTE)) {
+    if (!(i->type == I_TYPE_DIRECTIVE &&
+          (i->dir_type == D_BYTE || i->dir_type == D_ASCII ||
+           i->dir_type == D_ASCIZ))) {
         uint8_t** udata = (uint8_t**)d;
         *udata = (uint8_t*)(((size_t)*udata + 1L) & ~1L);
         ip = (ip + 1) & ~1;
@@ -207,11 +211,12 @@ void assemble_instruction(Instruction* i, void* d) {
                 }
                 case D_ASCIZ:
                 case D_ASCII: {
-                    char* str = i->dir_data;
-                    int   len = instruction_length(i);
-                    memset(*data, 0, len);
+                    uint8_t** udata = (uint8_t**)d;
+                    char*     str = i->dir_data;
+                    int       len = instruction_length(i);
+                    memset(*udata, 0, len);
                     strncpy((char*)*data, str, len);
-                    *data += instruction_length(i) / 2;
+                    *udata += instruction_length(i);
                     break;
                 }
                 case D_BYTE: {
@@ -272,6 +277,7 @@ void process_list(struct _GList* list, FILE* output_file) {
     create_tables();
     // g_list_foreach(list, &print_elem, NULL);
     g_list_foreach(list, &sum_program_length, &output_size);
+    output_size = (output_size + 1) & ~1;
     fprintf(stdout, "Program length: %zu bytes\n", output_size);
 #ifdef DEBUG
     g_list_foreach(list, &print_elem, NULL);

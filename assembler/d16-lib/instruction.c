@@ -202,14 +202,14 @@ int instruction_length(Instruction* i) {
     if (i->type == I_TYPE_DIRECTIVE) {
         if (i->dir_type == D_ASCIZ) {
             char* str = (char*)i->dir_data;
-            int   len = (int)(strlen(str) + 1 +
-                            1); // 1 for ending NULL, 1 for rounding up
-            return len & ~1;
+            int   len = (int)(strlen(str) + 1);
+            // 1 for ending NULL
+            return len;
 
         } else if (i->dir_type == D_ASCII) {
             char* str = (char*)i->dir_data;
-            int   len = (int)(strlen(str) + 1); // 1 for rounding up
-            return len & ~1;
+            int   len = (int)(strlen(str)); // 1 for rounding up
+            return len;
         } else if (i->dir_type == D_BYTE) {
             return 1;
         } else if (i->dir_type == D_DWORD) {
