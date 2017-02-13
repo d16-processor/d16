@@ -17,8 +17,8 @@ always @(posedge clk) begin
         counter_2 <= 0;
     end
     if(wr_en == 1 && en == 1) begin
-        counter_2 <= 0;
-        counter_1 <= data_in;
+        counter_1 <= 0;
+        counter_2 <= data_in;
     end
     else
         if(counter_1 >= COUNT) 
