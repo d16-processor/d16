@@ -1,7 +1,8 @@
 //deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v, mmio.v, lr.v
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
-module core(input clk,input rst_n, output [7:0] LED, input rx, output tx);
+module core(input clk,input rst_n, output [7:0] LED, input rx, output tx,
+    output snd_out, input [3:0] switches);
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [15:0]             SP_out;                 // From alu of alu.v
 wire [7:0]              alu_control;            // From decoder of decoder.v
@@ -148,6 +149,7 @@ mmio mmio(
           .led_out                      (LED),
           .serviced_read                (mmio_serviced_read),
           .tx                           (tx),
+          .snd_out                      (snd_out),
           .mem_wait                     (mmio_mem_wait),
           // Inputs
           .clk                          (clk),
@@ -158,7 +160,8 @@ mmio mmio(
           .byte_enable                  (byte_enable),
           .addr                         (addr[15:0]),
           .data_in                      (data_in[15:0]),
-          .rx                           (rx));
+          .rx                           (rx),
+          .switches                     (switches));
 lr lr(
       // Outputs
       .lr_out                           (lr_out[15:0]),

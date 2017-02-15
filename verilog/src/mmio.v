@@ -10,11 +10,13 @@ module mmio(
     input byte_enable,
     input [15:0] addr,
     input [15:0] data_in,
+    input [3:0] switches,
     output reg [15:0] data_out,
     output [7:0] led_out,
     output reg serviced_read = 0,
     input rx,
     output tx,
+    output snd_out,
     output mem_wait);
 
 
@@ -23,12 +25,16 @@ module mmio(
     wire led_wr_en;
     wire [7:0] uart_data_out;
     wire [7:0] uart_status_out;
+    wire [7:0] led_led_out;
     wire [15:0] timer_data_out;
     wire timer_wr_en;
     wire uart_wr_en, uart_wait, uart_read;
+    wire sound_wr_en;
+
+    reg [7:0] switch_sync;
 leds leds(
           // Outputs
-          .led_out                      (led_out[7:0]),
+          .led_out                      (led_led_out[7:0]),
           // Inputs
           .clk                          (clk),
           .en                           (en),
@@ -58,11 +64,22 @@ uart_controller uart(
                  .wr_en                 (timer_wr_en),
                  .rst                   (rst),
                  .data_in               (data_in[15:0]));
+    sound sound(
+                // Outputs
+                .snd_out                (snd_out),
+                // Inputs
+                .clk                    (clk),
+                .rst                    (rst),
+                .en                     (en),
+                .wr_en                  (sound_wr_en),
+                .data_in                (data_in/*.[15:0]*/));
     assign led_wr_en = (real_addr == `LED_WR_ADDR) & write_enable;
     assign uart_wr_en = (real_addr == `UART_DATA_ADDR) & write_enable;
     assign uart_read = (real_addr == `UART_DATA_ADDR) & en & ~write_enable;
     assign timer_wr_en = (real_addr == `TIMER_DATA_ADDR) & write_enable;
+    assign sound_wr_en = (real_addr == `SOUND_DATA_ADDR) & write_enable;
     assign mem_wait = uart_wait;
+    assign led_out = led_led_out;
     always @(posedge clk)
         if(rst)
             serviced_read <= 0;
@@ -71,6 +88,7 @@ uart_controller uart(
             serviced_read <= en & ~write_enable & real_addr >= 16'hff00;
         end
     always @(posedge clk) begin
+        switch_sync <= {switch_sync[3:0], switches};
         if(rst)
             data_out <= 0;
         else
@@ -83,6 +101,8 @@ uart_controller uart(
                 data_out <= {8'b0,uart_data_out};
             `TIMER_DATA_ADDR:
                 data_out <= timer_data_out;
+            16'hff01:
+                data_out <= {4'b0,switch_sync[7:4]};
             default:
                 data_out <= 0;
 
