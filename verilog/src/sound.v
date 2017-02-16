@@ -6,14 +6,21 @@ module sound(
     input [15:0] data_in,
     output snd_out);
     wire snd1,snd2,snd3,snd4;
+    wire s1_en, s2_en, s3_en, s4_en;
     reg [2:0] sigma1 = 0;
+    reg [4:0] sigma3 = 0;
 
     
     assign snd_out = sigma1[2];
+    //assign snd_out = snd1 ^ snd2;
     reg [13:0] c1_divider = 0;
     reg [13:0] c2_divider = 0;
     reg [13:0] c3_divider = 0;
     reg [13:0] c4_divider = 0;
+    assign s1_en = c1_divider != 0;
+    assign s2_en = c2_divider != 0;
+    assign s3_en = c3_divider != 0;
+    assign s4_en = c4_divider != 0;
     always @(posedge clk) begin
         if(rst == 1) begin
             c1_divider <= 0;
@@ -33,6 +40,7 @@ module sound(
                     c4_divider <= data_in[13:0];
             endcase
        sigma1 <= sigma1[1:0] + snd1+snd2+snd3+snd4;
+       sigma3 <= sigma3[2:0] + (s1_en ? (snd1 ? 1 : -1): 0) + (s2_en ? (snd2 ? 1 : -1) : 0) + 4;
        //sigma2 <= sigma2[1:0] + snd3+snd4;
     end
     channel channel1(
