@@ -205,7 +205,7 @@ void assemble_instruction(Instruction* i, void* d) {
         } else if (i->type == I_TYPE_DIRECTIVE) {
             switch (i->dir_type) {
                 case D_WORD: {
-                    **data = *(int*)i->dir_data;
+                    **data = i->address->immediate & 0xffff;
                     *data += 1;
                     break;
                 }
@@ -221,7 +221,7 @@ void assemble_instruction(Instruction* i, void* d) {
                 }
                 case D_BYTE: {
                     uint8_t** udata = (uint8_t**)d;
-                    **udata = *(int*)i->dir_data;
+                    **udata = i->address->immediate & 0xff;
                     *udata += 1;
                     break;
                 }
@@ -233,7 +233,7 @@ void assemble_instruction(Instruction* i, void* d) {
                     break;
                 }
                 case D_DWORD: {
-                    int dword = *(int*)i->dir_data;
+                    int dword = i->address->immediate ;
                     **data = dword & 0xffff;
                     *data += 1;
                     **data = (dword >> 16) & 0xffff;

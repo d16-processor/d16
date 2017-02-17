@@ -10,6 +10,7 @@
     extern FILE* yyin;
     extern int yyline;
     void yyerror(FILE * output_file, const char* s);
+    void my_memcpy(void*,void*,size_t);
 %}
 
 %union{
@@ -88,9 +89,9 @@ instruction:
 	|   OPCODE address NEWLINE {$$=new_instruction_jmpi($1,$2,AL);} //jump
 	|   OPCODE CONDITION_CODE address NEWLINE {$$=new_instruction_jmpi($1,$3,$2);}
 	|   OPCODE CONDITION_CODE REGISTER NEWLINE {$$=new_instruction_jmp($1,$3,$2);}
-    |   DIRECTIVE_WORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_WORD,i);}
-    |   DIRECTIVE_BYTE NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2;$$=new_instruction_directive(D_BYTE,i);}
-    |   DIRECTIVE_DWORD NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2; $$=new_instruction_directive(D_DWORD,i);}
+    |   DIRECTIVE_WORD address NEWLINE{int *i=malloc(sizeof(struct _Addr)); my_memcpy(i,$2,sizeof(struct _Addr));$$=new_instruction_directive(D_WORD,i);}
+    |   DIRECTIVE_BYTE address NEWLINE{int *i=malloc(sizeof(struct _Addr)); my_memcpy(i,$2,sizeof(struct _Addr));$$=new_instruction_directive(D_BYTE,i);}
+    |   DIRECTIVE_DWORD address NEWLINE{int *i=malloc(sizeof(struct _Addr)); my_memcpy(i,$2,sizeof(struct _Addr)); $$=new_instruction_directive(D_DWORD,i);}
     |   DIRECTIVE_ALIGN NUMBER NEWLINE{int *i=malloc(sizeof(int)); *i = $2; $$=new_instruction_directive(D_ALIGN,i);}
     |   DIRECTIVE_ASCIZ STRING NEWLINE {$$=new_instruction_directive(D_ASCIZ,$2);}
     |   DIRECTIVE_ASCII STRING NEWLINE {$$=new_instruction_directive(D_ASCII,$2);}
@@ -102,6 +103,9 @@ instruction:
 
 
 %%
+void my_memcpy(void* dest, void* src, size_t bytes){
+    memcpy(dest,src,bytes);
+}
 void yyerror(FILE * output_file, const char* s){
     fprintf(stderr, "Parse error on line %d: %s\n",yyline,s);
     exit(1);

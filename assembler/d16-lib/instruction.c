@@ -140,6 +140,7 @@ Instruction* new_instruction_directive(Dir_Type type, void* data) {
     i->dir_type = type;
     switch (type) {
         case D_WORD:
+            i->address = data;
             i->opcode = strdup(".dw");
             break;
         case D_ASCII:
@@ -149,12 +150,14 @@ Instruction* new_instruction_directive(Dir_Type type, void* data) {
             i->opcode = strdup(".asciz");
             break;
         case D_BYTE:
+            i->address = data;
             i->opcode = strdup(".db");
             break;
         case D_ALIGN:
             i->opcode = strdup(".align");
             break;
         case D_DWORD:
+            i->address = data;
             i->opcode = strdup(".dd");
             break;
     }
