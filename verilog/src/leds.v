@@ -14,12 +14,12 @@ module leds(
 
     always @(posedge clk) begin
         if(rst == 1)begin
-            `COVER;
+            //`COVER;
             led_out <= 0;
         end
         else if(en == 1 && wr_en == 1) begin
             led_out <= data[7:0];
-            `COVER;
+            //`COVER;
         end
     end
 `ifdef FORMAL

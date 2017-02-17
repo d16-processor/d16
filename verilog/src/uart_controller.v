@@ -14,7 +14,7 @@ module uart_controller(
     output reg uart_wait = 0);
     parameter FIFO_WIDTH = 8;
     parameter CLOCK_FREQUENCY = 50_000_000;
-    parameter BAUD_RATE = 115_200;
+    parameter BAUD_RATE = 115200;
     /*AUTOWIRE*/
     wire                empty;                  // From tx_fifo of fifo.v, ...
     wire                full;                   // From tx_fifo of fifo.v, ...

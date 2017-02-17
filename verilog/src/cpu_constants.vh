@@ -99,6 +99,7 @@
 `define UART_STATUS_ADDR 16'hff03
 `define UART_DATA_ADDR 16'hff02
 `define TIMER_DATA_ADDR 16'hff06
+`define SOUND_DATA_ADDR 16'hff08
 
 
 
