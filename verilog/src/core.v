@@ -2,7 +2,7 @@
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
 module core(input clk,input rst_n, output [7:0] LED, input rx, output tx,
-    output snd_out, input [3:0] switches);
+    output snd_out, output [3:0] snd_signals, input [3:0] switches);
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [15:0]             SP_out;                 // From alu of alu.v
 wire [7:0]              alu_control;            // From decoder of decoder.v
@@ -150,6 +150,7 @@ mmio mmio(
           .serviced_read                (mmio_serviced_read),
           .tx                           (tx),
           .snd_out                      (snd_out),
+          .snd_signals                  (snd_signals),
           .mem_wait                     (mmio_mem_wait),
           // Inputs
           .clk                          (clk),

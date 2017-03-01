@@ -17,6 +17,7 @@ module mmio(
     input rx,
     output tx,
     output snd_out,
+    output [3:0] snd_signals,
     output mem_wait);
 
 
@@ -67,6 +68,7 @@ uart_controller uart(
     sound sound(
                 // Outputs
                 .snd_out                (snd_out),
+                .snd_signals            (snd_signals),
                 // Inputs
                 .clk                    (clk),
                 .rst                    (rst),
