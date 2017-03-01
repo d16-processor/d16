@@ -17,6 +17,9 @@ ntsc_gen #(.DATA_BITS(4)) gen(/*AUTOINST*/
                               .v_sync           (v_sync),
                               // Inputs
                               .clk              (clk));
+pll1 pll(
+    .inclk0(CLOCK_50),
+    .c0(clk));
 
 core core(
           // Outputs
@@ -29,7 +32,6 @@ core core(
           .rst_n                        (rst_n[2]),
           .rx                           (Rx),
           .switches                     (SW[3:0]));
-assign clk = CLOCK_50;
 //assign LED[7] = Tx;
 
 always @(posedge CLOCK_50)begin
