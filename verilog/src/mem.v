@@ -9,13 +9,20 @@ module mem(
     input [15:0] addr,
     input [15:0] data_in,
     output reg [15:0] data_out,
-    output mem_wait);
+    output mem_wait,
+    //port 2
+    input write_enable_2,
+    input [15:0] addr2,
+    input [15:0] data_in2,
+    output reg [15:0] data_out2
+    );
 parameter MEM_BYTES = 128;
 parameter MEM_WORDS = MEM_BYTES / 2;
 reg [15:0] mem_storage [0:MEM_WORDS-1];
 reg [15:0] s_addr = 0;
+reg [15:0] s_addr2 = 0;
 reg s_byte_select, s_byte_enable;
-wire [15:0] mem_data;
+wire [15:0] mem_data, mem_data2;
 
 
 initial begin
@@ -23,6 +30,10 @@ initial begin
 end
 assign mem_wait = 0;
 assign mem_data = mem_storage[s_addr];
+assign mem_data2  = mem_storage[s_addr2];
+always @* begin
+    data_out2 <= mem_data2;
+end
 always @* begin
     if(s_byte_enable == 1)
         if(s_byte_select == 1)
@@ -60,4 +71,12 @@ always @(posedge clk) begin
 		  
     end
 end
+always @(posedge clk)
+    if(en == 1) begin
+        if(write_enable_2 == 1)begin
+            //mem_storage[addr2] <= data_in2;
+        end
+        s_addr2 <= addr2;
+    end
+
 endmodule
