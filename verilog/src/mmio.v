@@ -18,7 +18,9 @@ module mmio(
     output tx,
     output snd_out,
     output [3:0] snd_signals,
-    output mem_wait);
+    output mem_wait,
+    
+    input  dma_status);
 
 
     wire [15:0] real_addr;
@@ -105,6 +107,8 @@ uart_controller uart(
                 data_out <= timer_data_out;
             16'hff01:
                 data_out <= {4'b0,switch_sync[7:4]};
+            `DMA_CONTROL_ADDR:
+                data_out <= dma_status;
             default:
                 data_out <= 0;
 

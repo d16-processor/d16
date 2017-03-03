@@ -101,6 +101,11 @@
 `define TIMER_DATA_ADDR 16'hff06
 `define SOUND_DATA_ADDR 16'hff08
 
+`define DMA_CONTROL_ADDR 16'hff0a
+`define DMA_LOCAL_ADDR   16'hff0c
+`define DMA_PERIPH_ADDR  16'hff0e
+`define DMA_COUNT_ADDR   16'hff10
+
 
 
 `ifdef FORMAL

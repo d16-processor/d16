@@ -163,6 +163,14 @@ mmio mmio(
           .data_in                      (data_in[15:0]),
           .rx                           (rx),
           .switches                     (switches));
+dma_controller dma(
+          .clk(clk),
+          .rst(rst),
+          .en(en),
+          .addr(addr),
+          .data_in(data_in),
+          .write_enable(write_enable)
+      );
 lr lr(
       // Outputs
       .lr_out                           (lr_out[15:0]),
