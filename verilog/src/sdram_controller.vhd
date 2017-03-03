@@ -34,7 +34,8 @@ entity sdram_controller is
    req_write   : IN     STD_LOGIC;
    data_out      : OUT     STD_LOGIC_VECTOR (31 downto 0);
    data_out_valid : OUT     STD_LOGIC;
-   data_in      : IN     STD_LOGIC_VECTOR (31 downto 0)
+   data_in      : IN     STD_LOGIC_VECTOR (31 downto 0);
+   write_complete : OUT     STD_LOGIC
    );
 end entity;
    
@@ -59,7 +60,10 @@ architecture rtl of sdram_controller is
       data_out_low: std_logic_vector(15 downto 0);
       data_out_valid : std_logic;
 
+
       dq_masks      : std_logic_vector(1 downto 0);
+      initialized    : std_logic;
+      write_complete : std_logic;
    end record;
    component sdram_clk_gen
    PORT
@@ -72,8 +76,8 @@ architecture rtl of sdram_controller is
 
    -- note to self - this constant should be "(others => '0')" when not simulating!!!
    signal r : reg := ((others => '0'), (others => '0'), 
-                      (others => '0'), "000000000001000", (others => '0'), 
-                      '0', '0', '0', (others => '0'), (others => '0'), '0', (others => '0'));
+                      (others => '0'), "000000010000111", (others => '0'), 
+                      '0', '0', '0', (others => '0'), (others => '0'), '0', (others => '0'),'0','0');
    signal n : reg;
    
    -- Vectors for each SDRAM 'command'
@@ -163,6 +167,7 @@ sdram_clk_pll: sdram_clk_gen
    DATA_OUT         <= captured & r.data_out_low;
    DRAM_DQM       <= r.dq_masks;
    data_out_valid <= r.data_out_valid;
+   write_complete <= r.write_complete;
 
    process (r, address, req_read, req_write, addr_row, addr_bank, addr_col, data_in, captured)
    begin
@@ -191,8 +196,9 @@ sdram_clk_pll: sdram_clk_gen
       
       -- Set the data bus into HIZ, high and low bytes masked
       DRAM_DQ    <= (others => 'Z');
-
-      n.init_counter <= r.init_counter-1;
+      if r.initialized = '0' then
+          n.init_counter <= r.init_counter-1;
+      end if;
       
       -- Process the FSM
       case r.state(8 downto 4) is
@@ -229,6 +235,7 @@ sdram_clk_pll: sdram_clk_gen
             -- T-1 The switch to the FSM (first command will be a NOP
             if r.init_counter = 1 then
                n.state          <= s_idle;
+               n.initialized <= '1';
             end if;
 
          ------------------------------
@@ -319,6 +326,7 @@ sdram_clk_pll: sdram_clk_gen
          -- The Write section
          ------------------------------
          when s_wr0(8 downto 4) =>
+            n.write_complete <= '1';
             n.state    <= s_wr1;
             n.address <= "000" & addr_col;
             n.bank    <= addr_bank;
@@ -332,6 +340,7 @@ sdram_clk_pll: sdram_clk_gen
             DRAM_DQ     <= data_in(15 downto 0);
             n.state     <= s_wr3;
             n.dq_masks<= "00";
+            n.write_complete <= '0';
          when s_wr3(8 downto 4) =>
             -- Default to the idle+row active state
             n.state     <= s_ra2;
@@ -342,6 +351,7 @@ sdram_clk_pll: sdram_clk_gen
             if r.rd_pending = '1' or r.wr_pending = '1' then
                n.state         <= s_dr0;
                n.address(10) <= '1';
+               n.write_complete <= '0';
             end if;
 
             -- But if there is a read pending in the same row, do that
@@ -372,6 +382,7 @@ sdram_clk_pll: sdram_clk_gen
          -- The Read section
          ------------------------------
          when s_rd0(8 downto 4) =>
+            n.data_out_valid <= '0';
             n.state <= s_rd1;
             n.dq_masks <= "00";
          when s_rd1(8 downto 4) =>
@@ -387,6 +398,7 @@ sdram_clk_pll: sdram_clk_gen
             -- otherwise if there is a read or write prepare to deactivate the row.
             -- (This is overridden if the read/write is to the same page)
             if r.rd_pending = '1' or r.wr_pending = '1' then
+               n.write_complete <= '0';
                n.state       <= s_drdr0;
                n.address(10) <= '1';
             end if;
@@ -437,6 +449,7 @@ sdram_clk_pll: sdram_clk_gen
             -- otherwise if there is a read or write prepare to deactivate the row.
             -- (This is overridden if the read/write is to the same row)
             if r.rd_pending = '1' or r.wr_pending = '1' then
+               n.write_complete <= '0';
                n.state <= s_dr0;
                n.address(10) <= '1';
             end if;
@@ -481,6 +494,7 @@ sdram_clk_pll: sdram_clk_gen
             end if;
             
             if r.rd_pending = '1' or r.wr_pending = '1' then
+               n.write_complete <= '0';
                n.state       <= s_ra0;
                n.address    <= addr_row;
                n.act_row    <= addr_row;
