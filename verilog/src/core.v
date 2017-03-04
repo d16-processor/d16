@@ -2,7 +2,16 @@
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
 module core(input clk,input rst_n, output [7:0] LED, input rx, output tx,
-    output snd_out, output [3:0] snd_signals, input [3:0] switches);
+    output snd_out, output [3:0] snd_signals, input [3:0] switches,
+    
+    output [31:0] dram_data_out,
+    output [23:0] dram_addr,
+    output dram_req_read,
+    output dram_req_write,
+    input  [31:0] dram_data_in,
+    input  dram_data_valid,
+    input  dram_write_complete
+);
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [15:0]             SP_out;                 // From alu of alu.v
 wire [7:0]              alu_control;            // From decoder of decoder.v
@@ -45,6 +54,11 @@ wire [15:0] mmio_data_out;
 wire mmio_serviced_read;
 wire mmio_mem_wait;
 wire mem_mem_wait;
+
+wire [15:0] data_in2;
+wire [15:0] addr2;
+wire [15:0] data_out2;
+wire write_enable2;
 
 reg [1:0]              pc_op;
 reg [3:0]              flags_in;
@@ -134,7 +148,12 @@ mem#(
         .byte_select                    (byte_select),
         .byte_enable                    (byte_enable),
         .addr                           (addr[15:0]),
-        .data_in                        (data_in[15:0]));
+        .data_in                        (data_in[15:0]),
+        
+        .write_enable_2                  (write_enable2),
+        .data_in2                       (data_in2[15:0]),
+        .addr2                          (addr2[15:0]),
+        .data_out2                      (data_out2[15:0]));
 //leds leds(
     //.clk                                (clk),
     //.en                                 (en),
@@ -164,13 +183,27 @@ mmio mmio(
           .rx                           (rx),
           .switches                     (switches));
 dma_controller dma(
-          .clk(clk),
-          .rst(rst),
-          .en(en),
-          .addr(addr),
-          .data_in(data_in),
-          .write_enable(write_enable)
-      );
+                   // Outputs
+                   .ram_addr            (addr2[15:0]),
+                   .ram_data_out        (data_in2[15:0]),
+                   .ram_we              (write_enable2),
+                   // Inputs
+                   .clk                 (clk),
+                   .rst                 (rst),
+                   .en                  (en),
+                   .addr                (addr[15:0]),
+                   .data_in             (data_in[15:0]),
+                   .write_enable        (write_enable),
+                   .ram_data_in         (data_out2[15:0]),
+                   
+                   .dram_data_out       (dram_data_out[31:0]),
+                   .dram_addr           (dram_addr[23:0]),
+                   .dram_req_read       (dram_req_read),
+                   .dram_req_write      (dram_req_write),
+                   .dram_data_in        (dram_data_in[31:0]),
+                   .dram_data_valid     (dram_data_valid),
+                   .dram_write_complete (dram_write_complete)
+               );
 lr lr(
       // Outputs
       .lr_out                           (lr_out[15:0]),
