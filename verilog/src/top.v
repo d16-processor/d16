@@ -14,8 +14,8 @@ module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED,
 );
 /*AUTOWIRE*/
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
-wire                    v_sync;                 // From gen of ntsc_gen.v
 // End of automatics
+wire                    v_sync;                 // From gen of ntsc_gen.v
 wire clk;
 wire snd;
 wire ntsc_clk;
@@ -74,6 +74,7 @@ sdram_controller controller(
     .data_out_valid(dram_data_valid),
     .data_in(dram_data_in)
 );
+bus_arbiter arbiter(/*AUTOINST*/);
 //assign LED[7] = Tx;
 
 always @(posedge CLOCK_50)begin
