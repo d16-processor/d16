@@ -3,6 +3,7 @@
 module dma_controller_tb;
     /*AUTOWIRE*/
     // Beginning of automatic wires (for undeclared instantiated-module outputs)
+    wire                dma_status;             // From dma of dma_controller.v
     wire [23:0]         dram_addr;              // From dma of dma_controller.v
     wire [31:0]         dram_data_out;          // From dma of dma_controller.v
     wire                dram_req_read;          // From dma of dma_controller.v
@@ -26,6 +27,7 @@ module dma_controller_tb;
     // End of automatics
     dma_controller dma(/*AUTOINST*/
                        // Outputs
+                       .dma_status      (dma_status),
                        .ram_addr        (ram_addr[15:0]),
                        .ram_data_out    (ram_data_out[15:0]),
                        .ram_we          (ram_we),
@@ -52,7 +54,7 @@ module dma_controller_tb;
         addr = 0;
         data_in = 0;
         write_enable = 0;
-        ram_data_in = 0;
+        ram_data_in = 16'habcd;
         dram_data_in = 0;
         dram_data_valid = 0;
         dram_write_complete = 0;
@@ -74,13 +76,43 @@ module dma_controller_tb;
         data_in = 0;
         @(posedge clk)
         write_enable = 0;
+        //test read
+        @(negedge dma_status)
+        #20
+        addr = `DMA_COUNT_ADDR >> 1;
+        data_in = 16;
+        write_enable = 1;
+        @(posedge clk);
+        addr = `DMA_PERIPH_ADDR >> 1;
+        data_in = 16'h00c0;
+        @(posedge clk)
+        addr = `DMA_LOCAL_ADDR >> 1;
+        data_in = 16'hfe00;
+        @(posedge clk);
+        addr = `DMA_CONTROL_ADDR >> 1;
+        data_in = 1;
+        @(posedge clk)
+        write_enable = 0;
 
     end
+    reg busy = 0;
     always @(posedge clk) begin
-        if(dram_req_write) 
-            #30 dram_write_complete <= 1;
-        if(dram_write_complete)
+        if(dram_req_write && !busy) begin
+            #30 dram_write_complete = 1;
+            busy <= 1;
+        end
+        if(dram_write_complete && busy) begin
             dram_write_complete <= 0;
+            busy <= 0;
+        end
+        if(dram_req_read && !busy) begin
+            #80 dram_data_valid = 1;
+            busy <= 1;
+        end
+        if(dram_data_valid && busy) begin
+            dram_data_valid <= 0;
+            busy <= 0;
+        end
     end
 
 endmodule

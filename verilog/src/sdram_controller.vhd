@@ -62,7 +62,6 @@ architecture rtl of sdram_controller is
 
 
         dq_masks        : std_logic_vector(1 downto 0);
-        initialized     : std_logic;
         write_complete : std_logic;
     end record;
     component sdram_clk_gen
@@ -74,8 +73,8 @@ architecture rtl of sdram_controller is
     );
     end component;
     signal r : reg := ((others => '0'), (others => '0'), (others => '0'),
-    "000000010000011", (others => '0'), '0', '0', '0', (others => '0'),
-    (others => '0'), '0', (others => '0'),'0','0');
+    "000000000000000", (others => '0'), '0', '0', '0', (others => '0'),
+    (others => '0'), '0', (others => '0'),'0');
     signal n : reg;
     
     -- Vectors for each SDRAM 'command'
@@ -194,9 +193,7 @@ sdram_clk_pll: sdram_clk_gen
         
         -- Set the data bus into HIZ, high and low bytes masked
         DRAM_DQ     <= (others => 'Z');
-        if r.initialized = '0' then
-             n.init_counter <= r.init_counter-1;
-        end if;
+        n.init_counter <= r.init_counter-1;
         
         -- Process the FSM
         case r.state(8 downto 4) is
@@ -233,7 +230,6 @@ sdram_clk_pll: sdram_clk_gen
                 -- T-1 The switch to the FSM (first command will be a NOP
                 if r.init_counter = 1 then
                     n.state             <= s_idle;
-                    n.initialized <= '1';
                 end if;
 
             ------------------------------

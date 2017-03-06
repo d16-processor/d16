@@ -16,67 +16,55 @@ module mem(
     input [15:0] data_in2,
     output reg [15:0] data_out2
     );
-parameter MEM_BYTES = 128;
-parameter MEM_WORDS = MEM_BYTES / 2;
-reg [15:0] mem_storage [0:MEM_WORDS-1];
-reg [15:0] s_addr = 0;
-reg [15:0] s_addr2 = 0;
-reg s_byte_select, s_byte_enable;
-wire [15:0] mem_data, mem_data2;
-
-
-initial begin
-    $readmemh("mem.hex",mem_storage);
-end
-assign mem_wait = 0;
-assign mem_data = mem_storage[s_addr];
-assign mem_data2  = mem_storage[s_addr2];
+    /*AUTOWIRE*/
+    // Beginning of automatic wires (for undeclared instantiated-module outputs)
+    wire [15:0]         q_a;                    // From ram of ram_macro.v
+    wire [15:0]         q_b;                    // From ram of ram_macro.v
+    reg [15:0]         data_a;
+    reg [1:0] byteena_a;
+    assign mem_wait = 0;
+    // End of automatics
+    ram_macro ram(
+                  // Outputs
+                  .q_a                  (q_a[15:0]),
+                  .q_b                  (q_b[15:0]),
+                  // Inputs
+                  .address_a            (addr[13:0]),
+                  .address_b            (addr2[13:0]),
+                  .byteena_a            (byteena_a[1:0]),
+                  .clock                (clk),
+                  .data_a               (data_a[15:0]),
+                  .data_b               (data_in2[15:0]),
+                  .wren_a               (write_enable),
+                  .wren_b               (write_enable2));
+//input logic
 always @* begin
-    data_out2 <= mem_data2;
+    if(byte_enable) begin
+        if(byte_select) begin
+            byteena_a <= 2'b10;
+        end
+        else begin
+            byteena_a <= 2'b01;
+        end
+    end
+    else begin
+        byteena_a <= 2'b11;
+    end
+    data_a <= data_in;
 end
 always @* begin
-    if(s_byte_enable == 1)
-        if(s_byte_select == 1)
-            data_out <= {8'b0,mem_data[15:8]};
+    if(byte_enable) begin
+        if(byte_select)
+            data_out <= {8'b0,q_a[15:8]};
         else
-            data_out <= {8'b0,mem_data[7:0]};
-    else
-        data_out <= mem_data;
-end
-always @(posedge clk) begin
-    s_byte_enable <= byte_enable;
-    s_byte_select <= byte_select;
-    if (rst == 1) begin
-        s_addr <= 0;
-        /*AUTORESET*/
+            data_out <= {8'b0,q_a[7:0]};
     end
-    else if(en == 1)begin
-        if(addr < MEM_WORDS) begin
-            if(write_enable == 1) begin
-                if(byte_enable == 1) begin
-                    if(byte_select == 1) begin
-                        mem_storage[addr][15:8] <= data_in[7:0];
-//                        mem_storage[addr][7:0] <= mem_storage[addr][7:0];
-                    end
-                    else begin
-                        mem_storage[addr][7:0] <= data_in[7:0];
-//                        mem_storage[addr][15:8] <= mem_storage[addr][15:8];
-                    end
-                end
-                else
-                    mem_storage[addr] <= data_in;
-            end
-        end
-		  s_addr <= addr;
-		  
+    else begin
+        data_out <= q_a;
     end
 end
-always @(posedge clk)
-    if(en == 1) begin
-        if(write_enable_2 == 1)begin
-            //mem_storage[addr2] <= data_in2;
-        end
-        s_addr2 <= addr2;
-    end
+always @* begin
+    data_out2 <= q_b;
+end
 
 endmodule

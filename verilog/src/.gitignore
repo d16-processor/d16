@@ -8,4 +8,7 @@
 *.hex
 *.blif
 *.ihex
+*.mif
 greybox_tmp
+ram_macro.qip
+ram_macro.v

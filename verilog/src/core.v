@@ -59,6 +59,7 @@ wire [15:0] data_in2;
 wire [15:0] addr2;
 wire [15:0] data_out2;
 wire write_enable2;
+wire dma_status;
 
 reg [1:0]              pc_op;
 reg [3:0]              flags_in;
@@ -134,9 +135,7 @@ register_unit reg_unit(
                        .rS_sel          (rS_sel[2:0]),
                        .rD_data_in      (rD_data_in[15:0]),
                        .rS_data_in      (rS_data_in[15:0]));
-mem#(
-    .MEM_BYTES(16384)    
-) mem(
+mem mem(
         // Outputs
         .data_out                       (data_out[15:0]),
         .mem_wait                       (mem_mem_wait),
@@ -181,12 +180,14 @@ mmio mmio(
           .addr                         (addr[15:0]),
           .data_in                      (data_in[15:0]),
           .rx                           (rx),
-          .switches                     (switches));
+          .switches                     (switches),
+          .dma_status                   (dma_status));
 dma_controller dma(
                    // Outputs
                    .ram_addr            (addr2[15:0]),
                    .ram_data_out        (data_in2[15:0]),
                    .ram_we              (write_enable2),
+                   .dma_status          (dma_status),
                    // Inputs
                    .clk                 (clk),
                    .rst                 (rst),
