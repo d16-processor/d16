@@ -4,6 +4,6 @@ mem.hex: test.bin
 %.bin: %.s
 	d16 -b $< -o $@
 
-install: mem.hex
-	python $(hex2mif) mem.hex ../../../verilog_d16/mem.mif
+install: test.bin
+	cp test.bin ../../../verilog_d16/mem.bin
 .PHONY: install

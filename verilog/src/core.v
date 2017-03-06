@@ -149,7 +149,7 @@ mem mem(
         .addr                           (addr[15:0]),
         .data_in                        (data_in[15:0]),
         
-        .write_enable_2                  (write_enable2),
+        .write_enable2                  (write_enable2),
         .data_in2                       (data_in2[15:0]),
         .addr2                          (addr2[15:0]),
         .data_out2                      (data_out2[15:0]));
