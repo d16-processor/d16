@@ -11,19 +11,17 @@ module mem(
     output reg [15:0] data_out,
     output mem_wait,
     //port 2
-    input write_enable_2,
+    input write_enable2,
     input [15:0] addr2,
     input [15:0] data_in2,
     output reg [15:0] data_out2
     );
-    /*AUTOWIRE*/
-    // Beginning of automatic wires (for undeclared instantiated-module outputs)
+`ifdef ALTERA
     wire [15:0]         q_a;                    // From ram of ram_macro.v
     wire [15:0]         q_b;                    // From ram of ram_macro.v
     reg [15:0]         data_a;
     reg [1:0] byteena_a;
     assign mem_wait = 0;
-    // End of automatics
     ram_macro ram(
                   // Outputs
                   .q_a                  (q_a[15:0]),
@@ -66,5 +64,31 @@ end
 always @* begin
     data_out2 <= q_b;
 end
-
+`else
+    reg [15:0] mem_storage[0:2**16-1];
+    initial 
+        $readmemh("mem.hex",mem_storage);
+    always @(posedge clk) begin
+        if(byte_enable)
+            if(byte_select)
+                data_out <= {8'b0,mem_storage[addr][15:8]};
+            else
+                data_out <= {8'b0,mem_storage[addr][7:0]};
+        else
+            data_out <= mem_storage[addr];
+        if(write_enable)
+            if(byte_enable)
+                if(byte_select)
+                    mem_storage[addr][15:8] <= data_in[7:0];
+                else
+                    mem_storage[addr][7:0] <= data_in[7:0];
+            else
+                mem_storage[addr] <= data_in;
+    end
+    always @(posedge clk) begin
+        data_out2 <= mem_storage[addr2];
+        if(write_enable2)
+            mem_storage[addr2] <= data_in2;
+    end
+`endif
 endmodule
