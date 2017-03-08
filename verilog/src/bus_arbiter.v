@@ -1,3 +1,4 @@
+`define PASS_THROUGH
 module bus_arbiter(
     input clk,
 
@@ -28,6 +29,17 @@ assign write_complete2 = current_device ? dram_write_complete : 0;
 assign data_valid1 = current_device ? 0 : dram_data_out_valid;
 assign data_valid2 = current_device ? dram_data_out_valid : 0;
 
+`ifdef PASS_THROUGH
+    always @* begin
+        current_device <= 1'b1;
+        dram_addr <= addr2;
+        dram_data_in <= data_in2;
+        data_out2 <= dram_data_out;
+        dram_req_read <= req_read2;
+        dram_req_write <= req_write2;
+    end
+
+`else
 always @(posedge clk) begin
     if(req_read1 == 1 && !busy) begin
         current_device <= 0;
@@ -65,5 +77,5 @@ always @(posedge clk) begin
        end
    end
 end
-
+`endif
 endmodule

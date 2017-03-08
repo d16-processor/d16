@@ -51,6 +51,7 @@ architecture sim of sdram_controller_tb is
     signal DRAM_DQM : std_logic_vector(1 downto 0);
     signal DRAM_RAS_N : std_logic;
     signal DRAM_WE_N : std_logic;
+    signal data_1  : std_logic := '0';
 
 BEGIN
 
@@ -96,18 +97,49 @@ BEGIN
         wait for 20 ns;
         req_write <= '0';
         wait until write_complete = '1';
+        wait for 100 ns;
         address <= X"000f40";
         data_in <= X"beefc001";
         req_write <= '1';
         wait for 20 ns;
         req_write <= '0';
         wait until write_complete = '1';
+        wait for 100 ns;
         address <= X"00ffee";
+        req_read <= '1';
+        wait for 20 ns;
+        req_read <= '0';
+        wait for 160 ns;
         req_read <= '1';
         wait for 20 ns;
         req_read <= '0';
         wait;
     end process;
+
+read_proc: process begin
+    wait until rising_edge(DRAM_CLK);
+    if DRAM_RAS_N = '1' and DRAM_CAS_N = '0' and DRAM_WE_N = '1' then --read
+        if data_1 = '0' then
+            data_1 <= '1';
+            wait for 30 ns;
+            DRAM_DQ <= X"FEED";
+            wait for 10 ns;
+            DRAM_DQ <= X"F00D";
+            wait for 10 ns;
+            DRAM_DQ <= (others => 'Z');
+        else
+            wait for 30 ns;
+            DRAM_DQ <= X"5678";
+            wait for 10 ns;
+            DRAM_DQ <= X"1234";
+            wait for 10 ns;
+            DRAM_DQ <= (others => 'Z');
+        end if;
+    else 
+        DRAM_DQ <= (others => 'Z');
+    
+    end if;
+end process;
 
 
 end;

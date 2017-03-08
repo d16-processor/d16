@@ -35,6 +35,8 @@ wire [31:0] dram_data_out, dram_data_in;
 wire [31:0] data_in2;
 wire [23:0] addr2, addr1;
 
+wire req_read2, req_write2, req_read1, dram_write_complete;
+
 
 //assign Snd = {3'b0,snd};
 //assign Snd = snd_signals;
@@ -70,7 +72,37 @@ core core(
           .dram_write_complete          (write_complete2)
         
       );
+`ifdef CONTROLLER2
+wire sdram_clk;
+sdram_clk_gen sdram_pll (
+    .inclk0(clk),
+    .c0(sdram_clk)
+);
+wire [3:0] byte_enable = 4'b1111;
+SDRAM_Controller_v controller(
+    .clk(sdram_clk),
+    .reset(rst),
+    .cmd_ready(dram_write_complete),
+    .cmd_enable(dram_req_read),
+    .cmd_wr(dram_req_write),
+    .cmd_byte_enable(byte_enable),
+    .cmd_address(dram_addr),
+    .cmd_data_in(dram_data_in),
+    .data_out(dram_data_out),
+    .data_out_ready(dram_data_valid),
 
+    .SDRAM_CLK(DRAM_CLK),
+    .SDRAM_CKE(DRAM_CKE),
+    .SDRAM_CS(DRAM_CS),
+    .SDRAM_RAS(DRAM_RAS_N),
+    .SDRAM_CAS(DRAM_CAS_N),
+    .SDRAM_WE(DRAM_WE_N),
+    .SDRAM_DQM(DRAM_DQM),
+    .SDRAM_ADDR(DRAM_ADDR),
+    .SDRAM_BA(DRAM_BA),
+    .SDRAM_DATA(DRAM_DQ)
+);
+`else
 sdram_controller controller(
     .CLOCK_50(clk),
     .DRAM_ADDR(DRAM_ADDR),
@@ -92,6 +124,7 @@ sdram_controller controller(
     .data_in(dram_data_in),
     .write_complete(dram_write_complete)
 );
+`endif
 bus_arbiter arbiter(
                     // Outputs
                     .data1              (data1[31:0]),

@@ -49,7 +49,7 @@ architecture rtl of sdram_controller is
         address      : std_logic_vector(12 downto 0);
         bank            : std_logic_vector( 1 downto 0);
 
-        init_counter: std_logic_vector(14 downto 0);
+        init_counter: std_logic_vector(15 downto 0);
         rf_counter    : std_logic_vector( 9 downto 0);
         rf_pending     : std_logic;
 
@@ -68,12 +68,12 @@ architecture rtl of sdram_controller is
     PORT
     (
         inclk0: IN  STD_LOGIC;
-        c0        : OUT STD_LOGIC;
-        c1        : OUT STD_LOGIC
+        c1        : OUT STD_LOGIC;
+        c0        : OUT STD_LOGIC
     );
     end component;
     signal r : reg := ((others => '0'), (others => '0'), (others => '0'),
-    "000000000000000", (others => '0'), '0', '0', '0', (others => '0'),
+    "0000000000001011", (others => '0'), '0', '0', '0', (others => '0'),
     (others => '0'), '0', (others => '0'),'0');
     signal n : reg;
     
@@ -133,6 +133,9 @@ architecture rtl of sdram_controller is
     signal addr_col : std_logic_vector(9 downto 0);
 
     signal captured : std_logic_vector(15 downto 0);
+    signal data_out_all    : std_logic_vector(31 downto 0) := (others => '0');
+    signal data_valid_prev : std_logic_vector(2 downto 0) := (others => '0');
+    signal s_data_out : std_logic_vector(31 downto 0) := (others => '0');
     
     signal clock_100             : std_logic;
     signal clock_100_delayed_3ns : std_logic;
@@ -149,8 +152,8 @@ sdram_clk_pll: sdram_clk_gen
     PORT MAP
     (
         inclk0     => CLOCK_50,
-        c0            => clock_100,
-        c1            => clock_100_delayed_3ns
+        c1            => clock_100,
+        c0            => clock_100_delayed_3ns
     );
 
     DRAM_CLK            <= clock_100_delayed_3ns;
@@ -161,10 +164,18 @@ sdram_clk_pll: sdram_clk_gen
     DRAM_WE_N         <= r.state(0);
     DRAM_ADDR        <= r.address;
     DRAM_BA             <= r.bank;
-    DATA_OUT            <= captured & r.data_out_low;
+    DATA_OUT            <= s_data_out;
     DRAM_DQM         <= r.dq_masks;
-    data_out_valid <= r.data_out_valid;
+    data_out_valid <= data_valid_prev(0);
     write_complete <= r.write_complete;
+    process (CLOCK_50) begin
+        if rising_edge(CLOCK_50) then
+            --if r.data_out_valid = '1' and data_valid_prev = '0' then
+                --data_out_all <= captured & r.data_out_low;
+            --end if;
+            --data_out_all <= captured & data_out_all(31 downto 16);
+        end if;
+    end process;
 
     process (r, address, req_read, req_write, addr_row, addr_bank, addr_col, data_in, captured)
     begin
@@ -202,17 +213,17 @@ sdram_clk_pll: sdram_clk_gen
                 n.address <= (others => '0');
                 n.bank     <= (others => '0');
                 n.rf_counter    <= (others => '0');
-                n.data_out_valid <= '1';
+                n.data_out_valid <= '0';
                 
                 -- T-130, precharge all banks.
-                if r.init_counter = "000000010000010" then
+                if r.init_counter = "0000000000000000" then
                     n.state      <= s_init_pre;
                     n.address(10)    <= '1';
                 end if;
 
                 -- T-127, T-111, T-95, T-79, T-63, T-47, T-31, T-15, the 8 refreshes
                 
-                if r.init_counter(14 downto 7) = 0 and r.init_counter(3 downto 0) = 15 then
+                if r.init_counter(15 downto 7) = 0 and r.init_counter(3 downto 0) = 15 then
                     n.state      <= s_init_ref;
                 end if;
                 
@@ -221,7 +232,7 @@ sdram_clk_pll: sdram_clk_gen
                     n.state      <= s_init_mrs;
                                     -- Mode register is as follows:
                                     -- resvd    wr_b    OpMd    CAS=3    Seq    bust=4
-                     n.address    <= "000" & "0" & "00" & "011" & "0" & "010";
+                     n.address    <= "000" & "0" & "00" & "011" & "0" & "001";
                                     -- resvd
                     n.bank        <= "00";
                 end if;
@@ -332,6 +343,7 @@ sdram_clk_pll: sdram_clk_gen
                 n.dq_masks<= "00";
             when s_wr2(8 downto 4) =>
                 DRAM_DQ      <= data_in(15 downto 0);
+                DRAM_DQ      <= (others => 'Z');
                 n.state      <= s_wr3;
                 n.dq_masks<= "00";
                 n.write_complete <= '0';
@@ -505,6 +517,11 @@ sdram_clk_pll: sdram_clk_gen
     begin
         if clock_100'event and clock_100 = '1' then
             r <= n;
+            data_out_all <= captured & data_out_all(31 downto 16);
+            data_valid_prev <= '0' & r.data_out_valid & data_valid_prev(1);
+            if data_valid_prev = "010" then
+                s_data_out <= data_out_all;
+            end if;
         end if;
     end process;
 

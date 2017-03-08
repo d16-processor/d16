@@ -40,6 +40,8 @@ localparam STATE_DW_READ_LOW   = 6'b001000;
 localparam STATE_DW_READ_HIGH  = 6'b010000;
 localparam STATE_DW_WRITE_RAM  = 6'b011000;
 //read
+localparam STATE_DR_WAIT1      = 6'b100001;
+localparam STATE_DR_WAIT2      = 6'b101001;
 localparam STATE_DR_READ       = 6'b001001;
 localparam STATE_DR_WRITE_LOW  = 6'b010001;
 localparam STATE_DR_WRITE_HIGH = 6'b011001;
@@ -47,9 +49,11 @@ localparam STATE_DR_WRITE_HIGH = 6'b011001;
 
 reg [STATE_BITS-1:0] state = STATE_NOP;
 reg [31:0] ram_data = 0;
+reg [31:0] dram_data_tmp;
 
 //configuration process
 always @(posedge clk) begin
+    dram_data_tmp <= dram_data_in;
     if(rst == 1) begin
         state <= STATE_NOP;
         dma_in_progress <= 0;
@@ -81,24 +85,22 @@ always @(posedge clk) begin
             ram_addr <= local_addr;
             local_addr <= local_addr + 1;
             state <= STATE_DW_READ_LOW;
+            dram_addr <= remote_addr;
         end
         STATE_DW_READ_LOW:begin
-            ram_data[31:16] <= ram_data_in;
+            dram_data_out[31:16] <= ram_data_in;
             ram_addr <= local_addr;
             local_addr <= local_addr + 1;
             count <= count - 1;
             state <= STATE_DW_READ_HIGH;
         end
         STATE_DW_READ_HIGH: begin
-            ram_data[15:0] <= ram_data_in;
-            dram_addr <= remote_addr;
+            dram_data_out[15:0] <= ram_data_in;
             remote_addr <= remote_addr + 1;
             dram_req_write <= 1'b1;
-            dram_data_out[31:16] <= ram_data[31:16];
-            dram_data_out[15:0] <= ram_data_in;
             state <= STATE_DW_WRITE_RAM;
         end
-        STATE_DW_WRITE_RAM:
+        STATE_DW_WRITE_RAM: 
             if(dram_write_complete == 1) begin
                 dram_req_write <= 1'b0;
                 if(count == 0) begin
@@ -111,28 +113,35 @@ always @(posedge clk) begin
             end
         STATE_DRAM_READ: begin
             ram_we <= 0;
-            dram_addr <= remote_addr;
             dram_req_read <= 1;
             remote_addr <= remote_addr + 1;
             count <= count - 1;
+            state <= STATE_DR_WAIT1;
+        end
+        STATE_DR_WAIT1:
+            state <= STATE_DR_WAIT2;
+        STATE_DR_WAIT2: begin
             state <= STATE_DR_READ;
+            dram_req_read <= 0;
         end
         STATE_DR_READ:
             if(dram_data_valid == 1)begin
                 dram_req_read <= 0;
+                ram_data <= dram_data_in;
                 state <= STATE_DR_WRITE_LOW;
             end
         STATE_DR_WRITE_LOW:begin
             ram_addr <= local_addr;
             local_addr <= local_addr + 1;
+            dram_addr <= remote_addr;
             ram_we <= 1;
-            ram_data_out <= dram_data_in[31:16];
+            ram_data_out <= ram_data[31:16];
             state <= STATE_DR_WRITE_HIGH;
         end
         STATE_DR_WRITE_HIGH:begin
             ram_addr <= local_addr;
             local_addr <= local_addr + 1;
-            ram_data_out <=dram_data_in[15:0];
+            ram_data_out <=ram_data[15:0];
             if(count == 0) begin
                 state <= STATE_NOP;
                 dma_in_progress <= 0;
@@ -148,6 +157,7 @@ always @(posedge clk) begin
     
         STATE_NOP:begin
             ram_we <= 0;
+            dram_addr <= remote_addr;
             if(dma_in_progress)
                 state <= {2'b0,dma_type};
         end
