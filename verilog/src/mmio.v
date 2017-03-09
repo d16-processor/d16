@@ -1,4 +1,4 @@
-//deps: leds.v, uart_controller.v, timer.v
+//deps: leds.v, uart_controller.v, timer.v, sound.v
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
 module mmio(

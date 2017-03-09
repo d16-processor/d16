@@ -134,9 +134,9 @@ module sdram_controller3
      endcase // case ({DRAM_CS_N,DRAM_RAS_N,DRAM_CAS_N,DRAM_WE_N})
    
      
-
+   parameter init_counter_i = 15'b00000010001111;
 `ifdef SIMULATION
-   reg [14:0]        init_counter  = 15'b00000000010000;
+   reg [14:0] init_counter  = init_counter_i;
 `else
    reg [14:0]        init_counter  = 15'b00000000000000;
 `endif
@@ -179,7 +179,7 @@ end
 always @(posedge CLOCK_100)begin
    if(rst == 1)begin
 `ifdef SIMULATION
-      init_counter <= 15'h10;
+      init_counter <= init_counter_i;
 `else
       init_counter <= 15'h0;
 `endif // !`ifdef SIMULATION
@@ -245,6 +245,7 @@ always @(posedge CLOCK_100)begin
         if(rd_pending == 1 || wr_pending == 1) begin
            state     <= s_act0;
            DRAM_ADDR <= addr_row;
+           DRAM_BA   <= addr_bank;
         end
         if(rf_pending) begin
            state      <= s_rf0;
@@ -318,11 +319,11 @@ always @(posedge CLOCK_100)begin
      s_rd4[8:4]:begin
         state <= s_rd5;
         DRAM_ADDR[10] <= 1;
-        data_out[15:0] <= DRAM_DQ;      
+        data_out[15:0] <= captured;      
      end
      s_rd5[8:4]:begin
         state          <= s_rd6;
-        data_out[31:16] <= DRAM_DQ;
+        data_out[31:16] <= captured;
         s_data_valid     <= 1;
      end
      s_rd6[8:4]:begin

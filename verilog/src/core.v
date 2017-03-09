@@ -1,4 +1,4 @@
-//deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v, mmio.v, lr.v
+//deps: alu.v, control.v, mem.v, pc_unit.v, register_unit.v, decoder.v, mmio.v, lr.v, dma_controller.v
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
 module core(input clk,input rst_n, output [7:0] LED, input rx, output tx,

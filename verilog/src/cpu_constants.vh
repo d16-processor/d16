@@ -111,6 +111,6 @@
 `ifdef FORMAL
 `define COVER(x) cover(x);
 `else
-`define COVER(x)
+
 `define COVER
 `endif

@@ -92,7 +92,7 @@ always @(posedge clk) begin
         STATE_DW_READ_HIGH: begin
             ram_data[15:0] <= ram_data_in;
             dram_addr <= remote_addr;
-            remote_addr <= remote_addr + 1;
+            remote_addr <= remote_addr + 2;
             dram_req_write <= 1'b1;
             dram_data_out[31:16] <= ram_data[31:16];
             dram_data_out[15:0] <= ram_data_in;
@@ -113,15 +113,17 @@ always @(posedge clk) begin
             ram_we <= 0;
             dram_addr <= remote_addr;
             dram_req_read <= 1;
-            remote_addr <= remote_addr + 1;
+            remote_addr <= remote_addr + 2;
             count <= count - 1;
             state <= STATE_DR_READ;
         end
-        STATE_DR_READ:
-            if(dram_data_valid == 1)begin
-                dram_req_read <= 0;
-                state <= STATE_DR_WRITE_LOW;
-            end
+        STATE_DR_READ:begin
+           dram_req_read <= 0;
+           if(dram_data_valid == 1)begin
+              dram_req_read <= 0;
+              state <= STATE_DR_WRITE_LOW;
+           end
+           end
         STATE_DR_WRITE_LOW:begin
             ram_addr <= local_addr;
             local_addr <= local_addr + 1;
