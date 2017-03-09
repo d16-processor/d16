@@ -4,7 +4,8 @@ module sdram_controller3
    input             CLOCK_50,
    input             CLOCK_100,
    input             CLOCK_100_del_3ns,
-                               
+   input             rst,
+                                
    input [23:0]      address,
    input             req_read,
    input             req_write,
@@ -106,6 +107,29 @@ module sdram_controller3
       endcase
    end
    // End of automatics
+   reg [39:0] _cmd_ascii;
+   always @*
+     case({DRAM_CS_N,DRAM_RAS_N,DRAM_CAS_N,DRAM_WE_N})
+       cmd_nop:
+         _cmd_ascii <= "nop  ";
+       cmd_read:
+         _cmd_ascii <= "read ";
+       cmd_write:
+         _cmd_ascii <= "write";
+       cmd_act:
+         _cmd_ascii <= "act  ";
+       cmd_pre:
+         _cmd_ascii <= "pre  ";
+       cmd_ref:
+         _cmd_ascii <= "ref  ";
+       cmd_mrs:
+         _cmd_ascii <= "mrs  ";
+       default:
+         _cmd_ascii <= "und  ";
+     endcase // case ({DRAM_CS_N,DRAM_RAS_N,DRAM_CAS_N,DRAM_WE_N})
+   
+     
+
 `ifdef SIMULATION
    reg [14:0]        init_counter  = 15'b00000000010000;
 `else
@@ -138,19 +162,51 @@ module sdram_controller3
       data_valid <= s_data_valid;
       write_complete <= s_write_complete;
    end
-   
+
+always @(posedge CLOCK_100)begin // allow changing latency of command
+   DRAM_WE_N    <= state[0];
+   DRAM_CAS_N   <= state[1];
+   DRAM_RAS_N   <= state[2];
+   DRAM_CS_N    <= state[3];
+end
    
 
 always @(posedge CLOCK_100)begin
+   if(rst == 1)begin
+`ifdef SIMULATION
+      init_counter <= 15'h10;
+`else
+      init_counter <= 15'h0;
+`endif // !`ifdef SIMULATION
+      state <= s_init_nop;
+      DRAM_CS_N <= 1'h0;
+      /*AUTORESET*/
+      // Beginning of autoreset for uninitialized flops
+      DRAM_ADDR <= 13'h0;
+      DRAM_BA <= 2'h0;
+      DRAM_CAS_N <= ~1'h0;
+      DRAM_DQM <= 2'h0;
+      DRAM_RAS_N <= ~1'h0;
+      DRAM_WE_N <= ~1'h0;
+      data_out <= 32'h0;
+      dram_dq <= 16'h0;
+      dram_oe <= 1'h0;
+      rd_pending <= 1'h0;
+      rf_counter <= 10'h0;
+      rf_pending <= 1'h0;
+      s_data_valid <= 1'h0;
+      s_write_complete <= 1'h0;
+      wr_pending <= 1'h0;
+      // End of automatics
+            
+   end
+   else begin
    init_counter <= init_counter - 1;
    if(req_read)
      rd_pending <= 1;
    if(req_write)
      wr_pending <= 1;
-   DRAM_WE_N    <= state[0];
-   DRAM_CAS_N   <= state[1];
-   DRAM_RAS_N   <= state[2];
-   DRAM_CS_N    <= state[3];
+  
    if(rf_counter == 770) begin
       rf_counter <= 0;
       rf_pending <= 1;
@@ -286,10 +342,11 @@ always @(posedge CLOCK_100)begin
      
 
    endcase
-
+end
 end          
    endmodule
 
 // Local Variables:
 // verilog-simulator:"vbuild test sdram_controller_tb.v"
+// verilog-active-low-regexp: "_N$"
 // End:
