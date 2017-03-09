@@ -163,7 +163,7 @@ module sdram_controller3
       write_complete <= s_write_complete;
    end
 
-always @(posedge CLOCK_100)begin // allow changing latency of command
+always @(posedge CLOCK_100) begin // allow changing latency of command
    DRAM_WE_N    <= state[0];
    DRAM_CAS_N   <= state[1];
    DRAM_RAS_N   <= state[2];

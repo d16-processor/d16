@@ -79,11 +79,11 @@ core core(
 		     .c0(CLOCK_100_del_3ns),
 		     .c1(CLOCK_100));
    
-   sdram_controller3 controller(/*AUTOINST*/
-				// Outputs
+   sdram_controller3 controller(
 				.data_out	(dram_data_out[31:0]),
 				.data_valid	(dram_data_valid),
-				.write_complete	(write_complete),
+				// Outputs
+				.write_complete	(dram_write_complete),
 				.DRAM_ADDR	(DRAM_ADDR[12:0]),
 				.DRAM_BA	(DRAM_BA[1:0]),
 				.DRAM_CAS_N	(DRAM_CAS_N),
@@ -99,10 +99,11 @@ core core(
 				.CLOCK_50	(CLOCK_50),
 				.CLOCK_100	(CLOCK_100),
 				.CLOCK_100_del_3ns(CLOCK_100_del_3ns),
-				.address	(dram_address[23:0]),
+				.address	(dram_addr[23:0]),
 				.req_read	(dram_req_read),
 				.req_write	(dram_req_write),
-				.data_in	(dram_data_in[31:0]));
+				.data_in	(dram_data_in[31:0])
+				/*AUTOINST*/);
    
 `else
 sdram_controller controller(
