@@ -13,7 +13,7 @@ module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED,
     output          DRAM_WE_N
 
 );
-/*AUTOWIRE*/
+
 wire [31:0]             data1;                  // From arbiter of bus_arbiter.v
 wire [31:0]             data_out2;              // From arbiter of bus_arbiter.v
 wire                    data_valid1;            // From arbiter of bus_arbiter.v
@@ -73,35 +73,37 @@ core core(
         
       );
 `ifdef CONTROLLER2
-wire sdram_clk;
-sdram_clk_gen sdram_pll (
-    .inclk0(clk),
-    .c0(sdram_clk)
-);
-wire [3:0] byte_enable = 4'b1111;
-SDRAM_Controller_v controller(
-    .clk(sdram_clk),
-    .reset(rst),
-    .cmd_ready(dram_write_complete),
-    .cmd_enable(dram_req_read),
-    .cmd_wr(dram_req_write),
-    .cmd_byte_enable(byte_enable),
-    .cmd_address(dram_addr),
-    .cmd_data_in(dram_data_in),
-    .data_out(dram_data_out),
-    .data_out_ready(dram_data_valid),
-
-    .SDRAM_CLK(DRAM_CLK),
-    .SDRAM_CKE(DRAM_CKE),
-    .SDRAM_CS(DRAM_CS),
-    .SDRAM_RAS(DRAM_RAS_N),
-    .SDRAM_CAS(DRAM_CAS_N),
-    .SDRAM_WE(DRAM_WE_N),
-    .SDRAM_DQM(DRAM_DQM),
-    .SDRAM_ADDR(DRAM_ADDR),
-    .SDRAM_BA(DRAM_BA),
-    .SDRAM_DATA(DRAM_DQ)
-);
+   wire CLOCK_100, CLOCK_100_del_3ns;
+   sdram_clk_gen gen(
+		     .inclk0(CLOCK_50),
+		     .c0(CLOCK_100_del_3ns),
+		     .c1(CLOCK_100));
+   
+   sdram_controller3 controller(/*AUTOINST*/
+				// Outputs
+				.data_out	(dram_data_out[31:0]),
+				.data_valid	(dram_data_valid),
+				.write_complete	(write_complete),
+				.DRAM_ADDR	(DRAM_ADDR[12:0]),
+				.DRAM_BA	(DRAM_BA[1:0]),
+				.DRAM_CAS_N	(DRAM_CAS_N),
+				.DRAM_CKE	(DRAM_CKE),
+				.DRAM_CLK	(DRAM_CLK),
+				.DRAM_CS_N	(DRAM_CS_N),
+				.DRAM_DQM	(DRAM_DQM[1:0]),
+				.DRAM_RAS_N	(DRAM_RAS_N),
+				.DRAM_WE_N	(DRAM_WE_N),
+				// Inouts
+				.DRAM_DQ	(DRAM_DQ[15:0]),
+				// Inputs
+				.CLOCK_50	(CLOCK_50),
+				.CLOCK_100	(CLOCK_100),
+				.CLOCK_100_del_3ns(CLOCK_100_del_3ns),
+				.address	(dram_address[23:0]),
+				.req_read	(dram_req_read),
+				.req_write	(dram_req_write),
+				.data_in	(dram_data_in[31:0]));
+   
 `else
 sdram_controller controller(
     .CLOCK_50(clk),
