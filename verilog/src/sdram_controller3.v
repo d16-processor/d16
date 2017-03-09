@@ -32,43 +32,80 @@ module sdram_controller3
    localparam [3:0] cmd_ref 	   = 4'b0001;
    localparam [3:0] cmd_mrs 	   = 4'b0000;
 
-   localparam s_init_nop 	   = 9'b000000000 | cmd_nop;
-   localparam s_init_pre 	   = 9'b000000000 | cmd_pre;
-   localparam s_init_ref 	   = 9'b000000000 | cmd_ref;
-   localparam s_init_mrs 	   = 9'b000000000 | cmd_mrs;
-   localparam s_init 		   = 5'b00000;
+    parameter    [8:0] // synopsys enum state_info
+      s_init_nop 	   = 9'b000000000 | cmd_nop, 
+      s_init_pre 	   = 9'b000000000 | cmd_pre,
+      s_init_ref 	   = 9'b000000000 | cmd_ref,
+      s_init_mrs 	   = 9'b000000000 | cmd_mrs,       
+      s_idle 		   = 9'b00001_0000 | cmd_nop,
+       
+      s_rf0 		   = 9'b00010_0000 | cmd_ref,
+      s_rf1 		   = 9'b00011_0000 | cmd_nop,
+      s_rf2 		   = 9'b00100_0000 | cmd_nop,
+      s_rf3 		   = 9'b00101_0000 | cmd_nop,
+      s_rf4 		   = 9'b00110_0000 | cmd_nop,
+      s_rf5 		   = 9'b00111_0000 | cmd_nop,
+       
+      s_act0 		   = 9'b01000_0000 | cmd_act,
+      s_act1 		   = 9'b01001_0000 | cmd_nop,
+      s_act2 		   = 9'b01010_0000 | cmd_nop,
+       
+      s_wr0 		   = 9'b01011_0000 | cmd_write,
+      s_wr1 		   = 9'b01100_0000 | cmd_nop,
+      s_wr2 		   = 9'b01101_0000 | cmd_nop,
+      s_wr3 		   = 9'b01110_0000 | cmd_nop,
+      s_wr4 		   = 9'b01111_0000 | cmd_pre,
+      s_wr5 		   = 9'b10000_0000 | cmd_nop,
+      s_wr6 		   = 9'b10001_0000 | cmd_nop,
+       
+      s_rd0 		   = 9'b10010_0000 | cmd_read,
+      s_rd1 		   = 9'b10011_0000 | cmd_nop,
+      s_rd2 		   = 9'b10100_0000 | cmd_nop,
+      s_rd3 		   = 9'b10101_0000 | cmd_nop,
+      s_rd4 		   = 9'b10110_0000 | cmd_pre,
+      s_rd5 		   = 9'b10111_0000 | cmd_nop,
+      s_rd6 		   = 9'b11000_0000 | cmd_nop;
    
-   localparam s_idle 		   = 9'b00001_0000 | cmd_nop;
 
-   localparam s_rf0 		   = 9'b00010_0000 | cmd_ref;
-   localparam s_rf1 		   = 9'b00011_0000 | cmd_nop;
-   localparam s_rf2 		   = 9'b00100_0000 | cmd_nop;
-   localparam s_rf3 		   = 9'b00101_0000 | cmd_nop;
-   localparam s_rf4 		   = 9'b00110_0000 | cmd_nop;
-   localparam s_rf5 		   = 9'b00111_0000 | cmd_nop;
-
-   localparam s_act0 		   = 9'b01000_0000 | cmd_act;
-   localparam s_act1 		   = 9'b01001_0000 | cmd_nop;
-   localparam s_act2 		   = 9'b01010_0000 | cmd_nop;
-
-   localparam s_wr0 		   = 9'b01011_0000 | cmd_write;
-   localparam s_wr1 		   = 9'b01100_0000 | cmd_nop;
-   localparam s_wr2 		   = 9'b01101_0000 | cmd_nop;
-   localparam s_wr3 		   = 9'b01110_0000 | cmd_nop;
-   localparam s_wr4 		   = 9'b01111_0000 | cmd_pre;
-   localparam s_wr5 		   = 9'b10000_0000 | cmd_nop;
-   localparam s_wr6 		   = 9'b10001_0000 | cmd_nop;
-
-   localparam s_rd0 		   = 9'b10010_0000 | cmd_read;
-   localparam s_rd1 		   = 9'b10011_0000 | cmd_nop;
-   localparam s_rd2 		   = 9'b10100_0000 | cmd_nop;
-   localparam s_rd3 		   = 9'b10101_0000 | cmd_nop;
-   localparam s_rd4 		   = 9'b10110_0000 | cmd_pre;
-   localparam s_rd5 		   = 9'b10111_0000 | cmd_nop;
-   localparam s_rd6 		   = 9'b11000_0000 | cmd_nop;
-   
-
-   reg [8:0] 	     state 	   = s_init_nop;
+   reg [8:0] 	     /* synopsys enum state_info */
+		     state 	   = s_init_nop; /* synopsys state_vector state */
+   /*AUTOASCIIENUM("state","_state_ascii","s_")*/
+   // Beginning of automatic ASCII enum decoding
+   reg [63:0]		_state_ascii;		// Decode of state
+   always @(state) begin
+      case ({state})
+	s_init_nop: _state_ascii = "init_nop";
+	s_init_pre: _state_ascii = "init_pre";
+	s_init_ref: _state_ascii = "init_ref";
+	s_init_mrs: _state_ascii = "init_mrs";
+	s_idle:     _state_ascii = "idle    ";
+	s_rf0:      _state_ascii = "rf0     ";
+	s_rf1:      _state_ascii = "rf1     ";
+	s_rf2:      _state_ascii = "rf2     ";
+	s_rf3:      _state_ascii = "rf3     ";
+	s_rf4:      _state_ascii = "rf4     ";
+	s_rf5:      _state_ascii = "rf5     ";
+	s_act0:     _state_ascii = "act0    ";
+	s_act1:     _state_ascii = "act1    ";
+	s_act2:     _state_ascii = "act2    ";
+	s_wr0:      _state_ascii = "wr0     ";
+	s_wr1:      _state_ascii = "wr1     ";
+	s_wr2:      _state_ascii = "wr2     ";
+	s_wr3:      _state_ascii = "wr3     ";
+	s_wr4:      _state_ascii = "wr4     ";
+	s_wr5:      _state_ascii = "wr5     ";
+	s_wr6:      _state_ascii = "wr6     ";
+	s_rd0:      _state_ascii = "rd0     ";
+	s_rd1:      _state_ascii = "rd1     ";
+	s_rd2:      _state_ascii = "rd2     ";
+	s_rd3:      _state_ascii = "rd3     ";
+	s_rd4:      _state_ascii = "rd4     ";
+	s_rd5:      _state_ascii = "rd5     ";
+	s_rd6:      _state_ascii = "rd6     ";
+	default:    _state_ascii = "%Error  ";
+      endcase
+   end
+   // End of automatics
 `ifdef SIMULATION
    reg [14:0] 	     init_counter  = 15'b00000000010000;
 `else
@@ -102,6 +139,7 @@ module sdram_controller3
       write_complete <= s_write_complete;
    end
    
+   
 
 always @(posedge CLOCK_100)begin
    init_counter <= init_counter - 1;
@@ -123,7 +161,7 @@ always @(posedge CLOCK_100)begin
    
    
    case(state[8:4])
-     s_init: begin
+     s_init_nop[8:4]: begin
 	state 		 <= s_init_nop;
 	
 	if(init_counter == 'b000000010000010) begin
@@ -150,9 +188,8 @@ always @(posedge CLOCK_100)begin
 	   state      <= s_rf0;
 	   rf_pending <= 0;
 	end
-	s_data_valid <= 0;
-	
-     end
+	s_data_valid <= 0;	
+     end // case: s_idle[8:4]
      s_act0[8:4]:
        state <= s_act1;
      s_act1[8:4]:
@@ -179,8 +216,8 @@ always @(posedge CLOCK_100)begin
 	dram_oe    <= 1;
 	DRAM_BA    <= addr_bank;
 	DRAM_DQM   <= 0;
-	
-	end
+     end // case: s_wr0[8:4]
+     
      s_wr1[8:4]:begin
 	state 	<= s_wr2;
 	dram_dq <= data_in[31:16];
@@ -213,7 +250,6 @@ always @(posedge CLOCK_100)begin
        state <= s_rd3;
      s_rd3[8:4]: begin
 	state <= s_rd4;
-
      end
      s_rd4[8:4]:begin
 	state <= s_rd5;
@@ -250,3 +286,7 @@ always @(posedge CLOCK_100)begin
 
 end	     
    endmodule
+
+// Local Variables:
+// verilog-simulator:"vbuild test sdram_controller_tb.v"
+// End:
