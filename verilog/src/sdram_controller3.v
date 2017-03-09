@@ -69,7 +69,11 @@ module sdram_controller3
    
 
    reg [8:0] 	     state 	   = s_init_nop;
+`ifdef SIMULATION
+   reg [14:0] 	     init_counter  = 15'b00000000010000;
+`else
    reg [14:0] 	     init_counter  = 15'b00000000000000;
+`endif
    reg [9:0] 	     rf_counter    = 0;
    reg 		     rf_pending    = 0;
    reg 		     s_data_valid = 0;
@@ -209,18 +213,19 @@ always @(posedge CLOCK_100)begin
        state <= s_rd3;
      s_rd3[8:4]: begin
 	state <= s_rd4;
+
      end
      s_rd4[8:4]:begin
 	state <= s_rd5;
-	
+	data_out[15:0] <= captured;	
      end
      s_rd5[8:4]:begin
 	state 	       <= s_rd6;
-	data_out[15:0] <= captured;
+        data_out[31:16] <= captured;
 	s_data_valid     <= 1;
      end
      s_rd6[8:4]:begin
-        data_out[31:0] <= captured;
+
 	   state       <= s_idle;
      end
      s_rf0[8:4]:
