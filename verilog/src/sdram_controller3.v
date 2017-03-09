@@ -34,38 +34,41 @@ module sdram_controller3
    localparam [3:0] cmd_mrs        = 4'b0000;
 
     parameter    [8:0] // synopsys enum state_info
-      s_init_nop           = 9'b000000000 | cmd_nop, 
-      s_init_pre           = 9'b000000000 | cmd_pre,
-      s_init_ref           = 9'b000000000 | cmd_ref,
-      s_init_mrs           = 9'b000000000 | cmd_mrs,       
-      s_idle               = 9'b00001_0000 | cmd_nop,
-       
-      s_rf0                = 9'b00010_0000 | cmd_ref,
-      s_rf1                = 9'b00011_0000 | cmd_nop,
-      s_rf2                = 9'b00100_0000 | cmd_nop,
-      s_rf3                = 9'b00101_0000 | cmd_nop,
-      s_rf4                = 9'b00110_0000 | cmd_nop,
-      s_rf5                = 9'b00111_0000 | cmd_nop,
-       
-      s_act0               = 9'b01000_0000 | cmd_act,
-      s_act1               = 9'b01001_0000 | cmd_nop,
-      s_act2               = 9'b01010_0000 | cmd_nop,
-       
-      s_wr0                = 9'b01011_0000 | cmd_write,
-      s_wr1                = 9'b01100_0000 | cmd_nop,
-      s_wr2                = 9'b01101_0000 | cmd_nop,
-      s_wr3                = 9'b01110_0000 | cmd_nop,
-      s_wr4                = 9'b01111_0000 | cmd_pre,
-      s_wr5                = 9'b10000_0000 | cmd_nop,
-      s_wr6                = 9'b10001_0000 | cmd_nop,
-       
-      s_rd0                = 9'b10010_0000 | cmd_read,
-      s_rd1                = 9'b10011_0000 | cmd_nop,
-      s_rd2                = 9'b10100_0000 | cmd_nop,
-      s_rd3                = 9'b10101_0000 | cmd_nop,
-      s_rd4                = 9'b10110_0000 | cmd_pre,
-      s_rd5                = 9'b10111_0000 | cmd_nop,
-      s_rd6                = 9'b11000_0000 | cmd_nop;
+      s_init_nop  = 9'b000000000 | cmd_nop, 
+      s_init_pre  = 9'b000000000 | cmd_pre,
+      s_init_ref  = 9'b000000000 | cmd_ref,
+      s_init_mrs  = 9'b000000000 | cmd_mrs,       
+      s_idle      = 9'b00001_0000 | cmd_nop,
+                 
+      s_rf0       = 9'b00010_0000 | cmd_ref,
+      s_rf1       = 9'b00011_0000 | cmd_nop,
+      s_rf2       = 9'b00100_0000 | cmd_nop,
+      s_rf3       = 9'b00101_0000 | cmd_nop,
+      s_rf4       = 9'b00110_0000 | cmd_nop,
+      s_rf5       = 9'b00111_0000 | cmd_nop,
+                 
+      s_act0      = 9'b01000_0000 | cmd_act,
+      s_act1      = 9'b01001_0000 | cmd_nop,
+      s_act2      = 9'b01010_0000 | cmd_nop,
+                 
+      s_wr0       = 9'b01011_0000 | cmd_write,
+      s_wr1       = 9'b01100_0000 | cmd_nop,
+      s_wr2       = 9'b01101_0000 | cmd_nop,
+      s_wr3       = 9'b01110_0000 | cmd_nop,
+      s_wr4       = 9'b01111_0000 | cmd_pre,
+      s_wr5       = 9'b10000_0000 | cmd_nop,
+      s_wr6       = 9'b10001_0000 | cmd_nop,
+                 
+      s_rd0       = 9'b10010_0000 | cmd_read,
+      s_rd1       = 9'b10011_0000 | cmd_nop,
+      s_rd2       = 9'b10100_0000 | cmd_nop,
+      s_rd3       = 9'b10101_0000 | cmd_nop,
+      s_rd4       = 9'b10110_0000 | cmd_pre,
+      s_rd5       = 9'b10111_0000 | cmd_nop,
+      s_rd6       = 9'b11000_0000 | cmd_nop,
+                 
+      s_del1      = 9'b11001_0000 | cmd_nop,
+      s_del2      = 9'b11010_0000 | cmd_nop;
    
 
    reg [8:0]         /* synopsys enum state_info */
@@ -103,6 +106,8 @@ module sdram_controller3
         s_rd4:      _state_ascii = "rd4     ";
         s_rd5:      _state_ascii = "rd5     ";
         s_rd6:      _state_ascii = "rd6     ";
+        s_del1:     _state_ascii = "del1    ";
+        s_del2:     _state_ascii = "del2    ";
         default:    _state_ascii = "%Error  ";
       endcase
    end
@@ -184,10 +189,7 @@ always @(posedge CLOCK_100)begin
       // Beginning of autoreset for uninitialized flops
       DRAM_ADDR <= 13'h0;
       DRAM_BA <= 2'h0;
-      DRAM_CAS_N <= ~1'h0;
       DRAM_DQM <= 2'h0;
-      DRAM_RAS_N <= ~1'h0;
-      DRAM_WE_N <= ~1'h0;
       data_out <= 32'h0;
       dram_dq <= 16'h0;
       dram_oe <= 1'h0;
@@ -233,8 +235,12 @@ always @(posedge CLOCK_100)begin
            DRAM_BA   <= 2'b0;
         end
         if(init_counter == 1)
-          state <= s_idle;
+          state <= s_del1;
      end // case: s_init
+     s_del1[8:4]:
+       state <= s_del2;
+     s_del2[8:4]:
+       state <= s_idle;
      s_idle[8:4]:begin
         if(rd_pending == 1 || wr_pending == 1) begin
            state     <= s_act0;
