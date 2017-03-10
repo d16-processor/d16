@@ -1,4 +1,9 @@
 `timescale 1ns/1ps
+// Changelog:
+// d73bf5c0: ram working
+//           Implemented hamsterworks' DE0-nano SDRAM memory controller FSM 1
+//           http://hamsterworks.co.nz/mediawiki/index.php/SDRAM_Memory_Controller#FSM1_-_Simple_controller
+
 module sdram_controller3
   (
    input             CLOCK_50,
@@ -57,7 +62,7 @@ module sdram_controller3
       s_wr3       = 9'b01110_0000 | cmd_nop,
       s_wr4       = 9'b01111_0000 | cmd_pre,
       s_wr5       = 9'b10000_0000 | cmd_nop,
-      s_wr6       = 9'b10001_0000 | cmd_nop,
+
                  
       s_rd0       = 9'b10010_0000 | cmd_read,
       s_rd1       = 9'b10011_0000 | cmd_read,
@@ -98,7 +103,6 @@ module sdram_controller3
         s_wr3:      _state_ascii = "wr3     ";
         s_wr4:      _state_ascii = "wr4     ";
         s_wr5:      _state_ascii = "wr5     ";
-        s_wr6:      _state_ascii = "wr6     ";
         s_rd0:      _state_ascii = "rd0     ";
         s_rd1:      _state_ascii = "rd1     ";
         s_rd2:      _state_ascii = "rd2     ";
@@ -300,9 +304,7 @@ always @(posedge CLOCK_100)begin
         DRAM_ADDR[10] <= 0;
         state <= s_wr5;
      end
-     s_wr5[8:4]:
-       state <= s_wr6;
-     s_wr6[8:4]:begin
+     s_wr5[8:4]:begin
         state <= s_idle;
         s_write_complete <= 0;
      end
@@ -333,8 +335,18 @@ always @(posedge CLOCK_100)begin
         s_data_valid     <= 1;
      end
      s_rd6[8:4]:begin
+        state <= s_idle;
+        if(rd_pending == 1 || wr_pending == 1) begin
+           state     <= s_act0;
+           DRAM_ADDR <= addr_row;
+           DRAM_BA   <= addr_bank;
+        end
+        if(rf_pending) begin
+           state      <= s_rf0;
+           rf_pending <= 0;
+        end
+        s_data_valid <= 0;              
 
-           state       <= s_idle;
      end
      s_rf0[8:4]:
        state <= s_rf1;
