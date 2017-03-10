@@ -184,7 +184,7 @@ always @(posedge CLOCK_100)begin
       init_counter <= 15'h0;
 `endif // !`ifdef SIMULATION
       state <= s_init_nop;
-      DRAM_CS_N <= 1'h0;
+      
       /*AUTORESET*/
       // Beginning of autoreset for uninitialized flops
       DRAM_ADDR <= 13'h0;

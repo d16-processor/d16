@@ -1,3 +1,4 @@
+`define CONTROLLER2
 module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED, 
     output Tx, input Rx, output [3:0] Snd, input [3:0] SW,
     //DRAM signals
@@ -74,7 +75,7 @@ core core(
       );
 `ifdef CONTROLLER2
    wire CLOCK_100, CLOCK_100_del_3ns;
-   sdram_clk_gen gen(
+   sdram_clk_gen clk_gen(
 		     .inclk0(CLOCK_50),
 		     .c0(CLOCK_100_del_3ns),
 		     .c1(CLOCK_100));
