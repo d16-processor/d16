@@ -223,6 +223,7 @@ always @(posedge CLOCK_100)begin
         state            <= s_init_nop;
         
         if(init_counter == 'b000000010000010) begin
+           DRAM_ADDR     <= 0;
            state         <= s_init_pre;
            DRAM_ADDR[10] <= 1'b1;
         end
@@ -230,6 +231,7 @@ always @(posedge CLOCK_100)begin
           state      <= s_init_ref;
         if(init_counter == 3) begin
            state     <= s_init_mrs;
+           DRAM_ADDR[10] <= 0;
            //            res  wr_b opmd cas=3  seq  brst=2
            DRAM_ADDR <= 13'b000_0_00_011_0_001;
            DRAM_BA   <= 2'b0;
@@ -294,7 +296,7 @@ always @(posedge CLOCK_100)begin
      s_wr3[8:4]:
        state <= s_wr4;
      s_wr4[8:4]:begin
-        DRAM_ADDR[10] <= 1;
+        DRAM_ADDR[10] <= 0;
         state <= s_wr5;
      end
      s_wr5[8:4]:
@@ -318,7 +320,7 @@ always @(posedge CLOCK_100)begin
      end
      s_rd4[8:4]:begin
         state <= s_rd5;
-        DRAM_ADDR[10] <= 1;
+        DRAM_ADDR[10] <= 0;
         data_out[15:0] <= captured;      
      end
      s_rd5[8:4]:begin
