@@ -52,7 +52,7 @@ module sdram_controller3
       s_act2      = 9'b01010_0000 | cmd_nop,
                  
       s_wr0       = 9'b01011_0000 | cmd_write,
-      s_wr1       = 9'b01100_0000 | cmd_nop,
+      s_wr1       = 9'b01100_0000 | cmd_write,
       s_wr2       = 9'b01101_0000 | cmd_nop,
       s_wr3       = 9'b01110_0000 | cmd_nop,
       s_wr4       = 9'b01111_0000 | cmd_pre,
@@ -60,7 +60,7 @@ module sdram_controller3
       s_wr6       = 9'b10001_0000 | cmd_nop,
                  
       s_rd0       = 9'b10010_0000 | cmd_read,
-      s_rd1       = 9'b10011_0000 | cmd_nop,
+      s_rd1       = 9'b10011_0000 | cmd_read,
       s_rd2       = 9'b10100_0000 | cmd_nop,
       s_rd3       = 9'b10101_0000 | cmd_nop,
       s_rd4       = 9'b10110_0000 | cmd_pre,
@@ -232,8 +232,8 @@ always @(posedge CLOCK_100)begin
         if(init_counter == 3) begin
            state     <= s_init_mrs;
            DRAM_ADDR[10] <= 0;
-           //            res  wr_b opmd cas=3  seq  brst=2
-           DRAM_ADDR <= 13'b000_0_00_011_0_001;
+           //            res  wr_b opmd cas=3  seq  brst=1
+           DRAM_ADDR <= 13'b000_0_00_011_0_000;
            DRAM_BA   <= 2'b0;
         end
         if(init_counter == 1)
@@ -285,6 +285,7 @@ always @(posedge CLOCK_100)begin
      end // case: s_wr0[8:4]
      
      s_wr1[8:4]:begin
+        DRAM_ADDR <= addr_col + 1;
         state   <= s_wr2;
         dram_dq <= data_in[31:16];
      end
@@ -310,9 +311,12 @@ always @(posedge CLOCK_100)begin
         rd_pending <= 0;
         state <= s_rd1;
         DRAM_DQM <= 0;
+        DRAM_BA <= addr_bank;
      end
-     s_rd1[8:4]:
-       state <= s_rd2;
+     s_rd1[8:4]:begin
+        state <= s_rd2;
+        DRAM_ADDR <= addr_col + 1;
+        end
      s_rd2[8:4]:
        state <= s_rd3;
      s_rd3[8:4]: begin
