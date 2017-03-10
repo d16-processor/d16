@@ -15,3 +15,5 @@ ram_macro.v
 work/
 \#*\#
 \.#*
+transcript
+*.wlf
