@@ -3,6 +3,7 @@
 // d73bf5c0: ram working
 //           Implemented hamsterworks' DE0-nano SDRAM memory controller FSM 1
 //           http://hamsterworks.co.nz/mediawiki/index.php/SDRAM_Memory_Controller#FSM1_-_Simple_controller
+// 58304cbe: Reduce read and write latencies by 1 cycle, implement FSM 2
 
 module sdram_controller3
   (

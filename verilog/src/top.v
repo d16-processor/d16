@@ -6,7 +6,7 @@ module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED,
     output [1:0]    DRAM_BA,
     output          DRAM_CKE,
     output          DRAM_CLK,
-	 output 			  DRAM_CAS_N,
+         output                           DRAM_CAS_N,
     output          DRAM_CS_N,
     inout  [15:0]   DRAM_DQ,
     output [1:0]    DRAM_DQM,
@@ -76,35 +76,36 @@ core core(
 `ifdef CONTROLLER2
    wire CLOCK_100, CLOCK_100_del_3ns;
    sdram_clk_gen clk_gen(
-		     .inclk0(CLOCK_50),
-		     .c0(CLOCK_100_del_3ns),
-		     .c1(CLOCK_100));
+                     .inclk0(CLOCK_50),
+                     .c0(CLOCK_100_del_3ns),
+                     .c1(CLOCK_100));
    
    sdram_controller3 controller(
-				.data_out	(dram_data_out[31:0]),
-				.data_valid	(dram_data_valid),
-				// Outputs
-				.write_complete	(dram_write_complete),
-				.DRAM_ADDR	(DRAM_ADDR[12:0]),
-				.DRAM_BA	(DRAM_BA[1:0]),
-				.DRAM_CAS_N	(DRAM_CAS_N),
-				.DRAM_CKE	(DRAM_CKE),
-				.DRAM_CLK	(DRAM_CLK),
-				.DRAM_CS_N	(DRAM_CS_N),
-				.DRAM_DQM	(DRAM_DQM[1:0]),
-				.DRAM_RAS_N	(DRAM_RAS_N),
-				.DRAM_WE_N	(DRAM_WE_N),
-				// Inouts
-				.DRAM_DQ	(DRAM_DQ[15:0]),
-				// Inputs
-				.CLOCK_50	(CLOCK_50),
-				.CLOCK_100	(CLOCK_100),
-				.CLOCK_100_del_3ns(CLOCK_100_del_3ns),
-				.address	(dram_addr[23:0]),
-				.req_read	(dram_req_read),
-				.req_write	(dram_req_write),
-				.data_in	(dram_data_in[31:0])
-				/*AUTOINST*/);
+                                .data_out       (dram_data_out[31:0]),
+                                .data_valid     (dram_data_valid),
+                                // Outputs
+                                .write_complete (dram_write_complete),
+                                .DRAM_ADDR      (DRAM_ADDR[12:0]),
+                                .DRAM_BA        (DRAM_BA[1:0]),
+                                .DRAM_CAS_N     (DRAM_CAS_N),
+                                .DRAM_CKE       (DRAM_CKE),
+                                .DRAM_CLK       (DRAM_CLK),
+                                .DRAM_CS_N      (DRAM_CS_N),
+                                .DRAM_DQM       (DRAM_DQM[1:0]),
+                                .DRAM_RAS_N     (DRAM_RAS_N),
+                                .DRAM_WE_N      (DRAM_WE_N),
+                                // Inouts
+                                .DRAM_DQ        (DRAM_DQ[15:0]),
+                                // Inputs
+                                .CLOCK_50       (CLOCK_50),
+                                .CLOCK_100      (CLOCK_100),
+                                .CLOCK_100_del_3ns(CLOCK_100_del_3ns),
+                                .rst            (rst),
+                                .address        (dram_addr[23:0]),
+                                .req_read       (dram_req_read),
+                                .req_write      (dram_req_write),
+                                .data_in        (dram_data_in[31:0])
+                                /*AUTOINST*/);
    
 `else
 sdram_controller controller(
