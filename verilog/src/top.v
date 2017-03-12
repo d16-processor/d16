@@ -1,4 +1,3 @@
-`define CONTROLLER2
 module top(input CLOCK_50, input [1:0] KEY, output [7:0] LED, 
     output Tx, input Rx, output [3:0] Snd, input [3:0] SW,
     //DRAM signals
@@ -73,7 +72,6 @@ core core(
           .dram_write_complete          (write_complete2)
         
       );
-`ifdef CONTROLLER2
    wire CLOCK_100, CLOCK_100_del_3ns;
    sdram_clk_gen clk_gen(
                      .inclk0(CLOCK_50),
@@ -107,29 +105,7 @@ core core(
                                 .data_in        (dram_data_in[31:0])
                                 /*AUTOINST*/);
    
-`else
-sdram_controller controller(
-    .CLOCK_50(clk),
-    .DRAM_ADDR(DRAM_ADDR),
-    .DRAM_BA(DRAM_BA),
-    .DRAM_CAS_N(DRAM_CAS_N),
-    .DRAM_CKE(DRAM_CKE),
-    .DRAM_CLK(DRAM_CLK),
-    .DRAM_CS_N(DRAM_CS_N),
-    .DRAM_DQ(DRAM_DQ),
-    .DRAM_DQM(DRAM_DQM),
-    .DRAM_RAS_N(DRAM_RAS_N),
-    .DRAM_WE_N(DRAM_WE_N),
 
-    .address(dram_addr),
-    .req_read(dram_req_read),
-    .req_write(dram_req_write),
-    .data_out(dram_data_out),
-    .data_out_valid(dram_data_valid),
-    .data_in(dram_data_in),
-    .write_complete(dram_write_complete)
-);
-`endif
 bus_arbiter arbiter(
                     // Outputs
                     .data1              (data1[31:0]),
