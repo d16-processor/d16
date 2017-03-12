@@ -3,8 +3,7 @@ This is a simple(ish) 16 bit CPU formed in a collaboration between C-Elegans and
 The CPU is a load-store architecture, with variable length instructions (multiples of 16 bits) and 7 GP registers.
 The CPU is written in Verilog and is synthesizable for Altera FPGAs (Currently tested on a DE0-Nano).
 
-Current build health:
-[![CircleCI](https://circleci.com/gh/d16-processor/d16.svg?style=svg)](https://circleci.com/gh/d16-processor/d16)
+
 ## D16 Assembler
 The included assembler is written in C, and uses bison and flex for parsing. It's not of the best quality, but it works.
  
@@ -24,13 +23,6 @@ make
 ./d16-main/d16 <file> <output>
 ```
 
-Tests can be run by
-
-```
-cd d16/assembler/build
-cmake -DTARGET_GROUP=test ..; make
-./d16-tests/testing_main
-```
 
 # CPU 
 A general layout of the CPU is provided here, this is subject to change during the project
