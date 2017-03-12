@@ -6,229 +6,310 @@
 \author{Michael Nolan}
 \newcommand{\instrr}[2]{
 \subsection{#1}
-	\begin{tabular}{| c | c | c  | c | c |}
-	\hline
-	Immediate & opcode & Reserved & source & dest \\ \hline
-	Imm & #2 & 00 & rS & rD \\
-	\hline
-	\end{tabular} \\ \\
-	\noindent
-	\texttt{#1  rD, \textless rS or immediate\textgreater \\ \\}
+        \begin{tabular}{| c | c | c  | c | c |}
+        \hline
+        Immediate & opcode & Reserved & source & dest \\ \hline
+        Imm & #2 & 00 & rS & rD \\
+        \hline
+        \end{tabular} \\ \\
+        \noindent
+        \texttt{#1  rD, \textless rS or immediate\textgreater \\ \\}
 }
 \newcommand{\instj}[3]{
 \subsection{#1}
-	\begin{tabular}{| c | c | c | c | c |}
-	\hline
-	Immediate & opcode & Reserved & condition code & dest \\ \hline
-	Imm & #2 & 0 & cc & rD \\
-	\hline
-	\end{tabular} \\ \\
-	\noindent
-	\texttt{#1.CC \textless rD#3\textgreater \\ \\}
+        \begin{tabular}{| c | c | c | c | c |}
+        \hline
+        Immediate & opcode & Reserved & condition code & dest \\ \hline
+        Imm & #2 & 0 & cc & rD \\
+        \hline
+        \end{tabular} \\ \\
+        \noindent
+        \texttt{#1.CC \textless rD#3\textgreater \\ \\}
 }
 \newcommand{\instr}[3]{
 \subsection{#1}
-	\begin{tabular}{| c | c | c  | c | c |}
-	\hline
-	Immediate & opcode & Reserved & source & dest \\ \hline
-	Imm & #2 & 00 & 000 & rD \\
-	\hline
-	\end{tabular} \\ \\
-	\noindent
-	\texttt{#1 \textless rD#3\textgreater \\ \\} 
+        \begin{tabular}{| c | c | c  | c | c |}
+        \hline
+        Immediate & opcode & Reserved & source & dest \\ \hline
+        Imm & #2 & 00 & 000 & rD \\
+        \hline
+        \end{tabular} \\ \\
+        \noindent
+        \texttt{#1 \textless rD#3\textgreater \\ \\} 
 }
 \newcommand{\inst}[2]{
 \subsection{#1}
-	\begin{tabular}{| c | c | c |}
-	\hline
-	Reserved & Opcode & Reserved \\ \hline
-	0 & #2 & 00000000 \\ \hline
-	\end{tabular}\\ \\ \noindent
-	\texttt{#1 \\ \\}
+        \begin{tabular}{| c | c | c |}
+        \hline
+        Reserved & Opcode & Reserved \\ \hline
+        0 & #2 & 00000000 \\ \hline
+        \end{tabular}\\ \\ \noindent
+        \texttt{#1 \\ \\}
+}
+\newcommand{\regdesc}[2]{
+  \subsubsection{#1}
+  \begin{tabular}{|l|l|l|}
+    \hline
+    Bits & Type & Description \\ \hline
+    #2
+  \end{tabular}
 }
 
 \begin{document}
-	\pagenumbering{gobble}
-	\maketitle
-	\newpage
-	\tableofcontents
-	\newpage
-	\pagenumbering{arabic}
-	
-	\section{The Processor}
-	The D16 Processor is a very simple, RISC like 16 bit processor with variable length instructions. It has 8 general purpose registers, 32 special purpose registers, and support for up to 64K of memory.
-	\subsection{General Purpose Registers}
-	The D16 processor defines 8 general purpose registers, called r0 - r7. 2 of these, although they behave the same as the other registers, have special meaning to the processor and in the ABI, and they are as follows: \newline
-		\paragraph{r6:} This is generally used as the pointer to the start of a stack frame, but has no special meaning to the processor
-		\paragraph{r7:} This is the stack pointer, and is manipulated via the stack instructions (push and pop)
-	\subsection{Flags}
-		The processor also contains several flags in Special Register 0. \\ \\
-		\begin{tabular}{| l | l |}
-		\hline
-			Zero & set if the result of the last computation is 0 \\ \hline
-			Sign & set if the result is negative (bit 15 is set) \\ \hline
-			Carry & set if there was a carry or borrow in the past computation \\ \hline
-			oVerflow & set if there was a signed overflow in the last computation \\ \hline
-		\end{tabular}
-	\section{Instruction Set}
-	Most instructions come in 2 formats, register and immediate. The immediate versions of an instruction will have bit 7 set in the opcode field and the 16 bit immediate in the word following the instruction. In the subsequent definitions, op2 will refer to the immediate value if the instruction has an immediate, otherwise it refers to rS.
-	\instrr{ADD}{000001}{} 
-	rD = rD + op2\\
-	Updates flags
-	
-	\instrr{SUB}{000010}
-	rD = rD - op2\\
-	Updates flags
-	\instr{PUSH}{000011}{ or immediate}\noindent
-	r7 = r7 - 2 \\
-	memory[r7] = rD \\
-	This instruction does not update the flags \\
-	\instr{POP}{000100}{}
-	rD = memory[r7] \\
-	r7 = r7 + 2 \\
-	Does not update flags
-	\subsection{MOV}
-	Mov has 2 different encodings depending whether the immediate (if any) fits into 1 byte. \\
-	Neither encoding updates the flags.  
-	\subsubsection{general MOV encoding}
-	\begin{tabular}{| c | c | c  | c | c |}
-	\hline
-	Immediate & opcode & Reserved & source & dest \\ \hline
-	Imm & 001101 & 00 & rS & rD \\
-	\hline
-	\end{tabular} \\ \\
-	\noindent
-	\texttt{MOV rD, \textless rS or immediate\textgreater \\ \\}
-	rD = op2 \\
-	This encoding is used for register to register MOVs or when the immediate value will not fit in one byte. \\
-	\subsubsection{special byte MOV}
-	\begin{tabular}{| c | c | c |}
-	\hline
-	Reserved & opcode & data \\ \hline
-	0 & 000101 + rD & byte immediate \\ \hline
-	\end{tabular} \\ \\
-	\texttt{MOV rD, \textless byte immediate\textgreater \\ \\}
-	rD = immediate \\
-	This encoding is only used when the immediate will fit in 1 byte
-	\instrr{AND}{001110}\noindent
-	
-	rD = rD AND op2  \\
-	This instruction updates the flags, and will reset the overflow and carry flags. \\
-	\instrr{OR}{001111}\noindent
-	rD = rD OR op2 \\
-	This instruction updates the flags, and will reset the overflow and carry flags. \\
-	\instrr{XOR}{010000}\noindent
-	rD = rD XOR op2 \\
-	This instruction updates the flags, and will reset the overflow and carry flags. \\
-	\instr{NOT}{010001}\noindent
-	rD = !rD (bitwise NOT) \\
-	This instruction updates the flags, and will reset the overflow and carry flags. \\
-	\instr{NEG}{010010}\noindent
-	rD = 0-rD (signed negation) \\
-	This instruction updates the flags. \\
-	\subsection{LD}
-	\begin{tabular}{|c | c | c | c | c | c | c |}
-	\hline
-	Immediate & opcode & byte & displacement & address & data \\ \hline
-	imm & 010011 & byte & disp & rS & rD \\ \hline
-	\end{tabular}\noindent \\ \\
-	\texttt{LD\{.b\} rD, [rS] \\ LD\{.b\} rD, [immediate] \\ LD\{.b\} rD, [rS+immediate]\\ \\}
-	The load instruction loads a word (or byte) of data from the address specified in the brackets into register rD. The byte flag in the instruction encoding is set when the ".b" suffix is present and indicates a byte load. The displacement flag is set when the third instruction form is used and indicates that rS must be added to the displacement when generating the address. The displacement flag should only be set if the immediate flag is also set. If the displacement flag is set and the immediate flag is not, the behavior is undefined. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
-	\subsection{ST}
-	\begin{tabular}{|c | c | c | c | c | c | c |}
-	\hline
-	Immediate & opcode & byte & displacement & address & data \\ \hline
-	imm & 010100 & byte & disp & rS & rD \\ \hline
-	\end{tabular}\noindent \\ \\
-	\texttt{ST\{.b\} [rS], rD\\ ST\{.b\} [immediate], rD \\ ST\{.b\} [rS+immediate], rD\\ \\}
-	The store instruction stores the contents of rD into the address specified inside the brackets. The byte flag in the instruction is set when the ".b" suffix is present, and so the processor will only store the least significant 8 bits into the specified address. Similarly to the LD instruction, the disp flag indicates that the processor should add rS and the following immediate value before using the result as the address. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
-	\instrr{CMP}{010101}\noindent
-	The instruction sets the flags exactly like the SUB instruction, however it does not store the result back to rD.
-	\instj{JMP}{010110}{ or immediate}\noindent
-	If the condition code evaluates to True, JMP sets the instruction pointer to the address specified. \textbf{Important: This address must be word aligned}
-	\instj{CALL}{010111}{ or immediate}\noindent
-	If the condition evaluates to true, CALL saves the instruction pointer in the link register (LR), before setting it to the address specified. \textbf{Important: This address must be word aligned}
-	\inst{RET}{011000}
-	Sets the instruction pointer to the link register(LR).
-	\instrr{SHL}{011001}
-	Logical left shift rD by op2 and store the result in rD.\\
-	Update flags and clear V.
-	\instrr{SHR}{011010}
-	Logical right shift rD by op2 and store the result in rD.\\
-	Update flags and clear V.
-	\instrr{ROL}{011011}
-	Rotates the bits in rD left by the specified number in op2.\\ Updates flags
-	and clears carry and overflow.
-	\instrr{RCL}{011100}
-	Rotates the bits in rD, plus the carry bit left by the value in op2. \\
-	Updates flags and clears overflow.
-	\instj{SET}{100001}
-	If the condition code evaluates to true, sets rD to 1 otherwise sets rD to 0.
-	\instrr{TEST}{100010}
-	Sets the flags upon the result of the bitwise and of rD and op2. Does not modify the value of rD.
-	\inst{PUSHLR}{100011}
-	Pushes the link register onto the stack. This instruction should be used at the beginning of a subroutine if the subroutine executes the \texttt{CALL} instruction anywhere in its body. To return after executing this instruction, execute \\
-	\texttt{POP r1\\JMP.AL r1\\}
-	\textbf{Note: r1 can be replaced by any GP register}
-	\instrr{SAR}{100100}
-	Shifts the bits in \texttt{rD} left by op2 similarly to \texttt{SHR}, except the bits shifted in on the left are the sign bit (bit 15) of \texttt{rD}. Useful for signed division by powers of 2.
-	\section{Condition Codes}
-	In the \texttt{JMP} variety of instructions (\texttt{JMP}, \texttt{CALL}, \texttt{SET}), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
-	\begin{tabular}{| l | c | l | l |} \hline
-	Mnemonic & Encoding & Expression & Meaning \\ \hline
-	NV &0000& False & Never execute\\ \hline
-	EQ &0001& Z set & Equal\\ \hline
-	NE &0010& Z clear & Not equal \\ \hline
-	OS &0011& V set & Overflow \\ \hline
-	OC &0100& V clear & No overflow \\ \hline
-	HI &0101& C set and Z clear & Unsigned greater than \\ \hline
-	LS &0110& C clear and Z set & Unsigned less than or equal to \\ \hline
-	P  &0111& S clear & Positive \\ \hline
-	N  &1000& S set & Negative \\ \hline
-	CS &1001& C set & Carry set \\ \hline
-	CC &1010& C clear & Carry clear \\ \hline
-	GE &1011& S = V & Signed greater than or equal to\\ \hline
-	G  &1100& S = V and Z clear & Signed greater than \\ \hline
-	LE &1101& Z set or S $\neq$ V & Signed less than or equal to \\ \hline
-	L  &1110& S $\neq$ V & Signed less than \\ \hline
-	AL &1111& True & Always execute \\ \hline
-	\end{tabular}
-	\newpage
-	\section{Peripherals}
-	The D16 processor uses memory mapping to access its peripherals. Currently, the memory mapped region starts at address 0xFF00 and ends at address 0xFFFF. However in subsequent revisions, this may be expanded to the range 0xFC00-0xFFFF, so the programmer is encouraged not to make use of the top 1K of the address space.
-	All peripheral registers will specify their size, either 16 bit or 8 bit. \textbf{Important: All registers must be accessed at their stated size. It is illegal to access a 16 bit register as 2 8 bit parts or 2 8 bit registers as a 16 bit register.}
-	\subsection{UART}
-	The UART is set up as a pair of 8-entry FIFO queues that feed the Tx and Rx circuitry. \\
-	\begin{tabular}{|l|l|l| l|}
-	\hline
-	Name & Size & Address & Description \\ \hline
-	\verb|IO_UART_DATA| & 8 &0xFF02 & UART data \\ \hline
-	\verb|IO_UART_STATUS| & 8 & 0xFF03 & UART status \\ \hline
-	\verb|IO_UART_BAUD| & 16 & 0xFF04 & UART Baud rate divisor \\ \hline
-	
-	
-	\end{tabular}
-	\subsubsection{IO\_UART\_DATA}
-	\begin{tabular}{|l|l|l|}
-	\hline
-	Bits & Type & Description \\ \hline
-	0-7 & W & Data sent to UART Tx \\ \hline
-	0-7 & R & Data from UART Rx \\ \hline
-	\end{tabular}
-	\subsubsection{IO\_UART\_STATUS}
-	\begin{tabular}{|l|l|l|}
-	\hline
-	Bits & Type & Description \\ \hline
-	0 & R & Tx FIFO Space free \\ \hline
-	1 & R & Tx FIFO Empty \\ \hline
-	2 & R & Rx Data ready \\ \hline
-	3 & R & Rx FIFO Overrun \\ \hline
-	4-7 & X & Reserved \\ \hline
-\end{tabular}
-	\subsubsection{IO\_UART\_BAUD}
-	\begin{tabular}{|l|l|l|}
-	\hline
-	Bits & Type & Description \\ \hline
-	0-15 & R/W & Baud rate divisor \\ \hline
-	\end{tabular}
+        \pagenumbering{gobble}
+        \maketitle
+        \newpage
+        \tableofcontents
+        \newpage
+        \pagenumbering{arabic}
+        
+        \section{The Processor}
+        The D16 Processor is a very simple, RISC like 16 bit processor with variable length instructions. It has 8 general purpose registers, 32 special purpose registers, and support for up to 64K of memory.
+        \subsection{General Purpose Registers}
+        The D16 processor defines 8 general purpose registers, called r0 - r7. 2 of these, although they behave the same as the other registers, have special meaning to the processor and in the ABI, and they are as follows: \newline
+                \paragraph{r6:} This is generally used as the pointer to the start of a stack frame, but has no special meaning to the processor
+                \paragraph{r7:} This is the stack pointer, and is manipulated via the stack instructions (push and pop)
+        \subsection{Flags}
+                The processor also contains several flags in Special Register 0. \\ \\
+                \begin{tabular}{| l | l |}
+                \hline
+                        Zero & set if the result of the last computation is 0 \\ \hline
+                        Sign & set if the result is negative (bit 15 is set) \\ \hline
+                        Carry & set if there was a carry or borrow in the past computation \\ \hline
+                        oVerflow & set if there was a signed overflow in the last computation \\ \hline
+                \end{tabular}
+        \section{Instruction Set}
+        Most instructions come in 2 formats, register and immediate. The immediate versions of an instruction will have bit 7 set in the opcode field and the 16 bit immediate in the word following the instruction. In the subsequent definitions, op2 will refer to the immediate value if the instruction has an immediate, otherwise it refers to rS.
+        \instrr{ADD}{000001}{} 
+        rD = rD + op2\\
+        Updates flags
+        
+        \instrr{SUB}{000010}
+        rD = rD - op2\\
+        Updates flags
+        \instr{PUSH}{000011}{ or immediate}\noindent
+        r7 = r7 - 2 \\
+        memory[r7] = rD \\
+        This instruction does not update the flags \\
+        \instr{POP}{000100}{}
+        rD = memory[r7] \\
+        r7 = r7 + 2 \\
+        Does not update flags
+        \subsection{MOV}
+        Mov has 2 different encodings depending whether the immediate (if any) fits into 1 byte. \\
+        Neither encoding updates the flags.  
+        \subsubsection{general MOV encoding}
+        \begin{tabular}{| c | c | c  | c | c |}
+        \hline
+        Immediate & opcode & Reserved & source & dest \\ \hline
+        Imm & 001101 & 00 & rS & rD \\
+        \hline
+        \end{tabular} \\ \\
+        \noindent
+        \texttt{MOV rD, \textless rS or immediate\textgreater \\ \\}
+        rD = op2 \\
+        This encoding is used for register to register MOVs or when the immediate value will not fit in one byte. \\
+        \subsubsection{special byte MOV}
+        \begin{tabular}{| c | c | c |}
+        \hline
+        Reserved & opcode & data \\ \hline
+        0 & 000101 + rD & byte immediate \\ \hline
+        \end{tabular} \\ \\
+        \texttt{MOV rD, \textless byte immediate\textgreater \\ \\}
+        rD = immediate \\
+        This encoding is only used when the immediate will fit in 1 byte
+        \instrr{AND}{001110}\noindent
+        
+        rD = rD AND op2  \\
+        This instruction updates the flags, and will reset the overflow and carry flags. \\
+        \instrr{OR}{001111}\noindent
+        rD = rD OR op2 \\
+        This instruction updates the flags, and will reset the overflow and carry flags. \\
+        \instrr{XOR}{010000}\noindent
+        rD = rD XOR op2 \\
+        This instruction updates the flags, and will reset the overflow and carry flags. \\
+        \instr{NOT}{010001}\noindent
+        rD = !rD (bitwise NOT) \\
+        This instruction updates the flags, and will reset the overflow and carry flags. \\
+        \instr{NEG}{010010}\noindent
+        rD = 0-rD (signed negation) \\
+        This instruction updates the flags. \\
+        \subsection{LD}
+        \begin{tabular}{|c | c | c | c | c | c | c |}
+        \hline
+        Immediate & opcode & byte & displacement & address & data \\ \hline
+        imm & 010011 & byte & disp & rS & rD \\ \hline
+        \end{tabular}\noindent \\ \\
+        \texttt{LD\{.b\} rD, [rS] \\ LD\{.b\} rD, [immediate] \\ LD\{.b\} rD, [rS+immediate]\\ \\}
+        The load instruction loads a word (or byte) of data from the address specified in the brackets into register rD. The byte flag in the instruction encoding is set when the ".b" suffix is present and indicates a byte load. The displacement flag is set when the third instruction form is used and indicates that rS must be added to the displacement when generating the address. The displacement flag should only be set if the immediate flag is also set. If the displacement flag is set and the immediate flag is not, the behavior is undefined. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
+        \subsection{ST}
+        \begin{tabular}{|c | c | c | c | c | c | c |}
+        \hline
+        Immediate & opcode & byte & displacement & address & data \\ \hline
+        imm & 010100 & byte & disp & rS & rD \\ \hline
+        \end{tabular}\noindent \\ \\
+        \texttt{ST\{.b\} [rS], rD\\ ST\{.b\} [immediate], rD \\ ST\{.b\} [rS+immediate], rD\\ \\}
+        The store instruction stores the contents of rD into the address specified inside the brackets. The byte flag in the instruction is set when the ".b" suffix is present, and so the processor will only store the least significant 8 bits into the specified address. Similarly to the LD instruction, the disp flag indicates that the processor should add rS and the following immediate value before using the result as the address. \textbf{Important: All word accesses must be word aligned. Failure to ensure this will result in undefined behavior. }
+        \instrr{CMP}{010101}\noindent
+        The instruction sets the flags exactly like the SUB instruction, however it does not store the result back to rD.
+        \instj{JMP}{010110}{ or immediate}\noindent
+        If the condition code evaluates to True, JMP sets the instruction pointer to the address specified. \textbf{Important: This address must be word aligned}
+        \instj{CALL}{010111}{ or immediate}\noindent
+        If the condition evaluates to true, CALL saves the instruction pointer in the link register (LR), before setting it to the address specified. \textbf{Important: This address must be word aligned}
+        \inst{RET}{011000}
+        Sets the instruction pointer to the link register(LR).
+        \instrr{SHL}{011001}
+        Logical left shift rD by op2 and store the result in rD.\\
+        Update flags and clear V.
+        \instrr{SHR}{011010}
+        Logical right shift rD by op2 and store the result in rD.\\
+        Update flags and clear V.
+        \instrr{ROL}{011011}
+        Rotates the bits in rD left by the specified number in op2.\\ Updates flags
+        and clears carry and overflow.
+        \instrr{RCL}{011100}
+        Rotates the bits in rD, plus the carry bit left by the value in op2. \\
+        Updates flags and clears overflow.
+        \instrr{ADC}{011111}
+        rD = rD + op2 + Carry flag\\
+        Updates flags including overflow
+        \instrr{SBB}{100000}
+        rD = rD - op2 - Carry flag\\
+        Updates flags including overflow
+        \instj{SET}{100001}{}
+        If the condition code evaluates to true, sets rD to 1, otherwise sets rD to 0.
+        \instrr{TEST}{100010}
+        Sets the flags upon the result of the bitwise and of rD and op2. Does not modify the value of rD.
+        \inst{PUSHLR}{100011}
+        Pushes the link register onto the stack. This instruction should be used at the beginning of a subroutine if the subroutine executes the \texttt{CALL} instruction anywhere in its body. To return after executing this instruction, execute \\
+        \texttt{POP r1\\JMP.AL r1\\}
+        \textbf{Note: r1 can be replaced by any GP register}
+        \instrr{SAR}{100100}
+        Shifts the bits in \texttt{rD} left by op2 similarly to \texttt{SHR}, except the bits shifted in on the left are the sign bit (bit 15) of \texttt{rD}. Useful for signed division by powers of 2.
+        \section{Condition Codes}
+        In the \texttt{JMP} variety of instructions (\texttt{JMP}, \texttt{CALL}, \texttt{SET}), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
+        \begin{tabular}{| l | c | l | l |} \
+          hline
+        Mnemonic & Encoding & Expression & Meaning \\ \hline
+        NV &0000& False & Never execute\\ \hline
+        EQ &0001& Z set & Equal\\ \hline
+        NE &0010& Z clear & Not equal \\ \hline
+        OS &0011& V set & Overflow \\ \hline
+        OC &0100& V clear & No overflow \\ \hline
+        HI &0101& C set and Z clear & Unsigned greater than \\ \hline
+        LS &0110& C clear and Z set & Unsigned less than or equal to \\ \hline
+        P  &0111& S clear & Positive \\ \hline
+        N  &1000& S set & Negative \\ \hline
+        CS &1001& C set & Carry set \\ \hline
+        CC &1010& C clear & Carry clear \\ \hline
+        GE &1011& S = V & Signed greater than or equal to\\ \hline
+        G  &1100& S = V and Z clear & Signed greater than \\ \hline
+        LE &1101& Z set or S $\neq$ V & Signed less than or equal to \\ \hline
+        L  &1110& S $\neq$ V & Signed less than \\ \hline
+        AL &1111& True & Always execute \\ \hline
+        \end{tabular}
+        \newpage
+        \section{Peripherals}
+        The D16 processor uses memory mapping to access its peripherals. Currently, the memory mapped region starts at address 0xFF00 and ends at address 0xFFFF. However in subsequent revisions, this may be expanded to the range 0xFC00-0xFFFF, so the programmer is encouraged not to make use of the top 1K of the address space.
+        All peripheral registers will specify their size, either 16 bit or 8 bit. \textbf{Important: All registers must be accessed at their stated size. It is illegal to access a 16 bit register as 2 8 bit parts or 2 8 bit registers as a 16 bit register.}
+        \subsection{Peripheral registers}
+                \begin{tabular}{|l|l|l|l|}
+        \hline
+        Name & Size & Address & Description \\ \hline
+        \verb|IO_LED_DATA| & 8 &0xFF00 & LED Data \\ \hline
+        \verb|IO_UART_DATA| & 8 &0xFF02 & UART data \\ \hline
+        \verb|IO_UART_STATUS| & 8 & 0xFF03 & UART status \\ \hline
+        \verb|IO_UART_BAUD| & 16 & 0xFF04 & UART Baud rate divisor \\ \hline
+        \verb|IO_TIMER_DATA| & 16 & 0xFF06 & Timer Data \\ \hline
+        \verb|IO_SOUND_DATA| & 16 & 0xFF08 & Sound Data \\ \hline
+        \verb|DMA_CONTROL| & 16 & 0xFF0A & DMA Control \\ \hline
+        \verb|DMA_LOCAL_ADDRESS| & 16 & 0xFF0C & DMA Local Start Address \\ \hline
+        \verb|DMA_REMOTE_ADDRESS| & 16 & 0xFF0E & DMA Remote Start Address \\ \hline
+        \verb|DMA_COUNT_ADDRESS| & 16 & 0xFF10 & DMA Byte Count \\ \hline
+        
+        \end{tabular}
+
+
+        \subsection{LEDs}
+        \regdesc{IO\_LED\_DATA}{
+          0-7 & W & Output data to LEDs \\ \hline
+          0-7 & R & Read current LED data \\ \hline
+        }
+        \subsection{UART}
+        The UART is set up as a pair of 8-entry FIFO queues that feed the Tx and Rx circuitry. \\
+
+        \regdesc{IO\_UART\_DATA}{
+        0-7 & W & Data sent to UART Tx \\ \hline
+        0-7 & R & Data from UART Rx \\ \hline
+        }
+        \regdesc{IO\_UART\_STATUS}{
+        0 & R & Tx FIFO Space free \\ \hline
+        1 & R & Tx FIFO Empty \\ \hline
+        2 & R & Rx Data ready \\ \hline
+        3 & R & Rx FIFO Overrun \\ \hline
+        4-7 & X & Reserved \\ \hline
+        }
+
+        \regdesc{IO\_UART\_BAUD}{
+        0-15 & R/W & Baud rate divisor \\ \hline
+        }
+        \subsection{Timer}
+        \regdesc{IO\_TIMER\_DATA}{
+          0-15 & R/W & Current Timer Count \\ \hline
+        }
+        \subsubsection{Usage}
+        The timer counts down from the value set in \texttt{IO\_TIMER\_DATA} to
+        0 in 1 ms decrements.  For the recommended use of waiting for a
+        specified time period, load data into \texttt{IO\_TIMER\_DATA} and poll
+        the register until it returns 0.
+        \subsection{Sound}
+        \regdesc{IO\_SOUND\_DATA}{
+          0-13 & W & Frequency Divisor \\ \hline
+          14-15 & W & Channel selector \\ \hline
+        }
+        \subsubsection{Usage}
+        The sound controller contains 4 independant square wave voices with fixed 50\% duty
+        cycle and variable frequency. To program a voice's frequency divisor,
+        write the divisor ORed with the voice number shifted 14 bits to the left
+        Ex: \\ \texttt{mov r0, voice\\ shl r0, 14 \\ or r0, divisor \\ st
+          [0xff08], r0} \\
+        The counter for each voice runs at the cpu master clock frequency /
+        64. The divisor necessary to output a given frequency can be calculated
+        as follows: $$D=\frac{f_{clk}}{64*f_{desired}}$$
+        \subsection{DMA}
+        \regdesc{DMA\_CONTROL}{
+          0-2 & W & DMA type \& Start DMA \\ \hline
+          0-2 & R & DMA status (in progress) \\ \hline
+          3-15 & R/W & Reserved \\ \hline
+        }
+        \regdesc{DMA\_LOCAL\_ADDRESS}{
+          0-15 & W & Local ram address of data \\ \hline
+        }
+        \regdesc{DMA\_REMOTE\_ADDRESS}{
+          0-15 & W & Upper 16 bits of external DRAM address\\ \hline
+        }
+        \regdesc{DMA\_COUNT\_ADDRESS}{
+          0-15 & W & Number of bytes to transfer \\ \hline
+        }
+        \subsubsection{DMA Types}
+        \begin{tabular}{|l|l|l|}
+          \hline
+          Bits 0-2 & Name & Function \\ \hline
+          000 & DMA\_WRITE & Initiate write to external DRAM \\ \hline
+          001 & DMA\_READ & Initiate read from external DRAM \\ \hline
+          010-111 & RESERVED & Reserved \\ \hline
+        \end{tabular}
+        \subsubsection{Usage}
+        The DMA controller allows access to the external DRAM availible to the
+        D16 by asynchronously transferring memory to or from the external DRAM.
+        To use the DMA controller, it is recommended to write to all DMA
+        registers, however the Local address and Remote address registers will
+        contain the address immediately after the final address accessed after a
+        DMA transfer. The recommended usage is to (in this order) program the
+        number of \textbf{bytes} to transfer in the DMA Count register, the
+        upper 16 bits of the external ram addres in the DMA Remote register, the
+        word-aligned local address in the DMA Local register, and finally the
+        DMA type in the DMA Control register.
+        
+        
 \end{document}
