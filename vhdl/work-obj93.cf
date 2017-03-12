@@ -1,4 +1,0 @@
-v 4
-file . "src/register_unit.vhd" "f45f6a1215b61b8457cc5fdc4fd00c25cd1503ab" "20160619185119.878":
-  entity register_unit at 1( 0) + 0 on 15;
-  architecture behavior of register_unit at 16( 447) + 0 on 16;
