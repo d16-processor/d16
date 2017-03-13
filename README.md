@@ -23,6 +23,17 @@ make
 ./d16-main/d16 <file> <output>
 ```
 
+### Usage
+
+`d16 input.d16 -o output.o`
+
+`-h`: display assembler help
+
+`-b`: assemble to flat binary instead of a.out object file
+
+`-o`: set output file (defaults to `a.out`)
+
+By default the assembler outputs files in a.out object file format which can then be linked with the d16 linker (d16-ld)
 
 # CPU 
 A general layout of the CPU is provided here, this is subject to change during the project
