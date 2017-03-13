@@ -11,6 +11,7 @@
 %option noyywrap
 %option nounput
 %option batch
+%option caseless
 %%
 \;.*\n {yyline++;return NEWLINE;} ;
 \n {yyline++;return NEWLINE;};
