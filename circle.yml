@@ -2,9 +2,8 @@ dependencies:
   pre:
     - sudo apt-get install software-properties-common
     - sudo add-apt-repository -y ppa:george-edison55/cmake-3.x 
-    - sudo add-apt-repository -y ppa:pgavin/ghdl
     - sudo apt-get update
-    - sudo apt-get install cmake cmake-data build-essential libc6 flex bison ghdl
+    - sudo apt-get install cmake cmake-data build-essential libc6 flex bison 
 
 test:
   override:
@@ -12,7 +11,6 @@ test:
     - cd assembler/build; cmake -DTARGET_GROUP=production .. && make all
     - cd assembler/build; cmake -DTARGET_GROUP=test .. && make all && ./d16-tests/testing_main | tee testout.txt
     - sudo cp assembler/build/d16-main/d16 /usr/local/bin
-    - cd vhdl/build; make
   post:
     - assembler/d16-tests/Unity/auto/parseOutput.rb -xml assembler/build/testout.txt
     - cp report.xml $CIRCLE_TEST_REPORTS/
