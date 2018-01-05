@@ -124,19 +124,19 @@ void test_instruction_length(void) {
         new_instruction_ri(op("mov", MOV), 5, addr_from_immediate(1456));
     Instruction* jmpi =
         new_instruction_jmpi(op("jmp", JMP), addr_from_immediate(34), AL);
-    TEST_ASSERT_EQUAL_INT_MESSAGE(1, instruction_length(rr),
+    TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(rr),
                                   "Incorrect RR instruction length");
-    TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(ri),
+    TEST_ASSERT_EQUAL_INT_MESSAGE(4, instruction_length(ri),
                                   "Incorrect RI instruction length");
-    TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(memi),
+    TEST_ASSERT_EQUAL_INT_MESSAGE(4, instruction_length(memi),
                                   "Incorrect MemI instruction length");
-    TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(shift),
+    TEST_ASSERT_EQUAL_INT_MESSAGE(4, instruction_length(shift),
                                   "Incorrect Shift instruction length");
-    TEST_ASSERT_EQUAL_INT_MESSAGE(1, instruction_length(mov_special),
+    TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(mov_special),
                                   "Incorrect Special movi instruction length");
-    TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(mov_general),
+    TEST_ASSERT_EQUAL_INT_MESSAGE(4, instruction_length(mov_general),
                                   "Incorrect General movi instruction length");
-    TEST_ASSERT_EQUAL_INT_MESSAGE(2, instruction_length(jmpi),
+    TEST_ASSERT_EQUAL_INT_MESSAGE(4, instruction_length(jmpi),
                                   "Incorrect JmpI instruction length");
     free(rr);
     free(ri);
