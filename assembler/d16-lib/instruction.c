@@ -66,17 +66,10 @@ Instruction* new_instruction_ri(OP* op, int rD, Address* addr) {
     i->type = I_TYPE_RIMM;
     return i;
 }
-Instruction* new_instruction_cr(OP* op, int rD, int rS) {
+Instruction* new_instruction_rc(OP* op, int reg, int cp) {
     Instruction* i = gen_instruction_internal(op);
-    i->rD = rD;
-    i->rS = rS;
-    i->type = I_TYPE_CR;
-    return i;
-}
-Instruction* new_instruction_rc(OP* op, int rD, int rS) {
-    Instruction* i = gen_instruction_internal(op);
-    i->rD = rD;
-    i->rS = rS;
+    i->rD = reg;
+    i->rS = cp;
     i->type = I_TYPE_RC;
     return i;
 }

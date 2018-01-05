@@ -45,10 +45,19 @@ void test_assemble_SHRI(void) {
     TEST_ASSERT_EQUAL_HEX16_ARRAY(array_compare, data, 2);
     free(i);
 }
-
+void test_assemble_LDCP(void){
+	test_reset();
+	Instruction* i = new_instruction_rc(op("ldcp", LDCP), 1, 10);
+	assemble_instruction(i, &ptr_copy);
+	uint16_t array_compare[] = {0x1d51,0};
+	TEST_ASSERT_EQUAL_HEX16_ARRAY(array_compare, data, 2);
+	free(i);
+  
+}
 void main_run_all_tests() {
     printf("Running all tests for main.c\n");
     RUN_TEST(test_assemble_ADD);
     RUN_TEST(test_assemble_SUBI);
     RUN_TEST(test_assemble_SHRI);
+	RUN_TEST(test_assemble_LDCP);
 }

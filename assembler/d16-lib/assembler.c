@@ -261,10 +261,16 @@ void assemble_instruction(Instruction* i, void* d) {
                 *data += 1;
             }
 
-        } else {
-            **data = i->op_type << 8 | build_reg_selector(i);
-            *data += 1;
         }
+		else if(i->type == I_TYPE_RC){
+			uint16_t cp_sel = i->rD &0x7 | ((i->rS & 0xF)<<3);
+			**data = i->op_type << 8 | cp_sel;
+			*data += 1;
+		}
+		else {
+			**data = i->op_type << 8 | build_reg_selector(i);
+			*data += 1;
+		}
     }
     // free(i->address);
     //

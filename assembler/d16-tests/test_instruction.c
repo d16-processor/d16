@@ -78,6 +78,13 @@ void test_instruction_jmpi_3(void) {
     TEST_ASSERT_EQUAL_INT_MESSAGE(JMPI, i->op_type, "Incorrect opcode");
     free(i);
 }
+void test_instruction_rc(void){
+  Instruction* i = new_instruction_rc(op("ldcp", LDCP), 1 , 10);
+  TEST_ASSERT_EQUAL_INT(I_TYPE_RC, i->type);
+  TEST_ASSERT_EQUAL_INT(i->rD, 1);
+  TEST_ASSERT_EQUAL_INT(i->rS, 10);
+  free(i);
+}
 void test_reg_selector(void) {
     Instruction* i = new_instruction_rr(op("sub", SUB), 4, 3);
     uint8_t      sel = build_reg_selector(i);
@@ -168,6 +175,7 @@ void test_instruction_run_all_tests(void) {
     RUN_TEST(test_instruction_mem_4);
     RUN_TEST(test_instruction_memi_5);
     RUN_TEST(test_instruction_jmpi_3);
+    RUN_TEST(test_instruction_rc);
     RUN_TEST(test_reg_selector);
     RUN_TEST(test_shift_selector);
     RUN_TEST(test_mem_selector);

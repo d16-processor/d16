@@ -19,7 +19,8 @@
 , {return COMMA;}
 \x5b {return LBRACKET;};
 \x5d {return RBRACKET;};
-[cC][rR][0-9][1-9]? {yylval.ival = atoi(yytext+2); return CP_REGISTER;}
+[cC][rR][0-9][0-9]? {yylval.ival = atoi(yytext+2); return CP_REGISTER;}
+flags {yylval.ival = 0; return CP_REGISTER;}
 [rR][0-7] {yylval.ival = yytext[1] - '0'; return REGISTER;}
 \.dw {return DIRECTIVE_WORD;}
 \.db {return DIRECTIVE_BYTE;}
