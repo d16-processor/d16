@@ -202,6 +202,16 @@ reg [15:0] s_mem_data;
                 s_output <= {1'b0,16'hbeef};
                 // rcl
             end
+	    `OPC_LDCP: begin
+	       case(condition)
+		 0:
+		   s_output <= {12'b0, flags_in};
+		 default:
+		   s_output <= 16'b0;
+	       endcase // case (condition)
+	       
+	    end
+	      
             `OPC_CMP : begin
                 `COVER
                 s_output <= (data1 - data2);
