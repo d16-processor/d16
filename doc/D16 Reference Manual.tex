@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{courier}
 \usepackage[margin=1in]{geometry}
+\usepackage[pdftex,pdfpagelabels,bookmarks,hyperindex,hyperfigures]{hyperref}
 \title{D16 Processor Reference Manual}
 \date{Aug 16, 2016}
 \author{Michael Nolan}
@@ -25,6 +26,17 @@
         \end{tabular} \\ \\
         \noindent
         \texttt{#1.CC \textless rD#3\textgreater \\ \\}
+}
+\newcommand{\instrc}[2]{
+\subsection{#1}
+        \begin{tabular}{| c | c | c | c | c |}
+        \hline
+        Immediate & opcode & Reserved & Coprocessor Register & dest \\ \hline
+        0 & #2 & 0 & cr & rD \\
+        \hline
+        \end{tabular} \\ \\
+        \noindent
+        \texttt{#1 \textless rD\textgreater, \textless cr\textgreater\\ \\}
 }
 \newcommand{\instr}[3]{
 \subsection{#1}
@@ -170,6 +182,8 @@
         \instrr{RCL}{011100}
         Rotates the bits in rD, plus the carry bit left by the value in op2. \\
         Updates flags and clears overflow.
+        \instrc{LDCP}{011101}
+        Loads rD with the contents of cr.
         \instrr{ADC}{011111}
         rD = rD + op2 + Carry flag\\
         Updates flags including overflow
@@ -207,6 +221,15 @@
         LE &1101& Z set or S $\neq$ V & Signed less than or equal to \\ \hline
         L  &1110& S $\neq$ V & Signed less than \\ \hline
         AL &1111& True & Always execute \\ \hline
+        \end{tabular}
+        \section{Coprocessor Registers}
+        Coprocessor registers are extra registers that \textit{might}
+        be attached to a coprocessor, but may also be extra
+        configuration registers exposed by the cpu. A table is listed below: \\ \\
+        \begin{tabular}{|l | l | l|}\hline
+          Register & alternate names & description \\ \hline
+          cr0 & flags & The processor's condition flags. flags[15:4] = 0 and flags[3:0] = VSCZ \\ \hline
+          cr1-15 & N/A & Unimplemented \\ \hline
         \end{tabular}
         \newpage
         \section{Peripherals}
