@@ -23,13 +23,15 @@
 `include "cpu_constants.vh"
 `timescale 1ns/1ps
 module control(
-input wire clk,
-input wire en,
-input wire rst,
-input wire en_mem,
-input wire mem_wait,
-input wire should_branch,
-output wire [`CONTROL_BIT_MAX:0] control_o
+ input wire 			  clk,
+ input wire 			  en,
+ input wire 			  rst,
+ input wire 			  en_mem,
+ input wire 			  mem_wait,
+ input wire 			  should_branch,
+ input wire 			  imm,
+ output wire [`CONTROL_BIT_MAX:0] control_o,
+ output reg [1:0] 		  pc_op
 );
 
 
@@ -40,7 +42,8 @@ reg [`CONTROL_BIT_MAX:0] s_control = `STATE_FETCH;
   assign control_o = s_control;
   always @(posedge clk) begin
     if(rst == 1'b 1) begin
-      s_control <= 0;
+       s_control <= 0;
+       pc_op <= 0;
     end
     else begin
       if(en == 1'b 1) begin
@@ -56,6 +59,10 @@ reg [`CONTROL_BIT_MAX:0] s_control = `STATE_FETCH;
         end
         `STATE_DECODE : begin
           s_control <= `STATE_REG_READ;
+	   if(imm)
+	     pc_op <= `PC_INC;
+	   else
+	     pc_op <= `PC_NOP;
         end
         `STATE_REG_READ : begin
           s_control <= `STATE_ALU;
@@ -78,14 +85,17 @@ reg [`CONTROL_BIT_MAX:0] s_control = `STATE_FETCH;
         end
         `STATE_REG_WR : begin
           if(should_branch == 1'b 1) begin
-            s_control <= `STATE_PC_DELAY;
-          end
-          else begin
-            s_control <= `STATE_FETCH;
+	     s_control <= `STATE_PC_DELAY;
+	     pc_op <= `PC_SET;
+	  end
+	  else begin
+	     s_control <= `STATE_FETCH;
+	     pc_op <= `PC_INC;
           end
         end
         `STATE_PC_DELAY : begin
-          s_control <= `STATE_BRANCH_DELAY;
+	   s_control <= `STATE_BRANCH_DELAY;
+	   pc_op <= `PC_INC;
         end
         `STATE_BRANCH_DELAY : begin
           s_control <= `STATE_FETCH;

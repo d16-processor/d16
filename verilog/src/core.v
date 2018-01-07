@@ -61,7 +61,7 @@ wire [15:0] data_out2;
 wire write_enable2;
 wire dma_status;
 
-reg [1:0]              pc_op;
+wire [1:0]              pc_op;
 reg [3:0]              flags_in;
 reg [15:0]             instruction;
 // End of automatics
@@ -88,13 +88,15 @@ alu alu(
 control control(
                 // Outputs
                 .control_o              (control_state[`CONTROL_BIT_MAX:0]),
+		.pc_op			(pc_op[1:0]),
                 // Inputs
                 .clk                    (clk),
                 .en                     (en),
                 .rst                    (rst),
                 .en_mem                 (en_mem),
                 .mem_wait               (mem_wait),
-                .should_branch          (should_branch));
+                .should_branch          (should_branch),
+		.imm			(instruction[15]));
 decoder decoder(
                 // Outputs
                 .alu_control            (alu_control[7:0]),
@@ -252,19 +254,19 @@ lr lr(
             case (control_state)
                 `STATE_FETCH:
                     instruction <= data_out;
-                `STATE_REG_WR:
-                    if(should_branch == 1)
-                        pc_op <= `PC_SET;
-                    else
-                        pc_op <= `PC_INC;
-                `STATE_PC_DELAY:
-                    pc_op <= `PC_INC;
+                // `STATE_REG_WR:
+                //     if(should_branch == 1)
+                    //     pc_op <= `PC_SET;
+                    // else
+                    //     pc_op <= `PC_INC;
+                // `STATE_PC_DELAY:
+                    // pc_op <= `PC_INC;
                 `STATE_DECODE: begin
                     flags_in <= flags_out;
-                    if (data_out[15] == 1 )
-                        pc_op <= `PC_INC;
-                    else
-                        pc_op <= `PC_NOP;
+                    // if (data_out[15] == 1 )
+                    //     pc_op <= `PC_INC;
+                    // else
+                    //     pc_op <= `PC_NOP;
                 end
 
             endcase
