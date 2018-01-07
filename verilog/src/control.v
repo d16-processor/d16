@@ -22,7 +22,134 @@
 // no timescale needed
 `include "cpu_constants.vh"
 `timescale 1ns/1ps
+
+
 module control(
+ input wire 			  clk,
+ input wire 			  en,
+ input wire 			  rst,
+ input wire 			  en_mem,
+ input wire 			  mem_wait,
+ input wire 			  should_branch,
+ input wire 			  imm,
+ output reg [`CONTROL_BIT_MAX:0] control_o,
+ output reg [1:0] 		  pc_op
+);
+   localparam 			// auto enum state_info
+     RST = 0,
+     FETCH = 4'h1,
+     DECODE = 4'h2,
+     REG_READ = 4'h3,
+     ALU = 4'h4,
+     MEM = 4'h5,
+     REG_WR = 4'h6,
+     PC_DELAY = 4'h7,
+     BRANCH_DELAY = 4'h8;
+   reg [3:0] 			// auto enum state_info
+				state, next_state;
+   always @(posedge clk) begin
+      if(rst)
+	state <= 0;
+      else if(en)
+	state <= next_state;
+   end // always @ (posedge clk)
+
+   always @(/*AUTOSENSE*/state) begin
+      control_o <= 0;
+	case(state)
+	  FETCH:
+	    control_o[`BIT_FETCH] <= 1;
+	  DECODE:
+	    control_o[`BIT_DECODE] <= 1;
+	  REG_READ:
+	    control_o[`BIT_REG_READ] <= 1;
+	  ALU:
+	    control_o[`BIT_ALU] <= 1;
+	  REG_WR:
+	    control_o[`BIT_REG_WR] <= 1;
+	  MEM:
+	    control_o[`BIT_MEM] <= 1;
+	  PC_DELAY:
+	    control_o[`BIT_PC_DELAY] <= 1;
+	  BRANCH_DELAY:
+	    control_o[`BIT_BRANCH_DELAY] <= 1;
+	  default:
+	    control_o <= 0;
+	endcase // case (state)
+   end
+   always @(* ) begin
+      pc_op <= `PC_NOP;
+      case(state)
+	RST:
+	  pc_op <= `PC_RESET;
+        REG_READ:
+	  if(imm)
+	    pc_op <= `PC_INC;
+	FETCH:
+	  pc_op <= `PC_INC;
+	PC_DELAY:
+	  pc_op <= `PC_SET;
+      endcase // case (state)
+      
+   end
+   
+
+   always @(/*AS*/en_mem or mem_wait or should_branch or state) begin
+      case(state)
+	FETCH:
+	  next_state <= DECODE;
+	DECODE:
+	  next_state <= REG_READ;
+	REG_READ:
+	  next_state <= ALU;
+	ALU:
+	   if(en_mem)
+	     next_state <= MEM;
+	   else
+	     next_state <= REG_WR;
+	MEM:
+	  if(mem_wait)
+	    next_state <= MEM;
+	  else
+	    next_state <= REG_WR;
+	REG_WR:
+	  if(should_branch)
+	    next_state <= PC_DELAY;
+	  else
+	    next_state <= FETCH;
+	PC_DELAY:
+	  next_state <= BRANCH_DELAY;
+	default:
+	  next_state <= FETCH;
+      endcase // case (state)
+   end
+   
+   
+
+
+   
+
+   /*AUTOASCIIENUM("state", "state_ascii")*/
+   // Beginning of automatic ASCII enum decoding
+   reg [95:0]		state_ascii;		// Decode of state
+   always @(state) begin
+      case ({state})
+	RST:          state_ascii = "rst         ";
+	FETCH:        state_ascii = "fetch       ";
+	DECODE:       state_ascii = "decode      ";
+	REG_READ:     state_ascii = "reg_read    ";
+	ALU:          state_ascii = "alu         ";
+	MEM:          state_ascii = "mem         ";
+	REG_WR:       state_ascii = "reg_wr      ";
+	PC_DELAY:     state_ascii = "pc_delay    ";
+	BRANCH_DELAY: state_ascii = "branch_delay";
+	default:      state_ascii = "%Error      ";
+      endcase
+   end
+   // End of automatics
+endmodule // control
+
+module control_old(
  input wire 			  clk,
  input wire 			  en,
  input wire 			  rst,
@@ -168,3 +295,61 @@ reg [`CONTROL_BIT_MAX:0] s_control = `STATE_FETCH;
 
 
 endmodule
+
+module check(/*AUTOARG*/
+   // Outputs
+   control_o, pc_op,
+   // Inputs
+   clk, en, rst, en_mem, mem_wait, should_branch, imm
+   );
+/*AUTOINOUTMODULE("control_old")*/
+// Beginning of automatic in/out/inouts (from specific module)
+output [`CONTROL_BIT_MAX:0] control_o;
+output [1:0]		pc_op;
+input			clk;
+input			en;
+input			rst;
+input			en_mem;
+input			mem_wait;
+input			should_branch;
+input			imm;
+// End of automatics
+  wire [`CONTROL_BIT_MAX:0] control_uut;
+   wire [1:0] 		    pc_op_uut;
+  control uut(
+	      // Outputs
+	      .control_o		(control_uut[`CONTROL_BIT_MAX:0]),
+	      .pc_op			(pc_op_uut[1:0]),
+	      // Inputs
+	      .clk			(clk),
+	      .en			(en),
+	      .rst			(rst),
+	      .en_mem			(en_mem),
+	      .mem_wait			(mem_wait),
+	      .should_branch		(should_branch),
+	      .imm			(imm));
+   control_old gold(
+		    // Outputs
+		    .control_o		(control_o[`CONTROL_BIT_MAX:0]),
+		    .pc_op		(pc_op[1:0]),
+		    // Inputs
+		    .clk		(clk),
+		    .en			(en),
+		    .rst		(rst),
+		    .en_mem		(en_mem),
+		    .mem_wait		(mem_wait),
+		    .should_branch	(should_branch),
+		    .imm		(imm));
+`ifdef FORMAL
+   assert property(control_uut == control_o); 
+   `else
+    wire en_pc = control_uut[`BIT_FETCH] | control_uut[`BIT_REG_READ] | control_uut[`BIT_PC_DELAY];
+   wire 		    equiv = control_uut == control_o && en_pc ? pc_op == pc_op_uut : 1;
+   `endif // !`ifdef FORMAL
+   
+endmodule
+      
+      
+// Local Variables:
+// verilog-auto-sense-defines-constant: t
+// End:
