@@ -15,19 +15,7 @@ reg			should_branch;		// To uut of control.v
    wire [1:0]		pc_op;			// From uut of control.v
    // End of automatics
 
-   // control uut(/*AUTOINST*/
-   // 	       // Outputs
-   // 	       .control_o		(control_o[`CONTROL_BIT_MAX:0]),
-   // 	       .pc_op			(pc_op[1:0]),
-   // 	       // Inputs
-   // 	       .clk			(clk),
-   // 	       .en			(en),
-   // 	       .rst			(rst),
-   // 	       .en_mem			(en_mem),
-   // 	       .mem_wait		(mem_wait),
-   // 	       .should_branch		(should_branch),
-   // 	       .imm			(imm));
-   check ck(
+   control uut(/*AUTOINST*/
    	       // Outputs
    	       .control_o		(control_o[`CONTROL_BIT_MAX:0]),
    	       .pc_op			(pc_op[1:0]),
@@ -54,10 +42,10 @@ reg			should_branch;		// To uut of control.v
       #300 $finish;
    end // initial begin
    always #5 clk <= ~clk;
-   always @(negedge clk) begin
+   always @(posedge clk) begin
       if(control_o[`BIT_ALU])
 	en_mem <= ~en_mem;
-      if(control_o[`BIT_REG_WR]);
+      if(control_o[`BIT_REG_WR])
 	 should_branch <= ~should_branch;
       if(control_o[`BIT_ALU])
 	imm <= ~imm;
