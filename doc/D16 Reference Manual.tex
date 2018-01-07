@@ -202,8 +202,7 @@
         Shifts the bits in \texttt{rD} left by op2 similarly to \texttt{SHR}, except the bits shifted in on the left are the sign bit (bit 15) of \texttt{rD}. Useful for signed division by powers of 2.
         \section{Condition Codes}
         In the \texttt{JMP} variety of instructions (\texttt{JMP}, \texttt{CALL}, \texttt{SET}), the condition code field specifies that the instruction should only execute if the expression corresponding to the condition code evaluates to true. The conditions are as follows: \\ \\
-        \begin{tabular}{| l | c | l | l |} \
-          hline
+        \begin{tabular}{| l | c | l | l |} \hline
         Mnemonic & Encoding & Expression & Meaning \\ \hline
         NV &0000& False & Never execute\\ \hline
         EQ &0001& Z set & Equal\\ \hline
@@ -221,7 +220,16 @@
         LE &1101& Z set or S $\neq$ V & Signed less than or equal to \\ \hline
         L  &1110& S $\neq$ V & Signed less than \\ \hline
         AL &1111& True & Always execute \\ \hline
+        \end{tabular}\\\\
+        The Flags register is as follows: \\ \\
+        \begin{tabular}{| c | c | l | l |} \hline
+          Bit & Char & Name & Description \\ \hline
+          0 & Z & Zero Flag & Set when the output of the ALU is 0 \\ \hline
+          1 & C & Carry Flag & Set when there was a carry out of the MSB in the ALU \\ \hline
+          2 & S & Sign Flag & Set when the MSB of the ALU is 1 \\ \hline
+          3 & V & oVerflow Flag & Set when there was a carry out of ALU bit 14 and not one from ALU bit 15 \\ \hline
         \end{tabular}
+        
         \section{Coprocessor Registers}
         Coprocessor registers are extra registers that \textit{might}
         be attached to a coprocessor, but may also be extra
