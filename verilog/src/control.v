@@ -93,8 +93,10 @@ module control(
 	REG_WR:
 	  if(!should_branch)
 	    pc_op <= `PC_INC;
-	PC_DELAY:
-	  pc_op <= `PC_SET;
+	  else
+	    pc_op <= `PC_SET;
+	// PC_DELAY:
+	//   pc_op <= `PC_SET;
       endcase // case (state)
       
    end
@@ -124,7 +126,7 @@ module control(
 	  else
 	    next_state <= DECODE;
 	PC_DELAY:
-	  next_state <= BRANCH_DELAY;
+	  next_state <= FETCH;
 	default:
 	  next_state <= FETCH;
       endcase // case (state)

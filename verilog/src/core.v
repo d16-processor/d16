@@ -219,7 +219,7 @@ lr lr(
 
     assign en_alu = control_state[`BIT_ALU];
     assign en_decoder = control_state[`BIT_DECODE];
-    assign en_pc = control_state[`BIT_FETCH] | control_state[`BIT_REG_READ] | control_state[`BIT_PC_DELAY];
+    assign en_pc = control_state[`BIT_FETCH] | control_state[`BIT_REG_READ] | control_state[`BIT_REG_WR];
     assign en_register = control_state[`BIT_REG_READ] | control_state[`BIT_REG_WR];
     assign mem_enable = 1;
     assign mmio_enable = control_state[`BIT_MEM];
