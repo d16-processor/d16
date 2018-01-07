@@ -217,58 +217,45 @@ lr lr(
       .lr_in                            (lr_in[15:0]));
     
 
-    assign en_alu = control_state == `STATE_ALU;
-    assign en_decoder = control_state == `STATE_DECODE;
-    assign en_pc = control_state == `STATE_FETCH || control_state == `STATE_REG_READ || control_state == `STATE_PC_DELAY;
-    assign en_register = control_state == `STATE_REG_READ || control_state == `STATE_REG_WR;
+    assign en_alu = control_state[`BIT_ALU];
+    assign en_decoder = control_state[`BIT_DECODE];
+    assign en_pc = control_state[`BIT_FETCH] | control_state[`BIT_REG_READ] | control_state[`BIT_PC_DELAY];
+    assign en_register = control_state[`BIT_REG_READ] | control_state[`BIT_REG_WR];
     assign mem_enable = 1;
-    assign mmio_enable = control_state == `STATE_MEM;
-    assign write_enable = control_state == `STATE_MEM && 
+    assign mmio_enable = control_state[`BIT_MEM];
+    assign write_enable = control_state[`BIT_MEM] && 
         ({1'b0,instruction[14:8]} == `OPC_ST ||
          {1'b0,instruction[14:8]} == `OPC_PUSH ||
          {1'b0,instruction[14:8]} == `OPC_PUSHLR);
-    assign reg_write_enable = control_state == `STATE_REG_WR ? alu_wr_en : 0;
+    assign reg_write_enable = control_state[`BIT_REG_WR] ? alu_wr_en : 0;
     assign immediate = lr_is_input ? lr_out : (next_word ? data_out : dec_immediate);
     assign rD_data_in = en_mem ? (mmio_serviced_read ? mmio_data_out : data_out) : alu_output;
     assign pc_in = alu_output;
-    assign mem_addr_out = control_state == `STATE_MEM ? alu_output : pc_out;
+    assign mem_addr_out = control_state[`BIT_MEM]? alu_output : pc_out;
     assign byte_select = mem_addr_out[0];
-    assign byte_enable = control_state == `STATE_MEM ? mem_byte : 0;
+    assign byte_enable = control_state[`BIT_MEM]? mem_byte : 0;
     assign addr = {1'b0,mem_addr_out[15:1]};
     assign rS_data_in = SP_out;
     assign rS_wr_en = (instruction[14:8] == `OPC_PUSH ||
                        instruction[14:8] == `OPC_POP ||
                        instruction[14:8] == `OPC_PUSHLR)
-                        && control_state == `STATE_REG_WR ? 1 : 0;
+                        && control_state[`BIT_REG_WR]? 1 : 0;
     assign data_in = mem_data;
     assign en = rst_n; //! rst
     assign rst = ~rst_n;
     assign lr_in = pc_out;
-    assign lr_wr_en = control_state == `STATE_REG_WR ? alu_lr_wr_en : 0;
-    assign lr_is_input = dec_lr_is_input && control_state == `STATE_ALU;
+    assign lr_wr_en = control_state[`BIT_REG_WR] ? alu_lr_wr_en : 0;
+    assign lr_is_input = dec_lr_is_input && control_state[`BIT_ALU];
     assign mem_wait = mem_mem_wait | mmio_mem_wait;
     always @(posedge clk) begin
         if (rst_n == 0)
             flags_in <= 0;
-        else
-            case (control_state)
-                `STATE_FETCH:
-                    instruction <= data_out;
-                // `STATE_REG_WR:
-                //     if(should_branch == 1)
-                    //     pc_op <= `PC_SET;
-                    // else
-                    //     pc_op <= `PC_INC;
-                // `STATE_PC_DELAY:
-                    // pc_op <= `PC_INC;
-                `STATE_DECODE: begin
-                    flags_in <= flags_out;
-                    // if (data_out[15] == 1 )
-                    //     pc_op <= `PC_INC;
-                    // else
-                    //     pc_op <= `PC_NOP;
-                end
+	else begin
+	   if(control_state[`BIT_FETCH])
+	     instruction <= data_out;
+	   if(control_state[`BIT_DECODE])
+	     flags_in <= flags_out;
+	end
 
-            endcase
-        end
+    end
 endmodule

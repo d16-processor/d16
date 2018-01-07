@@ -90,6 +90,15 @@
 `define STATE_PC_DELAY 8'b01000000
 `define STATE_BRANCH_DELAY 8'b10000000
 
+`define BIT_FETCH 0
+`define BIT_DECODE 1
+`define BIT_REG_READ 2
+`define BIT_ALU 3
+`define BIT_MEM 4
+`define BIT_REG_WR 5
+`define BIT_PC_DELAY 6
+`define BIT_BRANCH_DELAY 7
+
 `define PC_NOP 2'b00
 `define PC_INC 2'b01
 `define PC_SET 2'b10
