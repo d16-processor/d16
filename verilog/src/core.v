@@ -2,15 +2,15 @@
 `timescale 1ns/1ps
 `include "cpu_constants.vh"
 module core(input clk,input rst_n, output [7:0] LED, input rx, output tx,
-    output snd_out, output [3:0] snd_signals, input [3:0] switches,
+    output 		  snd_out, output [3:0] snd_signals, input [3:0] switches,
     
     output [31:0] dram_data_out,
     output [23:0] dram_addr,
-    output dram_req_read,
-    output dram_req_write,
-    input  [31:0] dram_data_in,
-    input  dram_data_valid,
-    input  dram_write_complete
+	output 		  dram_req_read,
+	output 		  dram_req_write,
+	input [31:0]  dram_data_in,
+    input 		  dram_data_valid,
+    input 		  dram_write_complete
 );
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [15:0]             SP_out;                 // From alu of alu.v
@@ -231,15 +231,15 @@ lr lr(
     assign immediate = lr_is_input ? lr_out : (next_word ? data_out : dec_immediate);
     assign rD_data_in = en_mem ? (mmio_serviced_read ? mmio_data_out : data_out) : alu_output;
     assign pc_in = alu_output;
-    assign mem_addr_out = control_state[`BIT_MEM]? alu_output : pc_out;
-    assign byte_select = mem_addr_out[0];
+	assign mem_addr_out = control_state[`BIT_MEM]? alu_output : pc_out;
+	assign byte_select = mem_addr_out[0];
     assign byte_enable = control_state[`BIT_MEM]? mem_byte : 0;
     assign addr = {1'b0,mem_addr_out[15:1]};
     assign rS_data_in = SP_out;
     assign rS_wr_en = (instruction[14:8] == `OPC_PUSH ||
-                       instruction[14:8] == `OPC_POP ||
-                       instruction[14:8] == `OPC_PUSHLR)
-                        && control_state[`BIT_REG_WR]? 1 : 0;
+					   instruction[14:8] == `OPC_POP ||
+					   instruction[14:8] == `OPC_PUSHLR)
+						&& control_state[`BIT_REG_WR]? 1 : 0;
     assign data_in = mem_data;
     assign en = rst_n; //! rst
     assign rst = ~rst_n;
@@ -248,11 +248,11 @@ lr lr(
     assign lr_is_input = dec_lr_is_input && control_state[`BIT_ALU];
     assign mem_wait = mem_mem_wait | mmio_mem_wait;
     always @(posedge clk) begin
-        if (rst_n == 0)
-            flags_in <= 0;
+		if (rst_n == 0)
+		  flags_in <= 0;
 	else begin
 	   if(control_state[`BIT_FETCH])
-	     instruction <= data_out;
+		 instruction <= data_out;
 	   if(control_state[`BIT_DECODE])
 	     flags_in <= flags_out;
 	end
