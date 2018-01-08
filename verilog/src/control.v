@@ -43,8 +43,7 @@ module control(
      ALU = 4'h4,
      MEM = 4'h5,
      REG_WR = 4'h6,
-     PC_DELAY = 4'h7,
-     BRANCH_DELAY = 4'h8;
+     PC_DELAY = 4'h7;
    reg [3:0] 			// auto enum state_info
 				state, next_state;
    always @(posedge clk) begin
@@ -54,7 +53,7 @@ module control(
 	state <= next_state;
    end // always @ (posedge clk)
 
-   always @(/*AUTOSENSE*/state) begin
+   always @(/*AUTOSENSE*/should_branch or state) begin
       control_o <= 0;
 	case(state)
 	  FETCH:
@@ -74,13 +73,11 @@ module control(
 	    control_o[`BIT_MEM] <= 1;
 	  PC_DELAY:
 	    control_o[`BIT_PC_DELAY] <= 1;
-	  BRANCH_DELAY:
-	    control_o[`BIT_BRANCH_DELAY] <= 1;
 	  default:
 	    control_o <= 0;
 	endcase // case (state)
    end
-   always @(* ) begin
+   always @(/*AS*/imm or should_branch or state) begin
       pc_op <= `PC_NOP;
       case(state)
 	RST:
@@ -95,8 +92,6 @@ module control(
 	    pc_op <= `PC_INC;
 	  else
 	    pc_op <= `PC_SET;
-	// PC_DELAY:
-	//   pc_op <= `PC_SET;
       endcase // case (state)
       
    end
@@ -139,19 +134,18 @@ module control(
 
    /*AUTOASCIIENUM("state", "state_ascii")*/
    // Beginning of automatic ASCII enum decoding
-   reg [95:0]		state_ascii;		// Decode of state
+   reg [63:0]		state_ascii;		// Decode of state
    always @(state) begin
       case ({state})
-	RST:          state_ascii = "rst         ";
-	FETCH:        state_ascii = "fetch       ";
-	DECODE:       state_ascii = "decode      ";
-	REG_READ:     state_ascii = "reg_read    ";
-	ALU:          state_ascii = "alu         ";
-	MEM:          state_ascii = "mem         ";
-	REG_WR:       state_ascii = "reg_wr      ";
-	PC_DELAY:     state_ascii = "pc_delay    ";
-	BRANCH_DELAY: state_ascii = "branch_delay";
-	default:      state_ascii = "%Error      ";
+	RST:      state_ascii = "rst     ";
+	FETCH:    state_ascii = "fetch   ";
+	DECODE:   state_ascii = "decode  ";
+	REG_READ: state_ascii = "reg_read";
+	ALU:      state_ascii = "alu     ";
+	MEM:      state_ascii = "mem     ";
+	REG_WR:   state_ascii = "reg_wr  ";
+	PC_DELAY: state_ascii = "pc_delay";
+	default:  state_ascii = "%Error  ";
       endcase
    end
    // End of automatics

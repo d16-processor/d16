@@ -101,7 +101,7 @@ always @(posedge clk) begin : P1
             s_immediate <= 16'h 0000;
             if(opcode == `OPC_PUSH || opcode == `OPC_POP ||
                opcode == `OPC_PUSHI || opcode == `OPC_PUSHLR) begin
-                s_rS_sel <= 3'b 111;
+                s_rS_sel <= ~instruction[5:3];
                 //Stack pointer
             end
             else begin

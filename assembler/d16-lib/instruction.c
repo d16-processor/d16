@@ -177,6 +177,15 @@ void resolve_address(Address* addr) {
     }
 }
 uint8_t build_reg_selector(Instruction* i) {
+    Op_Type t = i->op_type & 0x7f;
+    if(t == PUSH || t == POP){
+	if(i->type == I_TYPE_RR){
+	    return ((i->rS & 0x7)^0x7)<<3 | (i->rD & 0x7);
+	}
+	else{
+	    return i->rD & 0x7;
+	}
+    }
     if (i->type == I_TYPE_RR) {
         return (i->rS & 0x7) << 3 | (i->rD & 0x7);
     } else if (i->type == I_TYPE_R || i->type == I_TYPE_RIMM) {

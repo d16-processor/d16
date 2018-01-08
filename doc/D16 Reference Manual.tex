@@ -49,6 +49,17 @@
         \noindent
         \texttt{#1 \textless rD#3\textgreater \\ \\} 
 }
+\newcommand{\instp}[3]{
+\subsection{#1}
+        \begin{tabular}{| c | c | c  | c | c |}
+        \hline
+        Immediate & opcode & Reserved & source & dest \\ \hline
+        Imm & #2 & 00 & $\sim$rS & rD \\
+        \hline
+        \end{tabular} \\ \\
+        \noindent
+        \texttt{#1 \textless rD#3\textgreater [, rS]\\ \\} 
+}
 \newcommand{\inst}[2]{
 \subsection{#1}
         \begin{tabular}{| c | c | c |}
@@ -99,13 +110,15 @@
         \instrr{SUB}{000010}
         rD = rD - op2\\
         Updates flags
-        \instr{PUSH}{000011}{ or immediate}\noindent
-        r7 = r7 - 2 \\
-        memory[r7] = rD \\
+        \instp{PUSH}{000011}{ or immediate}\noindent
+        rS = rS - 2 \\
+        memory[rS] = rD \\
+        If no rS is specified, rS defaults to r7
         This instruction does not update the flags \\
-        \instr{POP}{000100}{}
-        rD = memory[r7] \\
-        r7 = r7 + 2 \\
+        \instp{POP}{000100}{}
+        rD = memory[rS] \\
+        rS = rS + 2 \\
+        If no rS is specified, rS defaults to r7
         Does not update flags
         \subsection{MOV}
         Mov has 2 different encodings depending whether the immediate (if any) fits into 1 byte. \\
