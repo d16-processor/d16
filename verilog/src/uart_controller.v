@@ -16,7 +16,7 @@ module uart_controller(
     parameter FIFO_WIDTH = 8;
     parameter CLOCK_FREQUENCY = 50_000_000;
     parameter BAUD_RATE = 115200;
-    paramater CLOCK_DIVIDE = CLOCK_FREQUENCY/(BAUD_RATE*4);
+    parameter CLOCK_DIVIDE = CLOCK_FREQUENCY/(BAUD_RATE*4);
     /*AUTOWIRE*/
     wire                empty;                  // From tx_fifo of fifo.v, ...
     wire                full;                   // From tx_fifo of fifo.v, ...

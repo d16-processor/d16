@@ -211,7 +211,7 @@ module uart(
 	   tx_state = tx_countdown ? TX_DELAY_RESTART : TX_IDLE;
 	end
       endcase
-      if(tx_state == TX_IDLE && rx_state == RX_IDLE)
+      if(tx_state == TX_IDLE && recv_state == RX_IDLE)
 	clk_divide <= clk_div_in;
    end
 

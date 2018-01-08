@@ -280,8 +280,10 @@
           0-7 & R & Read current LED data \\ \hline
         }
         \subsection{UART}
-        The UART is set up as a pair of 8-entry FIFO queues that feed the Tx and Rx circuitry. \\
+        The UART is set up as a pair of 8-entry FIFO queues that feed
+        the Tx and Rx circuitry. \\
 
+        
         \regdesc{IO\_UART\_DATA}{
         0-7 & W & Data sent to UART Tx \\ \hline
         0-7 & R & Data from UART Rx \\ \hline
@@ -295,8 +297,15 @@
         }
 
         \regdesc{IO\_UART\_BAUD}{
-        0-15 & R/W & Baud rate divisor \\ \hline
+        0-15 & W & Baud rate divisor \\ \hline
         }
+        The baud rate divisor is calculated by
+        \begin{equation}
+          divisor=\frac{f_{osc}}{4*baudrate}
+        \end{equation}
+        Upon reset, the baud rate divisor is set for 115200 baud at
+        50MHz.
+        
         \subsection{Timer}
         \regdesc{IO\_TIMER\_DATA}{
           0-15 & R/W & Current Timer Count \\ \hline
@@ -324,7 +333,7 @@
         \regdesc{DMA\_CONTROL}{
           0-2 & W & DMA type \& Start DMA \\ \hline
           0-2 & R & DMA status (in progress) \\ \hline
-          3-15 & R/W & Reserved \\ \hline
+          3-15 & R/W & Reserved, write as 0 \\ \hline
         }
         \regdesc{DMA\_LOCAL\_ADDRESS}{
           0-15 & W & Local ram address of data \\ \hline
@@ -344,16 +353,19 @@
           010-111 & RESERVED & Reserved \\ \hline
         \end{tabular}
         \subsubsection{Usage}
-        The DMA controller allows access to the external DRAM availible to the
-        D16 by asynchronously transferring memory to or from the external DRAM.
-        To use the DMA controller, it is recommended to write to all DMA
-        registers, however the Local address and Remote address registers will
-        contain the address immediately after the final address accessed after a
-        DMA transfer. The recommended usage is to (in this order) program the
-        number of \textbf{bytes} to transfer in the DMA Count register, the
-        upper 16 bits of the external ram addres in the DMA Remote register, the
-        word-aligned local address in the DMA Local register, and finally the
-        DMA type in the DMA Control register.
+        The DMA controller allows access to the external DRAM
+        availible to the D16 by asynchronously transferring memory to
+        or from the external DRAM.  To use the DMA controller, it is
+        recommended to write to all DMA registers, however the Local
+        address and Remote address registers will contain the address
+        immediately after the final address accessed after a DMA
+        transfer. The recommended usage is to (in this order) program
+        the number of \textbf{bytes} to transfer in the DMA Count
+        register, the upper 16 bits of the external ram addres in the
+        DMA Remote register, the word-aligned local address in the DMA
+        Local register, and finally the DMA type in the DMA Control
+        register. Upon writing to the DMA\_CONTROL register, the DMA
+        engine will begin transferring data.
         
         
 \end{document}

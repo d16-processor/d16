@@ -124,7 +124,7 @@ module top_tb;
       $dumpvars;
 
       
-      #30000 $finish;
+      #5000 $finish;
    end // initial begin
 
    initial begin
