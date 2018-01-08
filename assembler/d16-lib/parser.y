@@ -68,6 +68,7 @@ instruction:
 	}
     |   OPCODE REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_rr($1,$2,$4);}
     |   OPCODE REGISTER COMMA address NEWLINE{$$=new_instruction_ri($1,$2,$4);}
+    |   OPCODE address COMMA REGISTER NEWLINE{$$=new_instruction_ri($1,$4,$2);}
     |   OPCODE REGISTER COMMA CP_REGISTER NEWLINE{$$=new_instruction_rc($1,$2,$4);}
     |   OPCODE CP_REGISTER COMMA REGISTER NEWLINE{$$=new_instruction_rc($1,$4,$2);}
     |   OPCODE REGISTER COMMA LBRACKET REGISTER RBRACKET NEWLINE{$$=new_instruction_mem($1,$2,$5,false);}//ld r3,[r4]

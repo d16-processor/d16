@@ -179,9 +179,13 @@ void resolve_address(Address* addr) {
 uint8_t build_reg_selector(Instruction* i) {
     Op_Type t = i->op_type & 0x7f;
     if(t == PUSH || t == POP){
-	if(i->type == I_TYPE_RR){
+	if(i->type == I_TYPE_RIMM){
+	    return ((i->rD & 0x7)^0x7)<<3; 
+	}
+	else if(i->type == I_TYPE_RR){
 	    return ((i->rS & 0x7)^0x7)<<3 | (i->rD & 0x7);
 	}
+
 	else{
 	    return i->rD & 0x7;
 	}
@@ -200,6 +204,10 @@ uint8_t build_shift_selector(Instruction* i) {
     return i->rD | (i->address->immediate & 0xF) << 3;
 }
 uint8_t build_jmp_selector(Instruction* i) {
+    Op_Type t = i->op_type & 0x7f;
+    if(t == PUSH || t == POP){
+	return 0;
+    }
     return (i->cc & 0xf) << 3 | i->rD;
 }
 
