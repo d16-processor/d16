@@ -43,7 +43,8 @@ module control(
      ALU = 4'h4,
      MEM = 4'h5,
      REG_WR = 4'h6,
-     PC_DELAY = 4'h7;
+     PC_DELAY = 4'h7,
+     MEM_DELAY = 4'h8;
    reg [3:0] 			// auto enum state_info
 				state, next_state;
    always @(posedge clk) begin
@@ -114,7 +115,7 @@ module control(
 	  if(mem_wait)
 	    next_state <= MEM;
 	  else
-	    next_state <= REG_WR;
+	    next_state <= MEM_DELAY;
 	REG_WR:
 	  if(should_branch)
 	    next_state <= PC_DELAY;
@@ -122,6 +123,8 @@ module control(
 	    next_state <= DECODE;
 	PC_DELAY:
 	  next_state <= FETCH;
+	MEM_DELAY:
+	  next_state <= REG_WR;
 	default:
 	  next_state <= FETCH;
       endcase // case (state)
@@ -134,19 +137,20 @@ module control(
 
    /*AUTOASCIIENUM("state", "state_ascii")*/
    // Beginning of automatic ASCII enum decoding
-   reg [63:0]		state_ascii;		// Decode of state
+   reg [71:0]		state_ascii;		// Decode of state
    always @(state) begin
-      case ({state})
-	RST:      state_ascii = "rst     ";
-	FETCH:    state_ascii = "fetch   ";
-	DECODE:   state_ascii = "decode  ";
-	REG_READ: state_ascii = "reg_read";
-	ALU:      state_ascii = "alu     ";
-	MEM:      state_ascii = "mem     ";
-	REG_WR:   state_ascii = "reg_wr  ";
-	PC_DELAY: state_ascii = "pc_delay";
-	default:  state_ascii = "%Error  ";
-      endcase
+       case ({state})
+	 RST:       state_ascii = "rst      ";
+	 FETCH:     state_ascii = "fetch    ";
+	 DECODE:    state_ascii = "decode   ";
+	 REG_READ:  state_ascii = "reg_read ";
+	 ALU:       state_ascii = "alu      ";
+	 MEM:       state_ascii = "mem      ";
+	 REG_WR:    state_ascii = "reg_wr   ";
+	 PC_DELAY:  state_ascii = "pc_delay ";
+	 MEM_DELAY: state_ascii = "mem_delay";
+	 default:   state_ascii = "%Error   ";
+       endcase
    end
    // End of automatics
 endmodule // control
