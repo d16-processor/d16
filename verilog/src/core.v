@@ -64,6 +64,7 @@ wire dma_status;
 wire [1:0]              pc_op;
 reg [3:0]              flags_in;
 reg [15:0]             instruction;
+reg [15:0] 	       mem_out_reg;
 // End of automatics
 alu alu(
         // Outputs
@@ -229,7 +230,7 @@ lr lr(
          {1'b0,instruction[14:8]} == `OPC_PUSHLR);
     assign reg_write_enable = control_state[`BIT_REG_WR] ? alu_wr_en : 0;
     assign immediate = lr_is_input ? lr_out : (next_word ? data_out : dec_immediate);
-    assign rD_data_in = en_mem ? (mmio_serviced_read ? mmio_data_out : data_out) : alu_output;
+    assign rD_data_in = en_mem ? mem_out_reg : alu_output;
     assign pc_in = alu_output;
 	assign mem_addr_out = control_state[`BIT_MEM]? alu_output : pc_out;
 	assign byte_select = mem_addr_out[0];
@@ -258,4 +259,9 @@ lr lr(
 	end
 
     end
+
+    always @(posedge clk) begin
+	mem_out_reg <= mmio_serviced_read ? mmio_data_out : data_out;
+    end
+    
 endmodule

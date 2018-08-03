@@ -28,32 +28,34 @@ reg dma_in_progress = 0;
 reg [15:0] local_addr = 0;
 reg [23:0] remote_addr = 0;
 reg [15:0] count = 2;
-assign dma_status = dma_in_progress;
+    assign dma_status = dma_in_progress;
 
 localparam STATE_BITS          = 6;
-localparam STATE_NOP           = 6'b111111;
-localparam STATE_DRAM_WRITE    = 6'b000000;
-localparam STATE_DRAM_READ     = 6'b000001;
-localparam STATE_RESERVED      = 6'b000111;
-//write
-localparam STATE_DW_READ_LOW   = 6'b001000;
-localparam STATE_DW_READ_HIGH  = 6'b010000;
-localparam STATE_DW_WRITE_RAM  = 6'b011000;
-//read
-localparam STATE_DR_READ       = 6'b001001;
-localparam STATE_DR_WRITE_LOW  = 6'b010001;
-localparam STATE_DR_WRITE_HIGH = 6'b011001;
+localparam 			// auto enum dma_state
+  STATE_NOP           = 6'b111111,
+  STATE_DRAM_WRITE    = 6'b000000,
+  STATE_DRAM_READ     = 6'b000001,
+  STATE_RESERVED      = 6'b000111,
+  //write
+  STATE_DW_READ_LOW   = 6'b001000,
+  STATE_DW_READ_HIGH  = 6'b010000,
+  STATE_DW_WRITE_RAM  = 6'b011000,
+  //read
+  STATE_DR_READ       = 6'b001001,
+  STATE_DR_WRITE_LOW  = 6'b010001,
+  STATE_DR_WRITE_HIGH = 6'b011001;
 
 
-reg [STATE_BITS-1:0] state = STATE_NOP;
+reg   				// auto enum dma_state
+    [STATE_BITS-1:0] state = STATE_NOP;
 reg [31:0] ram_data = 0;
 
 //configuration process
 always @(posedge clk) begin
+    ram_addr <= local_addr;
     if(rst == 1) begin
         state <= STATE_NOP;
         dma_in_progress <= 0;
-        ram_addr <= 0;
         ram_data_out <= 0;
         ram_we <= 0;
         dram_addr <= 0;
@@ -62,14 +64,15 @@ always @(posedge clk) begin
         dram_req_write <= 0;
         ram_data <= 0;
     end
-    else if(en == 1 && write_enable == 1)
+    else if(en == 1 && write_enable == 1) 
         case({addr[14:0],1'b0})
             `DMA_CONTROL_ADDR: begin
                 dma_type <= data_in[2:0];
                 dma_in_progress <= 1;
             end
-            `DMA_LOCAL_ADDR:
+            `DMA_LOCAL_ADDR: begin
                 local_addr <= data_in>>1;
+		end
             `DMA_PERIPH_ADDR:
                 remote_addr <= {data_in,8'b0};
             `DMA_COUNT_ADDR:
@@ -78,24 +81,24 @@ always @(posedge clk) begin
     else 
     case(state)
         STATE_DRAM_WRITE: begin
-            ram_addr <= local_addr;
             local_addr <= local_addr + 1;
+	    ram_addr <= local_addr + 1;
             state <= STATE_DW_READ_LOW;
         end
         STATE_DW_READ_LOW:begin
-            ram_data[31:16] <= ram_data_in;
-            ram_addr <= local_addr;
+            ram_data[15:0] <= ram_data_in;
             local_addr <= local_addr + 1;
+	    ram_addr <= local_addr + 1;
             count <= count - 1;
             state <= STATE_DW_READ_HIGH;
         end
         STATE_DW_READ_HIGH: begin
-            ram_data[15:0] <= ram_data_in;
+            ram_data[31:16] <= ram_data_in;
             dram_addr <= remote_addr;
             remote_addr <= remote_addr + 2;
             dram_req_write <= 1'b1;
-            dram_data_out[31:16] <= ram_data[31:16];
-            dram_data_out[15:0] <= ram_data_in;
+            dram_data_out[15:0] <= ram_data[15:0];
+            dram_data_out[31:16] <= ram_data_in;
             state <= STATE_DW_WRITE_RAM;
         end
         STATE_DW_WRITE_RAM:
@@ -125,16 +128,14 @@ always @(posedge clk) begin
            end
            end
         STATE_DR_WRITE_LOW:begin
-            ram_addr <= local_addr;
             local_addr <= local_addr + 1;
             ram_we <= 1;
-            ram_data_out <= dram_data_in[31:16];
+            ram_data_out <= dram_data_in[15:0];
             state <= STATE_DR_WRITE_HIGH;
         end
         STATE_DR_WRITE_HIGH:begin
-            ram_addr <= local_addr;
             local_addr <= local_addr + 1;
-            ram_data_out <=dram_data_in[15:0];
+            ram_data_out <=dram_data_in[31:16];
             if(count == 0) begin
                 state <= STATE_NOP;
                 dma_in_progress <= 0;
@@ -155,6 +156,25 @@ always @(posedge clk) begin
         end
     endcase
 end
+    /*AUTOASCIIENUM("state", "state_ascii")*/
+    // Beginning of automatic ASCII enum decoding
+    reg [151:0]		state_ascii;		// Decode of state
+    always @(state) begin
+	case ({state})
+	  STATE_NOP:           state_ascii = "state_nop          ";
+	  STATE_DRAM_WRITE:    state_ascii = "state_dram_write   ";
+	  STATE_DRAM_READ:     state_ascii = "state_dram_read    ";
+	  STATE_RESERVED:      state_ascii = "state_reserved     ";
+	  STATE_DW_READ_LOW:   state_ascii = "state_dw_read_low  ";
+	  STATE_DW_READ_HIGH:  state_ascii = "state_dw_read_high ";
+	  STATE_DW_WRITE_RAM:  state_ascii = "state_dw_write_ram ";
+	  STATE_DR_READ:       state_ascii = "state_dr_read      ";
+	  STATE_DR_WRITE_LOW:  state_ascii = "state_dr_write_low ";
+	  STATE_DR_WRITE_HIGH: state_ascii = "state_dr_write_high";
+	  default:             state_ascii = "%Error             ";
+	endcase
+    end
+    // End of automatics
 
 
 endmodule
