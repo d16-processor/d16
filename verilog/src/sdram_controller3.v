@@ -220,6 +220,9 @@ always @(posedge CLOCK_100)begin
    end
    else if(state[8:4] != s_init_nop[8:4])
      rf_counter <= rf_counter + 1;
+
+   if(s_data_valid & data_valid)
+     s_data_valid <= 0;
    
    
    
@@ -346,7 +349,6 @@ always @(posedge CLOCK_100)begin
            state      <= s_rf0;
            rf_pending <= 0;
         end
-        s_data_valid <= 0;              
 
      end
      s_rf0[8:4]:
@@ -376,3 +378,4 @@ end
 // verilog-simulator:"vbuild test sdram_controller_tb.v"
 // verilog-active-low-regexp: "_N$"
 // End:
+
