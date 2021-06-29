@@ -104,6 +104,16 @@ L?\"(\\.|[^\\"])*\" {
     return STRING;
 
 }
+\'.*\' {
+    char *str = strdup(yytext+1);
+    char *end = str + (strlen(str) - 1);
+    *end = '\0';
+    char *compr = g_strcompress(str);
+    yylval.ival = compr[0];
+    g_free(compr);
+    free(str);
+    return NUMBER;
+}
 . {return yytext[0];}
 
 %%
